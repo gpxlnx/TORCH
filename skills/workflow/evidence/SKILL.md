@@ -12,7 +12,7 @@ Run this BEFORE attaching any screenshot, HAR, or request/response to a finding 
 ## Pre-Screenshot Checklist
 ```
 [ ] Network tab Headers panel collapsed or out of frame
-[ ] Burp Request panel hidden behind divider
+[ ] Caido request and response both visible in the evidence card
 [ ] No "Copy as cURL" output visible on screen
 [ ] DevTools Application -> Cookies tab closed
 [ ] Browser URL bar does not show a session token in query string

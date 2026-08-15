@@ -355,7 +355,7 @@ No paid JWT-specific reports in current H1 dataset (0 of 1,901 bounty reports ta
 
 ## Tools
 
-- [[burp-suite]] — intercept and modify JWTs (JWT Editor / JOSEPH extension); supports embedded JWK attack, jku injection, algorithm confusion re-signing
+- [[caido]] — intercept and replay JWT requests. For in-tool JWT signing/tampering use Burp with the JWT Editor / JOSEPH extension (embedded JWK, jku injection, algorithm-confusion re-signing); Caido has no JWT-signing extension, use jwt_tool / PyJWT alongside Caido
 - jwt.io / token.dev — online decode/encode/verify (token.dev usable when Burp JWT Editor unavailable)
 - CyberChef — Base64Url encode/decode
 - `hashcat` — HS256 secret brute force (`-m 16500`)
@@ -458,7 +458,7 @@ The server uses RS256 but a vulnerable library accepts HS256 signed with the pub
 1. Navigate to `/.well-known/jwks.json` or `/jwks.json` to retrieve the server's public key.
 2. In Burp JWT Editor → New RSA Key → paste the server's JWK and save.
 3. Right-click the key → Copy Public Key as PEM.
-4. Base64-encode the PEM (Burp Decoder or CyberChef).
+4. Base64-encode the PEM (local encode/decode tools or CyberChef).
 5. Create a new Symmetric Key in JWT Editor → replace `k` with the Base64-encoded PEM.
 6. In the JWT, change `alg` to `HS256`, `sub` to `administrator`.
 7. Sign with the symmetric key → "Don't modify header" → OK.

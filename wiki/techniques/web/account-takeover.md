@@ -92,7 +92,7 @@ Reset poisoning, OAuth pre-ATO, and "change email without current password" are 
 Single-use, short-lived, high-entropy reset tokens bound to the user; never trust `Host` for email links (use a fixed canonical base URL); require current password + re-auth for email/password/MFA changes; verify email before merge/login; normalize+canonicalize identifiers **before** uniqueness checks; set `Referrer-Policy: no-referrer` on sensitive pages.
 
 ## Tools
-Burp ([[burp-suite]]) + Collaborator, `nuclei` reset/takeover templates. Driven by the `hunt-auth` skill.
+[[caido]] + interactsh (OOB), `nuclei` reset/takeover templates. Driven by the `hunt-auth` skill.
 
 ## Sources
 - PayloadsAllTheThings - Account Takeover

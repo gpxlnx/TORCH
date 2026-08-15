@@ -286,7 +286,7 @@ Slash notation distinguishes them: `windows/shell/bind_tcp` = staged (stager + s
 - **`--chunked` transfer encoding in HTTP**: Splits POST body so blacklisted keywords cross chunk boundaries.
 
 ```bash
-# Route MSF traffic through Burp for debugging
+# Route MSF traffic through Caido for debugging
 use auxiliary/scanner/http/robots_txt
 set PROXIES HTTP:127.0.0.1:8080
 ```

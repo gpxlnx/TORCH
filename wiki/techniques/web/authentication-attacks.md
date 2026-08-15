@@ -40,7 +40,7 @@ Content-Type: application/x-www-form-urlencoded
 username=candidate&password=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ```
 
-Use Burp Intruder (Sniper) with a username wordlist. Sort by response length or time to spot the outlier.
+Use Caido Automate (Sniper) with a username wordlist. Sort by response length or time to spot the outlier.
 
 ### 2. Brute Force Login
 
@@ -61,7 +61,7 @@ Look for a `302` redirect or a different response body/length that signals succe
 X-Forwarded-For: 10.0.0.§1§
 ```
 
-Use Burp Intruder Pitchfork with one payload list incrementing `X-Forwarded-For` and another iterating passwords.
+Use Caido Automate Pitchfork with one payload list incrementing `X-Forwarded-For` and another iterating passwords.
 
 **Counter-reset bypass** — if a failed-attempt counter resets on successful login, interleave a known-good credential in the wordlist. A script can generate a synchronised list:
 
@@ -80,7 +80,7 @@ Payload 2 (password): peter, password1, peter, password2, ...
 
 Each `wiener:peter` pair resets the failure counter; the subsequent `carlos:passwordN` pair tests the target. A `302` response on a carlos entry reveals the correct password.
 
-**Null payload lockout enumeration** — send 5–10 repeated requests against each username using Burp Intruder null payloads (no payload modification). A username that eventually returns `"You have made too many incorrect login attempts"` instead of `"Invalid username or password"` is valid — the lockout only fires when the backend can find and lock a real account.
+**Null payload lockout enumeration** — send 5–10 repeated requests against each username using Caido Automate null payloads (no payload modification). A username that eventually returns `"You have made too many incorrect login attempts"` instead of `"Invalid username or password"` is valid — the lockout only fires when the backend can find and lock a real account.
 
 **JSON array credential bypass** — when the login endpoint accepts a JSON body, check whether the `password` field accepts an array. If so, submit the entire password wordlist as one request, bypassing per-request rate limiting entirely:
 
@@ -141,7 +141,7 @@ The password change form can be abused to brute-force the current password witho
 | Incorrect | A | B (different) | `Current password is incorrect` |
 | Incorrect | A | A (same) | Account lockout triggered |
 
-**Exploit:** Always send two different new passwords. The server validates the current password first — if it's correct, it moves on and checks the mismatch. Use Burp Intruder (Sniper) on the `current-password` field with `new-password-1` ≠ `new-password-2`. Grep for `New passwords do not match` to identify the hit. Change the username parameter to target another user's account if the username is embedded in the form as a hidden field.
+**Exploit:** Always send two different new passwords. The server validates the current password first — if it's correct, it moves on and checks the mismatch. Use Caido Automate (Sniper) on the `current-password` field with `new-password-1` ≠ `new-password-2`. Grep for `New passwords do not match` to identify the hit. Change the username parameter to target another user's account if the username is embedded in the form as a hidden field.
 
 ### 7. 2FA Simple Bypass
 
@@ -163,7 +163,7 @@ Cookie: account=victim-user
 verification-code=§000000§
 ```
 
-Log in with your own credentials to obtain the session, then change the `account` cookie (or equivalent) to the target username when submitting the verification code. Brute-force the 4–6 digit code with Burp Intruder (Sniper, numeric brute force 000000–999999).
+Log in with your own credentials to obtain the session, then change the `account` cookie (or equivalent) to the target username when submitting the verification code. Brute-force the 4–6 digit code with Caido Automate (Sniper, numeric brute force 000000–999999).
 
 Alternative with ffuf (no Burp Pro required):
 
@@ -184,7 +184,7 @@ seq -w 0 9999 > numbers.txt
 
 ### 9. 2FA Brute-Force with CSRF Token Rotation (Expert)
 
-When the 2FA endpoint uses CSRF tokens that change with each request, a standard Intruder attack fails because every request after the first will have a stale token. Use Burp Suite session handling macros to refresh tokens automatically:
+When the 2FA endpoint uses CSRF tokens that change with each request, a standard Automate attack fails because every request after the first will have a stale token. Use a Burp session-handling macro (or a Caido workflow / scripted step) to refresh tokens automatically:
 
 1. Go to **Project Options → Sessions → Session Handling Rules → Add**.
 2. Set the rule to run a **macro** before every Intruder request.
@@ -296,7 +296,7 @@ SSH certificates issued for certain GitHub contexts were accepted by `gist.githu
 
 ## Tools
 
-- [[burp-suite]] — Intruder (Sniper / Pitchfork / Cluster Bomb), Repeater
+- [[caido]] — Automate (Sniper / Pitchfork / Cluster Bomb), Replay
 - [[wiki/tools/ffuf]] — fast HTTP fuzzing for login endpoints
 - [[hydra]] — network login brute force
 - hashcat — offline cracking of password hashes found in cookies
@@ -306,7 +306,7 @@ SSH certificates issued for certain GitHub contexts were accepted by `gist.githu
 
 ### Lab 1 — Username enumeration via different responses (Apprentice)
 
-Send username wordlist in Burp Intruder (Sniper). The valid username returns a different error message (`Incorrect password` vs `Invalid username or password`) or a different response length. Switch to brute-forcing the password once the username is confirmed; look for a `302` redirect.
+Send username wordlist in Caido Automate (Sniper). The valid username returns a different error message (`Incorrect password` vs `Invalid username or password`) or a different response length. Switch to brute-forcing the password once the username is confirmed; look for a `302` redirect.
 
 ### Lab 2 — 2FA simple bypass (Apprentice)
 
@@ -355,7 +355,7 @@ Send 5 null payload requests (identical repeated requests) for each candidate us
 
 ### Lab 8 — 2FA broken logic (Practitioner)
 
-Log in with your own credentials. Intercept the `POST /login2` request and change the `verify` cookie to the target username. Brute-force the 4-digit MFA code with Burp Intruder (Sniper, numeric 0000–9999). Look for a `302`.
+Log in with your own credentials. Intercept the `POST /login2` request and change the `verify` cookie to the target username. Brute-force the 4-digit MFA code with Caido Automate (Sniper, numeric 0000–9999). Look for a `302`.
 
 Alternative with ffuf (no Burp Pro):
 
@@ -417,11 +417,11 @@ The login endpoint accepts JSON. Rate limiting fires after 3 failed attempts reg
 {"username": "carlos", "password": ["password1", "password2", "password3", "..."]}
 ```
 
-Send in Burp Repeater. A `302` response indicates the correct password was found in the array. Use "Show response in browser" to obtain the authenticated session.
+Send in Caido Replay. A `302` response indicates the correct password was found in the array. Use "Show response in browser" to obtain the authenticated session.
 
 ### Lab 14 — 2FA bypass using a brute-force attack (Expert)
 
-The 2FA endpoint uses per-request CSRF tokens, making raw Intruder attacks fail after the first request. Solve with Burp session handling macros:
+The 2FA endpoint uses per-request CSRF tokens, making raw Automate attacks fail after the first request. Solve with a Burp session-handling macro (or a Caido workflow / scripted step):
 
 1. **Project Options → Sessions → Session Handling Rules → Add**
 2. Set rule action to **Run a macro**

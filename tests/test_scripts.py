@@ -23,7 +23,7 @@ def test_capture_sh_usage_lists_all_modes():
     r = subprocess.run(["bash", os.path.join(REPO, "scripts", "capture.sh")],
                        capture_output=True, text=True)
     combined = r.stdout + r.stderr
-    for mode in ("ev", "req", "tmux", "burp"):
+    for mode in ("ev", "req", "tmux", "caido"):
         assert mode in combined
     assert r.returncode != 0   # no mode -> usage + nonzero
 

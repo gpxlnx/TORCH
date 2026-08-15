@@ -201,7 +201,7 @@ output; this table is the manual reference when it does not fire or you are reas
 Process skills (not vuln classes): `Skill(ctf-box)` boot-to-root, `Skill(wiki-recon)` external recon,
 `Skill(arsenal)` / `Skill(wiki-arsenal)` tool+payload lookup, `Skill(triage)` -> `Skill(evidence)`
 finding validation, `Skill(coverage)` untested-class gaps, `Skill(next-move)` prioritize,
-`Skill(hunt-burp)` drive Burp.
+`Skill(hunt-caido)` drive Caido.
 
 ## FIND output
 

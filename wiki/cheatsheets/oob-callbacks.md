@@ -4,12 +4,12 @@ type: cheatsheet
 tags: [oob, ssrf, xxe, ssti, command-injection, blind, recon, web, exfiltration]
 date_created: 2026-06-18
 date_updated: 2026-06-18
-sources: [interactsh-github, canarytokens-docs, portswigger-collaborator]
+sources: [interactsh-github, canarytokens-docs]
 ---
 
 ## Why
 
-Blind bug classes (blind SSRF, blind XXE, blind SSTI, blind/OOB SQLi, blind RCE, blind CRLF/SMTP) produce **no response signal**. The engagement rule is hard: an OOB callback is required to prove them, never inference. This page is the channel setup the hunt skills and payload pages assume when they say "confirm with Collaborator/interactsh". Cross-refs: [[wiki/payloads/ssrf]], [[xxe]], [[ssti]], [[os-command-injection]], [[sql-injection]].
+Blind bug classes (blind SSRF, blind XXE, blind SSTI, blind/OOB SQLi, blind RCE, blind CRLF/SMTP) produce **no response signal**. The engagement rule is hard: an OOB callback is required to prove them, never inference. This page is the channel setup the hunt skills and payload pages assume when they say "confirm with interactsh/OAST". Cross-refs: [[wiki/payloads/ssrf]], [[xxe]], [[ssti]], [[os-command-injection]], [[sql-injection]].
 
 ## Channel choice
 
@@ -20,7 +20,6 @@ DNS fires more often than HTTP: egress firewalls usually allow outbound DNS (por
 | DNS + HTTP + SMTP, self-hostable, scriptable | interactsh |
 | One-off HTTP callback, zero setup | webhook.site / Beeceptor / RequestBin |
 | DNS + HTTP, free, persistent token | Canarytokens |
-| Pro Burp workflow | Burp Collaborator (hosted or self-hosted) |
 | Full control / data exfil at scale | own domain + authoritative DNS |
 
 Always use a **unique correlation subdomain per injection point** so a late callback maps back to the exact payload.
@@ -74,10 +73,6 @@ interactsh-client -server https://example.com
 
 `https://canarytokens.org` - generate a DNS or web token, get a `*.canarytokens.com` host, receive email/webhook on trigger. Good for low-and-slow stored/blind payloads that may fire days later.
 
-## Burp Collaborator
-
-Burp Pro: Repeater/Intruder -> "Insert Collaborator payload", or run a Collaborator client (Burp menu) to generate `*.oastify.com` and poll. Self-host with the Collaborator server on your own domain (`burpcollaborator` config + wildcard DNS + TLS cert) when `oastify.com` is filtered. Scanner auto-injects Collaborator payloads for blind classes.
-
 ## Own domain (max control + data exfil)
 
 ```bash
@@ -121,8 +116,8 @@ curl -sG -o /dev/null -w '%{http_code}\n' --data-urlencode "q=x.oastify.com" htt
 Observed on a Cloudflare-fronted estate: `oastify.com`, `interact.sh` and
 `burpcollaborator.net` are blocked by name, while `oast.fun` / `oast.me` / `oast.pro` /
 `oast.site`, `canarytokens.com`, `requestrepo.com`, `webhook.site`, `dnslog.cn` and
-arbitrary own domains pass. **Burp Collaborator is therefore unusable on some targets**
-regardless of payload - fall back to interactsh or your own domain. This is independent of
+arbitrary own domains pass. A provider domain can therefore be unusable on some targets
+regardless of payload; rotate to another interactsh domain or your own domain. This is independent of
 the separate rule that blocks the DNS *verb* (`nslookup`/`curl`/`wget`); see the
 CDN/WAF section in [[wiki/payloads/command-injection]].
 
@@ -145,7 +140,7 @@ host poscontrol.<your-id>.oast.fun     # must appear in the client / interaction
 
 An automated recon-capture/correlation hook can report a false "OOB HIT" by matching a token-label
 string the tooling itself echoed to stdout, not a real callback from the target. This is only
-caught by checking the interactsh/Collaborator provider's own raw interaction log, which shows no
+caught by checking the interactsh/OAST provider's own raw interaction log, which shows no
 matching entry.
 
 For any blind SSRF/XXE/SSTI claim gated on an out-of-band callback: treat an automated correlator's
@@ -156,6 +151,5 @@ itself and match timestamp, source IP, and full token before writing up the find
 
 - ProjectDiscovery interactsh (slug: interactsh-github) (`https://github.com/projectdiscovery/interactsh`).
 - Canarytokens (slug: canarytokens-docs) (`https://canarytokens.org`).
-- PortSwigger Burp Collaborator (slug: portswigger-collaborator) (`https://portswigger.net/burp/documentation/collaborator`).
 
 <!-- promoted-slug: oob-blind-vulnerability-correlator-tooling-can-self-correlat -->

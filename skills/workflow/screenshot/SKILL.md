@@ -71,7 +71,7 @@ flag, a leaked source) - presentable as full-file PoC. Capture it deliberately, 
 
 **Full fidelity (`capture.sh req`):** for a request you want as a clean PoC (request line +
 headers + body, response status + headers + body), run it through the `req` mode - it runs `curl -sS -iv`,
-colors the request(`>`)/response(`<`) Burp-style, and pulls the PNG into `poc/`:
+colors the request(`>`)/response(`<`) Caido-style, and pulls the PNG into `poc/`:
 ```bash
 scripts/capture.sh req <eng> <slug> -- -sk -X POST https://T:5000/login --data @/tmp/body.txt
 ```
@@ -149,15 +149,17 @@ Target the tab by the `@NN` window id or the sanitized name (dots/colons became 
 then pull the PNG into `poc/` as usual.
 
 ## GUI / desktop capture (scrot)
-For real GUI apps with no text stream (Burp, Wireshark, a browser rendering an exploit)
-or the whole desktop:
+For a Caido exchange, avoid a fragile GUI screenshot and capture the stored exchange by request ID:
 ```bash
-bash /root/vm.sh 'python3 /tmp/shot.py --window "Burp Suite" --step 3 --slug burp --dir /tmp/poc'
+bash scripts/capture.sh caido <eng> <slug> <request-id> [highlight-regex]
+```
+For other GUI apps with no text stream (Wireshark or a browser rendering an exploit), or the whole desktop:
+```bash
 bash /root/vm.sh 'python3 /tmp/shot.py --screen --step 4 --slug desktop --dir /tmp/poc'
 ```
 shot.py wakes + unlocks the seat session and grabs as the desktop user (root-over-SSH has
 no X authority, so a bare `scrot` fails with "Can't open X display :0"). `--window` grabs
-the named app (even behind a lock); it falls back to full screen if the name is not found.
+a named app; it falls back to full screen if the name is not found.
 Use `--term` for tool STDOUT text, `--tmux` for a live tmux scan tab, `--screen`/`--window`
 for GUI windows.
 

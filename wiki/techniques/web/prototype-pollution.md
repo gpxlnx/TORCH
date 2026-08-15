@@ -296,7 +296,7 @@ Replay merge-heavy routers locally, fuzz **`constructor.prototype`** when `__pro
 
 ## Tools
 
-- [[burp-suite]] — intercept JSON bodies and inject prototype pollution payloads
+- [[caido]] — intercept JSON bodies and inject prototype pollution payloads
 - **DOM Invader (Burp built-in browser)** — enable "Prototype pollution" option, reload page; identifies sources automatically, then click "Scan for gadgets" to find sinks; click "Exploit" to generate a PoC `alert()`
 - Browser DevTools Console — verify pollution by checking `{}.property` after injection
 - `yuske/server-side-prototype-pollution` — Server-Side Prototype Pollution gadgets
@@ -457,7 +457,7 @@ location="https://YOUR-LAB-ID.web-security-academy.net/#__proto__%5BhitCallback%
 **Vulnerability:** Admin maintenance jobs spawn Node.js child processes via `child_process.fork`; `execArgv` is read from the prototype.
 
 1. Confirm source: `"__proto__": {"json spaces": 10}` — indentation changes in response.
-2. Inject `execArgv` gadget to prove RCE (Burp Collaborator):
+2. Inject `execArgv` gadget to prove RCE (interactsh/OAST):
 ```json
 {
   "__proto__": {

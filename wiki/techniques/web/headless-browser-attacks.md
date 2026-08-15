@@ -60,7 +60,7 @@ wkhtmltopdf/`pdfkit`/`wkhtml`-based exporters have repeated SSRF+LFR CVEs and ma
 Disable `file://` and local file access; run the renderer in a locked-down container/network namespace with **no** access to metadata/internal IPs (egress allowlist); never use `--no-sandbox`/`--allow-file-access-from-files`; bind the debugging port to nothing or authenticate it; validate/allowlist the input URL; strip dangerous tags from user HTML.
 
 ## Tools
-Burp ([[burp-suite]]) + Collaborator (OOB), a CDP client (`chrome-remote-interface`), [[wiki/techniques/web/ssrf]] payloads, [[imds-cloud-metadata]]. Driven by the `hunt-ssrf` skill.
+[[caido]] + interactsh (OOB), a CDP client (`chrome-remote-interface`), [[wiki/techniques/web/ssrf]] payloads, [[imds-cloud-metadata]]. Driven by the `hunt-ssrf` skill.
 
 ## Sources
 - PayloadsAllTheThings - Headless Browser

@@ -22,17 +22,17 @@ Needs a cache in front (CDN / Varnish / Cloudflare / Akamai / Fastly, or an app-
 
 **Rank before testing:**
 
-- **Unkeyed headers that reflect** - `X-Forwarded-Host`, `X-Forwarded-Scheme`, `X-Host`, `X-Forwarded-For`, plus custom headers a page reflects into links/scripts. Highest hit-rate poisoning vector; discover unkeyed inputs with Param Miner.
+- **Unkeyed headers that reflect** - `X-Forwarded-Host`, `X-Forwarded-Scheme`, `X-Host`, `X-Forwarded-For`, plus custom headers a page reflects into links/scripts. Diff a bounded candidate-header set in named Caido Replay sessions.
 - **Path / parameter cloaking** - static-looking suffixes and delimiter tricks (`/account/profile.css`, `/account/profile/nonexistent.js`, path-parameter `;`, encoded `%2f`, fat GET) that desync what the cache keys on from what the origin serves. Primary deception vector.
 - **CDN edges and normalization gaps** - cache-key normalization (case, trailing slash, duplicate params) differing from origin routing; multi-CDN or origin-vs-edge disagreement.
 
 ## Methodology
 
-**Drive load-bearing requests through Burp Repeater** for operator visibility; use Param Miner to enumerate unkeyed headers/params. curl is fine for the quick keyed-vs-unkeyed loop.
+**Drive load-bearing requests through Caido Replay** for operator visibility; use a bounded candidate-header list and response diffing to find unkeyed inputs. curl is fine for the quick keyed-vs-unkeyed loop.
 
 1. **Identify the cache + cache key.** Compare `X-Cache`/`Age` across requests; determine what is keyed (usually method + host + path + some query) vs **unkeyed** (most headers, some params). Always attach a unique cache-buster while probing so you never touch a shared key.
 2. **Cache poisoning (unkeyed input -> harmful response, then cached for others).**
-   - Find an unkeyed input that affects the response (reflected header/param): `X-Forwarded-Host`, `X-Forwarded-Scheme`, `X-Host`, `X-Forwarded-For`, custom headers (Param Miner to discover).
+   - Find an unkeyed input that affects the response (reflected header/param): `X-Forwarded-Host`, `X-Forwarded-Scheme`, `X-Host`, `X-Forwarded-For`, and bounded custom-header candidates.
    - Make it produce harm (XSS / redirect / resource swap), then confirm the **cached** poisoned response is served to a fresh request (cache-buster off) - and cross-session (see confirmation gate).
    - Fat GET, parameter cloaking, and cache-key normalization gaps as variants.
 3. **Cache deception (trick the cache into storing a victim's private page).**
@@ -55,9 +55,9 @@ Web cache poisoning is a blind / OOB-capable class: the win is a response served
 
 **NOT confirmation:** your own cached response reflected back to you alone; a single response that might be per-user; an `Age` / `X-Cache: hit` change with no cross-session retrieval; the payload echoed in your own request.
 
-**IS confirmation:** a poisoned or deceived response served to a DIFFERENT session and reproduced in a clean session (fresh profile, no cached state, cache-buster off); or an OOB callback to your unique Burp Collaborator / interactsh subdomain from a resource you injected into the cached page - a Collaborator-pointed unkeyed header confirms the poisoning reaches the cache and is loaded by other clients.
+**IS confirmation:** a poisoned or deceived response served to a DIFFERENT session and reproduced in a clean session (fresh profile, no cached state, cache-buster off); or an OOB callback to your unique interactsh/OAST subdomain from a resource you injected into the cached page - an OAST-pointed unkeyed header confirms the poisoning reaches the cache and is loaded by other clients.
 
-When you plant a blind/OOB payload, append a row to `targets/<eng>/oob.md`: `| <token> | <sink url+param> | cache | <date> | waiting | |` (columns: token | sink | class | planted | status | source; token = your unique Burp Collaborator / interactsh label). The recon-capture hook auto-correlates incoming callbacks to flip the row to HIT and SessionStart surfaces HITs; a HIT row in `targets/<eng>/oob.md` is the gate to scaffold the FIND. Do NOT claim a blind cache poisoning without cross-session proof or a HIT row.
+When you plant a blind/OOB payload, append a row to `targets/<eng>/oob.md`: `| <token> | <sink url+param> | cache | <date> | waiting | |` (columns: token | sink | class | planted | status | source; token = your unique interactsh/OAST label). The recon-capture hook auto-correlates incoming callbacks to flip the row to HIT and SessionStart surfaces HITs; a HIT row in `targets/<eng>/oob.md` is the gate to scaffold the FIND. Do NOT claim a blind cache poisoning without cross-session proof or a HIT row.
 
 ## Stop condition (traffic-affecting)
 

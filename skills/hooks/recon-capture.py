@@ -9,7 +9,7 @@ Two jobs after a recon/exec tool runs:
      guard suppresses false fires when the command is reading/editing the vault's own
      playbook/hook/wiring machinery (its output is full of playbook tokens).
   2. OOB callback auto-correlation: flip a waiting oob.md row to HIT when its planted
-     token appears in the command+output blob (operator polling OAST/Collaborator).
+     token appears in the command+output blob (operator polling OAST/interactsh).
 
 Keyword matching only (no structured/version-fragile parsing).
 Emits Claude Code JSON additionalContext. Non-fatal: any error exits 0 silent.
@@ -813,7 +813,7 @@ def main():
 
     # 0. OOB callback auto-correlation: flip a waiting oob.md row to HIT when its token
     #    appears in this command's output. Runs on EVERY command, INCLUDING a cat/grep/rg
-    #    poll of a saved OAST/Collaborator log (the most common poll method), so it is
+    #    poll of a saved OAST/interactsh log (the most common poll method), so it is
     #    placed BEFORE the doc-command skip below.
     if d and _engagement:
         blob_oob = cmd + "\n" + _response_text(data)

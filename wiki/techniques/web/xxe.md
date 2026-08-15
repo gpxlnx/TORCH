@@ -90,7 +90,7 @@ Use the external entity to make the server issue HTTP requests:
 </contact>
 ```
 
-Use Burp Intruder to iterate port numbers from 1 to 65535. Responses with non-default length indicate open services. This technique can reach internal admin panels, metadata endpoints, and microservices.
+Use Caido Automate to iterate port numbers from 1 to 65535. Responses with non-default length indicate open services. This technique can reach internal admin panels, metadata endpoints, and microservices.
 
 **AWS Instance Metadata enumeration via XXE SSRF** — walk the metadata API incrementally; each response reveals the next path level:
 
@@ -136,7 +136,7 @@ If parameter entities are blocked ("Entities are not allowed for security reason
 </stockCheck>
 ```
 
-The response will say "Invalid product ID" (entity not reflected) but Burp Collaborator will register a DNS/HTTP hit — confirming blind XXE.
+The response will say "Invalid product ID" (entity not reflected) but interactsh/OAST will register a DNS/HTTP hit — confirming blind XXE.
 
 **Parameter entity OOB (when regular entities are blocked):**
 
@@ -466,10 +466,10 @@ et = parse(xml_input)
 
 ## Tools
 
-- [[burp-suite]] — Intruder for port scanning via SSRF, Repeater for manual XXE
+- [[caido]] — Automate for port scanning via SSRF, Replay for manual XXE
 - Python `http.server` — receive OOB callbacks
 - `php -S` — serve DTD files for OOB chain
-- Burp Collaborator — detect blind XXE via DNS/HTTP OOB
+- interactsh/OAST — detect blind XXE via DNS/HTTP OOB
 - WPScan — identify vulnerable WordPress versions
 
 ## Sources
@@ -634,7 +634,7 @@ Start at `http://169.254.169.254/` and follow directory listings: `latest` → `
 
 ### Lab 3 — Blind XXE with out-of-band interaction (Practitioner)
 
-Confirm blind XXE when no data is reflected. Use a regular general entity pointing at Burp Collaborator:
+Confirm blind XXE when no data is reflected. Use a regular general entity pointing at interactsh/OAST:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -645,7 +645,7 @@ Confirm blind XXE when no data is reflected. Use a regular general entity pointi
 </stockCheck>
 ```
 
-If `%parameter;` entities are blocked with "Entities are not allowed", try a regular `<!ENTITY xxe SYSTEM ...>` instead. Check Burp Collaborator for DNS/HTTP hits.
+If `%parameter;` entities are blocked with "Entities are not allowed", try a regular `<!ENTITY xxe SYSTEM ...>` instead. Check interactsh/OAST for DNS/HTTP hits.
 
 ### Lab 4 — Blind XXE via XML parameter entities (Practitioner)
 
@@ -688,7 +688,7 @@ Host a DTD file on your exploit server, then load it from the target. The DTD ex
 </stockCheck>
 ```
 
-Monitor exploit server access logs for `GET /?x=<hostname>`. Can also use Burp Collaborator instead of a self-hosted exploit server.
+Monitor exploit server access logs for `GET /?x=<hostname>`. Can also use interactsh/OAST instead of a self-hosted exploit server.
 
 ### Lab 6 — Blind XXE via error messages (Practitioner)
 

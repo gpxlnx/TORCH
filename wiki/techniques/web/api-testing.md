@@ -28,10 +28,10 @@ Root cause: APIs expose application logic and data directly; developers frequent
 
 ### Discovering API Endpoints
 
-- Use **Burp Scanner** to crawl the application and surface API paths.
+- Use **nuclei plus manual validation** to crawl the application and surface API paths.
 - Browse the application manually in **Burp's browser** to trigger API calls.
 - Look for URL patterns indicating API endpoints (e.g., `/api/`, `/v1/`, `/internal/`).
-- Inspect JavaScript files for references to undocumented endpoints — use the **JS Link Finder BApp** or manually review JS files in Burp.
+- Inspect JavaScript files for references to undocumented endpoints — use the **JS Link Finder** Burp BApp, or manually review JS files in Caido.
 
 ### API Documentation Discovery
 
@@ -66,7 +66,7 @@ OPTIONS /api/tasks       -> Returns allowed methods header
 ```
 
 - Send an `OPTIONS` request to enumerate what methods the endpoint accepts.
-- Use **Burp Intruder's HTTP verbs list** to brute-force supported methods.
+- Use **Caido Automate's HTTP verbs list** to brute-force supported methods.
 - Target low-priority objects when testing destructive methods to avoid unintended damage.
 
 ### Identifying Supported Content Types
@@ -93,7 +93,7 @@ Example: a GET response reveals `isAdmin`, but the documented PATCH only mention
 If the application exposes its API documentation or a redirect to it, an attacker can discover every supported endpoint and operation — including administrative ones not accessible through the UI.
 
 **Steps:**
-1. Interact with the API through the UI and capture traffic in Burp.
+1. Interact with the API through the UI and capture traffic in Caido.
 2. Identify the API base path from observed requests (e.g., `/api/user/wiener`).
 3. Strip path components incrementally — removing the resource and identifier may trigger a redirect to the documentation root.
 4. Review the documentation for sensitive operations (DELETE, admin actions).
@@ -195,7 +195,7 @@ username=../../v1/users/administrator/field/passwordResetToken%23
 Undocumented or unused endpoints may accept HTTP methods that have weaker or missing access controls. A PATCH or PUT endpoint on a product object may allow price manipulation if the developer only enforced authorization on GET.
 
 **Steps:**
-1. Browse the application and identify API calls in Burp.
+1. Browse the application and identify API calls in Caido.
 2. Send an `OPTIONS` request to the endpoint to list allowed methods.
 3. Try methods not normally used by the UI (e.g., PATCH, PUT on a read-only-looking endpoint).
 4. If the server rejects the content type, switch to `application/json` (use Content Type Converter BApp).
@@ -336,11 +336,11 @@ GET /forgot-password?reset_token=<TOKEN>
 
 ## Tools
 
-### Burp Suite
+### Caido
 
-- **Burp Scanner** — crawl application to surface API endpoints automatically.
-- **Burp Repeater** — manually replay and modify API requests; observe error messages and field behavior.
-- **Burp Intruder** — brute-force HTTP methods (use HTTP verbs wordlist) and fuzz parameter names/values.
+- **nuclei plus manual validation** — crawl application to surface API endpoints automatically.
+- **Caido Replay** — manually replay and modify API requests; observe error messages and field behavior.
+- **Caido Automate** — brute-force HTTP methods (use HTTP verbs wordlist) and fuzz parameter names/values.
 - **Burp Browser** — browse the application to trigger API calls and populate Proxy history.
 - **OPTIONS request** — send to any endpoint to enumerate allowed HTTP methods via `Allow` response header.
 
@@ -374,8 +374,8 @@ Common paths to fuzz for API documentation:
 **Goal:** Delete the user `carlos` by discovering the API documentation and using an undocumented DELETE endpoint.
 
 1. Log in as `wiener:peter` and navigate to the account settings page.
-2. Change the email address and capture the `PATCH /api/user/wiener` request in Burp.
-3. In Burp Repeater, remove `user/wiener` from the path, leaving only `/api/`, and send the request.
+2. Change the email address and capture the `PATCH /api/user/wiener` request in Caido.
+3. In Caido Replay, remove `user/wiener` from the path, leaving only `/api/`, and send the request.
 4. Observe that the server returns a `302` redirect; follow the redirect to reach the REST API documentation page.
 5. The documentation reveals a `DELETE /api/user/{username}` endpoint.
 6. Send a `DELETE` request to `/api/user/carlos`.
@@ -388,7 +388,7 @@ Common paths to fuzz for API documentation:
 **Goal:** Exploit SSPP in the forgot-password flow to retrieve the administrator's password reset token and delete `carlos`.
 
 1. Navigate to the login page and click "Forgot password".
-2. Submit a username and capture the POST request to `/forgot-password` in Burp.
+2. Submit a username and capture the POST request to `/forgot-password` in Caido.
 3. Set `username=administrator` — confirm a 200 response indicating the account exists.
 4. Append `%23` to the username (`username=administrator%23`) — observe a changed response hinting at a `field` parameter.
 5. Inject `%26a=b` (`username=administrator%26a=b`) — if the server responds with `"Parameter is not supported"`, the backend processes injected parameters.
@@ -428,7 +428,7 @@ if (resetToken) {
 
 1. Log in as `wiener:peter`.
 2. Add the leather jacket to the cart and proceed to checkout.
-3. Capture the POST request sent to `/api/checkout` in Burp.
+3. Capture the POST request sent to `/api/checkout` in Caido.
 4. Send an `OPTIONS` request to `/api/checkout` — confirm GET and POST are supported.
 5. Issue a GET request to `/api/checkout` — observe the response JSON structure, which reveals a `chosen_discount` object with a `percentage` field not present in the normal checkout POST body.
 6. Craft a POST request to `/api/checkout` with the discount injected:
@@ -458,7 +458,7 @@ if (resetToken) {
 **Goal:** Exploit SSPP in the REST URL path to retrieve the administrator's password reset token and delete `carlos`.
 
 1. Navigate to the login page; click "Forgot password".
-2. Submit `administrator` as the username and capture the request in Burp — confirm a 200 response.
+2. Submit `administrator` as the username and capture the request in Caido — confirm a 200 response.
 3. Probe whether user input is placed in a URL path by submitting `./administrator` — if the server returns the same response as submitting `administrator`, the input is likely appended to a path.
 4. Submit `../administrator` — an "Invalid route" error confirms the path traversal is processed.
 5. Incrementally increase depth (`../../`, `../../../`, `../../../../`) until you get a "Not found" response, indicating you've navigated outside the API root.

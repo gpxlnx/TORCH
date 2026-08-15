@@ -209,7 +209,7 @@ A Sentry DSN gives read access to the project's error log, which often contains 
 
 - `curl`, Python (stdlib): auth endpoint interaction and JWT decoding
 - `wscat`: WebSocket subscription testing
-- [[burp-suite]]: intercepting anon key from bundle network requests
+- [[caido]]: intercepting anon key from bundle network requests
 
 ## Sources
 

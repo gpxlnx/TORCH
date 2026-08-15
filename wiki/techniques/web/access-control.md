@@ -158,7 +158,7 @@ Even though step 1 (the upgrade form) correctly blocked the low-privilege user, 
 Some applications enforce access control only on specific HTTP methods. A POST endpoint that returns 401 for a low-privilege user may be accessible via GET:
 
 ```
-Burp Repeater → right-click request → "Change request method"
+Caido Replay → right-click request → "Change request method"
 POST /admin-roles → GET /admin-roles?username=wiener&action=upgrade
 ```
 
@@ -204,7 +204,7 @@ When an application uses GUIDs or other non-sequential identifiers as user IDs, 
 
 ### 10. Data Leakage in 302 Redirect Response Body
 
-When a server detects unauthorized access and issues a `302 Found` redirect to `/login`, the response body may still contain the target user's data before the browser follows the redirect. In Burp Repeater (which does not auto-follow redirects), the full HTML body of the 302 response is visible:
+When a server detects unauthorized access and issues a `302 Found` redirect to `/login`, the response body may still contain the target user's data before the browser follows the redirect. In Caido Replay (which does not auto-follow redirects), the full HTML body of the 302 response is visible:
 
 ```http
 HTTP/2 302 Found
@@ -269,7 +269,7 @@ JavaScript admin URL leak — search in browser DevTools or:
 curl https://target.com/static/app.js | grep -i admin
 ```
 
-Hidden field manipulation (modify in Burp before forwarding):
+Hidden field manipulation (modify in Caido before forwarding):
 
 ```http
 POST /login/home HTTP/1.1
@@ -416,11 +416,11 @@ curl -H "Authorization: Bearer $USER_TOKEN" https://api.example.com/api/v1/users
 
 ## Tools
 
-- [[burp-suite]] — Intruder for IDOR enumeration, Repeater for manual parameter manipulation
+- [[caido]] — Automate for IDOR enumeration, Replay for manual parameter manipulation
 - [[wiki/tools/ffuf]] — directory/endpoint brute force
 - dirsearch — recursive directory enumeration
-- [[burp-suite]] Autorize extension — automated detection of horizontal/vertical access control failures across roles
-- [[burp-suite]] Authz and AuthMatrix extensions — further IDOR and access control testing
+- Burp Autorize extension — automated detection of horizontal/vertical access control failures across roles (Burp-only; no Caido equivalent)
+- Burp Authz and AuthMatrix extensions — further IDOR and access control testing (Burp-only)
 
 ---
 
@@ -454,7 +454,7 @@ nuclei -t http/default-logins -u https://example.com
 
 #### Lab 3 — User role controlled by request parameter (Cookie: Admin)
 
-1. Log in as `wiener:peter`; intercept with Burp.
+1. Log in as `wiener:peter`; intercept with Caido.
 2. In the POST `/login` response, observe `Cookie: Admin=false`.
 3. In every subsequent request (GET `/my-account`, GET `/admin`, GET `/admin/delete`), change `Admin=false` to `Admin=true` before forwarding.
 4. Access `/admin` and delete the target user.
@@ -462,7 +462,7 @@ nuclei -t http/default-logins -u https://example.com
 #### Lab 4 — User role can be modified in user profile (JSON roleId)
 
 1. Log in as `wiener:peter`.
-2. Use the "Update email" feature and capture the POST request in Burp Repeater.
+2. Use the "Update email" feature and capture the POST request in Caido Replay.
 3. Observe the JSON response contains `"roleid":1`.
 4. Add `"roleid":2` to the JSON request body:
 ```json
@@ -475,7 +475,7 @@ nuclei -t http/default-logins -u https://example.com
 
 1. Log in as `wiener:peter`; navigate to "My Account".
 2. Observe the request: `GET /my-account?id=wiener`.
-3. Change `id=wiener` to `id=carlos` in Burp Repeater.
+3. Change `id=wiener` to `id=carlos` in Caido Replay.
 4. The response contains carlos's API key — submit it to solve.
 
 #### Lab 6 — User ID controlled by request parameter, with unpredictable user IDs (GUID leakage)
@@ -483,12 +483,12 @@ nuclei -t http/default-logins -u https://example.com
 1. Log in as `wiener:peter`; note your GUID in the `/my-account` request.
 2. Browse blog posts on the home page; find a post authored by carlos.
 3. Click carlos's username — the URL or page source reveals his GUID.
-4. In Burp Repeater, replace wiener's GUID with carlos's in `GET /my-account?id=<GUID>`.
+4. In Caido Replay, replace wiener's GUID with carlos's in `GET /my-account?id=<GUID>`.
 5. Retrieve carlos's API key from the response and submit.
 
 #### Lab 7 — User ID controlled by request parameter with data leakage in redirect
 
-1. Log in as `wiener:peter`; capture `GET /my-account?id=wiener` in Burp Repeater.
+1. Log in as `wiener:peter`; capture `GET /my-account?id=wiener` in Caido Replay.
 2. Change `id=wiener` to `id=carlos` and send.
 3. The server responds with `302 Found` redirecting to `/login`, but the **response body** still contains carlos's API key.
 4. Read the body of the 302 response (do not follow the redirect) and extract the API key.
@@ -496,7 +496,7 @@ nuclei -t http/default-logins -u https://example.com
 #### Lab 8 — User ID controlled by request parameter with password disclosure
 
 1. Log in as `wiener:peter`; observe the account page prefills the password in a masked field.
-2. Capture `GET /my-account?id=wiener` in Burp Repeater.
+2. Capture `GET /my-account?id=wiener` in Caido Replay.
 3. Change `?id=wiener` to `?id=administrator`.
 4. The response HTML prefills the administrator's password in the password field — extract it from the source.
 5. Log in as `administrator` with the leaked password; delete the target user.
@@ -516,7 +516,7 @@ nuclei -t http/default-logins -u https://example.com
 #### Lab 10 — URL-based access control can be circumvented (X-Original-URL)
 
 1. Browse to `/admin` — receive "Access Denied" from the front-end.
-2. Capture any request to the root (`GET /`) in Burp Repeater.
+2. Capture any request to the root (`GET /`) in Caido Replay.
 3. Add the header `X-Original-URL: /admin` and send — verify the admin panel loads.
 4. To delete a user, set `X-Original-URL: /admin/delete` and add `username=carlos` to the real query string:
 ```http
@@ -531,14 +531,14 @@ X-Original-URL: /admin/delete
 2. Note the promotion endpoint: `POST /admin-roles` with body `username=wiener&action=upgrade`.
 3. Log out; log in as `wiener:peter`.
 4. Paste wiener's session cookie into the captured POST request — receive 401.
-5. Right-click the request in Burp → "Change request method" → converts to GET with params in query string.
+5. Right-click the request in Caido → "Change request method" → converts to GET with params in query string.
 6. Send the GET request with wiener's session cookie — receive 302, wiener is promoted to admin.
 
 #### Lab 12 — Multi-step process with no access control on one step
 
 1. Log in as `administrator`; complete the full user-upgrade flow — capture both requests (step 1: form submit, step 2: confirmation).
 2. Log out; log in as `wiener:peter`.
-3. In Burp Repeater, replay only the **confirmation step** (step 2) using wiener's session cookie:
+3. In Caido Replay, replay only the **confirmation step** (step 2) using wiener's session cookie:
 ```http
 POST /admin-roles HTTP/1.1
 Cookie: session=WIENER_SESSION_TOKEN
@@ -552,7 +552,7 @@ action=upgrade&confirmed=true&username=wiener
 1. Log in as `administrator`; use the admin panel to promote a user — capture the GET request.
    The request has `Referer: https://<lab>/admin`.
 2. Log out; log in as `wiener:peter`.
-3. In Burp Repeater, replay the same promotion request with wiener's session cookie but keep the forged `Referer: https://<lab>/admin` header:
+3. In Caido Replay, replay the same promotion request with wiener's session cookie but keep the forged `Referer: https://<lab>/admin` header:
 ```http
 GET /admin/promote?username=wiener HTTP/1.1
 Referer: https://<lab>/admin

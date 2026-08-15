@@ -74,8 +74,8 @@ http:
 ```bash
 nuclei -l live.txt -dast                      # run all fuzzing templates
 nuclei -l urls.txt -t fuzzing/ -fuzz-param-frequency 10
-# import Burp/proxy traffic and fuzz real requests:
-nuclei -dast -im burp -input-file traffic.xml
+# import a supported proxy export and fuzz real requests:
+nuclei -dast -im openapi -input-file openapi.yaml
 ```
 
 ## Anti-block / evasion (run without bans)
@@ -90,7 +90,7 @@ nuclei -l t.txt -H "User-Agent: Mozilla/5.0 (Windows NT 10.0)" -H "X-Forwarded-F
 # rotate UA per request via a wrapper / -v and custom templates with {{rand}}
 
 # proxy + IP rotation (defeat IP bans / WAF rep)
-nuclei -l t.txt -p http://127.0.0.1:8080                 # through Burp
+nuclei -l t.txt -p http://127.0.0.1:8080                 # through Caido
 nuclei -l t.txt -p socks5://127.0.0.1:9050               # Tor
 # IP rotation: front each request through AWS API Gateway with fireprox -> new source IP per request
 fireprox --command create --url https://target ; nuclei -l fireprox_urls.txt

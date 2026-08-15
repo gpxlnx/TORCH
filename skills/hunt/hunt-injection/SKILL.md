@@ -23,7 +23,7 @@ Anchors: [[xxe]], [[graphql-attacks]], [[xslt-injection]] (server-side XSLT inje
 ### Signals
 ```
 /graphql  /api/graphql  /v1/graphql  /query  /gql
-POST requests with {"query": "..."} body in Burp history
+POST requests with {"query": "..."} body in Caido history
 "apollo", "ApolloClient", "gql`" in JS bundles
 ```
 
@@ -36,7 +36,7 @@ curl -s -X POST https://target.com/graphql \
 ```
 If blocked, try: `{"query":"{ __typename }"}`
 
-2. Use InQL (Burp extension) or graphql-voyager to map schema. Push load-bearing queries/mutations to **Burp Repeater** (`Skill(hunt-burp)` / the Burp MCP) so the operator can replay them.
+2. Use InQL CLI, Clairvoyance, or graphql-voyager to map schema. Push load-bearing queries/mutations to **Caido Replay** (`Skill(hunt-caido)` / the Caido MCP) so the operator can replay them.
 3. Find REST/GraphQL overlap - resources modifiable via BOTH APIs
 4. Test IDOR: replay queries/mutations with another user's object IDs
 5. Test authorization: lower-privilege user calling admin mutations
@@ -131,7 +131,7 @@ Highest yield first: PDF/invoice generators and email-template fields (server-si
 
 ## Chaining
 - **SSTI -> RCE.** Evaluation confirmed -> escalate to command execution with the engine payload above (safe command first). For sandbox-escape gadget chains and OOB-blind RCE, hand off to `hunt-rce`.
-- **XXE -> SSRF / file read.** Point the external entity at `http://169.254.169.254/...` for cloud metadata or an internal service; for the full SSRF surface (redirect bypass, protocol smuggling, Collaborator-gated blind) hand off to `hunt-ssrf`. File read escalates to source/config disclosure and, through those, to further creds.
+- **XXE -> SSRF / file read.** Point the external entity at `http://169.254.169.254/...` for cloud metadata or an internal service; for the full SSRF surface (redirect bypass, protocol smuggling, interactsh-gated blind) hand off to `hunt-ssrf`. File read escalates to source/config disclosure and, through those, to further creds.
 - **GraphQL IDOR / auth bypass -> object enumeration.** Nested-resolver and `node(id:)` traversal are IDOR - hand off to `hunt-idor` (two-account method) or `hunt-api` (BOLA/BFLA, mass assignment, batching).
 
 ## Confirmation gate
@@ -144,11 +144,11 @@ Per `hunt-core`. Reproduce every claim in a clean session before scaffolding a F
 **XXE - NOT confirmation:** a parser error, a `500`, or "entity not allowed" - these prove XML is parsed, not that the entity resolved.
 **XXE - IS confirmation:** the external entity resolves to real content - `/etc/passwd` (or metadata creds) reflected in the response, OR an out-of-band callback.
 
-**Blind XXE / blind SSTI need an OOB HIT.** When you plant a blind/OOB payload (parameter-entity XXE, or SSTI with no reflected sink), fire it at your own interactsh/Collaborator listener and append a row to `targets/<eng>/oob.md`:
+**Blind XXE / blind SSTI need an OOB HIT.** When you plant a blind/OOB payload (parameter-entity XXE, or SSTI with no reflected sink), fire it at your own interactsh/OAST listener and append a row to `targets/<eng>/oob.md`:
 ```
 | <token> | <sink url+param> | xxe | <date> | waiting | |
 ```
-(columns: token | sink | class | planted | status | source; token = your unique interactsh/Collaborator label). The recon-capture hook flips the row waiting -> HIT on the incoming callback and SessionStart surfaces HITs; that HIT row is the confirmation gate to scaffold the FIND. Do NOT claim a blind XXE (or blind SSTI) without a HIT row.
+(columns: token | sink | class | planted | status | source; token = your unique interactsh/OAST label). The recon-capture hook flips the row waiting -> HIT on the incoming callback and SessionStart surfaces HITs; that HIT row is the confirmation gate to scaffold the FIND. Do NOT claim a blind XXE (or blind SSTI) without a HIT row.
 
 ## Severity
 

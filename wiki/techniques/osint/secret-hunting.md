@@ -557,10 +557,10 @@ Search for the target name across: `stackoverflow.com`, `serverfault.com`, `supe
 | `secret_scan.py` | stdlib-only scanner in `raw/git/Claude-OSINT/skills/offensive-osint/scripts/` |
 | [GitDorker](https://github.com/obheda12/GitDorker) | Automates GitHub code-search dorks |
 | GitHub code search | Manual dork queries via browser / API |
-| [[burp-suite]] | Intercept + scan JS/API responses for secrets |
+| [[caido]] | Intercept + scan JS/API responses for secrets |
 | `trivy` | General purpose vulnerability and misconfiguration scanner (searches for API keys) |
 | `badsecrets` / `crapsecrets` | Libraries for detecting known or weak secrets |
-| `SignSaboteur` | Burp Suite extension for editing/signing web tokens |
+| `SignSaboteur` | Caido extension for editing/signing web tokens |
 | `secrets-patterns-db` | Database of regex patterns for detecting secrets |
 | `keyhacks` | Repository of ways to validate leaked API keys |
 | `KeyFinder` | Browser extension/tool to find keys while surfing |

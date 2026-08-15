@@ -182,7 +182,7 @@ msfvenom ... -x legit.exe -k ...
 rar a payload.rar -p payload.js && mv payload.rar payload
 rar a payload2.rar -p payload && mv payload2.rar payload2
 
-# Proxy MSF traffic through Burp
+# Proxy MSF traffic through Caido
 set PROXIES HTTP:127.0.0.1:8080
 ```
 

@@ -296,7 +296,7 @@ Explore the website with a proxy:
 nuclei -u https://example.com
 ```
 
-* [Burp Suite's web vulnerability scanner](https://portswigger.net/burp/vulnerability-scanner)
+* [Burp Suite web vulnerability scanner](https://portswigger.net/burp/vulnerability-scanner)
 * [sullo/nikto](https://github.com/sullo/nikto)
 
 ```ps1
@@ -352,7 +352,7 @@ Apply vendor baselines for logging, least privilege, patch cadence, and segmenta
 
 ## Tools
 
-- [[burp-suite]]
+- [[caido]]
 - [[wiki/tools/ffuf]]
 - [[gobuster]]
 - [[gowitness]]

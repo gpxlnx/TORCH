@@ -40,7 +40,7 @@ grep -nE 'android:exported="true"|<uses-permission|android:debuggable|usesCleart
 # Patch out a check in smali (e.g. root/pinning) then rebuild + sign
 #   find the method in smali/, flip the return, apktool b, re-sign, install
 
-# Add a network_security_config to allow user CAs (intercept TLS in Burp)
+# Add a network_security_config to allow user CAs (intercept TLS in Caido)
 ```
 
 ## Tips and gotchas

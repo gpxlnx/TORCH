@@ -16,7 +16,7 @@ Technical reference for **Android Application** collected from InternalAllTheThi
 
 ## How it works
 
-Android application security testing involves decompiling APKs with tools like `apktool` or `jadx` to review Smali bytecode and Java source, then analyzing the manifest for exported components, insecure permissions, and debug flags. Attackers intercept traffic via a local proxy (Burp Suite) by installing a custom CA certificate and routing device traffic through the proxy, using Frida or Objection to bypass SSL pinning at runtime. Sensitive data exposure in SharedPreferences, SQLite databases, and logcat output, as well as exploitable exported activities and content providers, are common findings.
+Android application security testing involves decompiling APKs with tools like `apktool` or `jadx` to review Smali bytecode and Java source, then analyzing the manifest for exported components, insecure permissions, and debug flags. Attackers intercept traffic via a local proxy (Caido) by installing a custom CA certificate and routing device traffic through the proxy, using Frida or Objection to bypass SSL pinning at runtime. Sensitive data exposure in SharedPreferences, SQLite databases, and logcat output, as well as exploitable exported activities and content providers, are common findings.
 
 ## Attack phases
 
@@ -195,7 +195,7 @@ blutter jadx/resources/lib/arm64-v8a/ ./blutter_output
 
 Dynamic analysis for Android malware involves executing and monitoring an app in a controlled environment to observe its behavior. This technique detects malicious activities like data exfiltration, unauthorized access, and system modifications. Additionally, it aids in reverse engineering app features, revealing hidden functionalities and potential vulnerabilities for better threat mitigation.
 
-### Burp Suite
+### Caido
 
 * Proxy > Listen to all interfaces
 * Import/Export CA certificate
@@ -205,10 +205,10 @@ Dynamic analysis for Android malware involves executing and monitoring an app in
 * Configure the AVD to use the proxy
 
 ```ps1
-# Convert Burp certificate for Android
-openssl x509 -inform DER -in burp.der -out burp.pem
-openssl x509 -inform PEM -subject_hash_old -in burp.pem |head -1
-mv burp.pem <hash output>.0
+# Convert the Caido certificate for Android
+openssl x509 -inform DER -in caido.der -out caido.pem
+openssl x509 -inform PEM -subject_hash_old -in caido.pem |head -1
+mv caido.pem <hash output>.0
 
 # Push the certificate in the AVD
 emulator -list-avds
@@ -378,7 +378,7 @@ Examples:
 
 ### Flutter
 
-Repackage a Flutter Android application to allow Burp Suite proxy interception.
+Repackage a Flutter Android application to allow Caido proxy interception.
 
 * [ptswarm/reFlutter](https://github.com/ptswarm/reFlutter) - Flutter Reverse Engineering Framework
 
@@ -459,7 +459,7 @@ Java.perform(function() {
 ```
 
 * [m0bilesecurity/RMS-Runtime-Mobile-Security](https://github.com/m0bilesecurity/RMS-Runtime-Mobile-Security) - Certificate Pinning bypass script (all + okhttpv3)
-* [federicodotta/Brida](https://github.com/federicodotta/Brida) - The new bridge between Burp Suite and Frida
+* [federicodotta/Brida](https://github.com/federicodotta/Brida) - The new bridge between Caido and Frida
 
 ## Root Detection Bypass
 
@@ -1012,9 +1012,9 @@ app is sensitive.
 * [Android app vulnerability classes - Google Play Protect](https://static.googleusercontent.com/media/www.google.com/fr//about/appsecurity/play-rewards/Android_app_vulnerability_classes.pdf)
 * [Appium documentation](https://appium.io/docs/en/latest/)
 * [Configuring Android Emulator with Burp Suite - Jarrod @Jrod_R87 - January 8, 2025](https://owlhacku.com/configuring-android-emulator-with-burp-suite/)
-* [Configuring Burp Suite with Android Emulators - Aashish Tamang - June 6, 2022](https://blog.yarsalabs.com/setting-up-burp-for-android-application-testing/)
+* [Configuring Burp with Android Emulators - Aashish Tamang - June 6, 2022](https://blog.yarsalabs.com/setting-up-burp-for-android-application-testing/)
 * [Configuring Burp Suite With Android Nougat - ropnop - January 18, 2018](https://blog.ropnop.com/configuring-burp-suite-with-android-nougat)
-* [Configuring Frida with BurpSuite and Genymotion to bypass Android SSL Pinning - arben - September 4, 2020](https://spenkk.github.io/bugbounty/Configuring-Frida-with-Burp-and-GenyMotion-to-bypass-SSL-Pinning/)
+* [Configuring Frida with Burp Suite and Genymotion to bypass Android SSL Pinning - arben - September 4, 2020](https://spenkk.github.io/bugbounty/Configuring-Frida-with-Burp-and-GenyMotion-to-bypass-SSL-Pinning/)
 * [How to root an Android device for analysis and vulnerability assessment - Joe Lovett - August 23, 2024](https://www.pentestpartners.com/security-blog/how-to-root-an-android-device-for-analysis-and-vulnerability-assessment/)
 * [Intercepting OkHttp at Runtime With Frida - A Practical Guide - Szymon Drosdzol - January 22, 2026](https://blog.doyensec.com/2026/01/22/frida-instrumentation.html)
 * [Introduction to Android Pentesting - Jarrod - July 8, 2024](https://owlhacku.com/introduction-to-android-pentesting/)
@@ -1032,7 +1032,7 @@ Apply vendor baselines for logging, least privilege, patch cadence, and segmenta
 ## Tools
 
 - [[apktool]]
-- [[burp-suite]]
+- [[caido]]
 - [[frida]]
 - [[ghidra]]
 - [[jadx]]

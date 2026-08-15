@@ -58,7 +58,7 @@ The server must never accept a price value from the client — it should look up
 
 ### Integer Overflow / Negative Quantity Abuse
 
-Applications that store totals as bounded integers (e.g., 32-bit signed) can be forced to wrap to negative values by adding quantity=99 in a loop. Use Burp Intruder with Null payloads (Continue Indefinitely) to overflow the cart total past zero and into negative territory, then fine-tune quantity to land the total in the affordable range.
+Applications that store totals as bounded integers (e.g., 32-bit signed) can be forced to wrap to negative values by adding quantity=99 in a loop. Use Caido Automate with Null payloads (Continue Indefinitely) to overflow the cart total past zero and into negative territory, then fine-tune quantity to land the total in the affordable range.
 
 ```
 Intruder: Sniper | Null payloads | Continue indefinitely
@@ -108,7 +108,7 @@ csrf=TOKEN&username=administrator&new-password-1=pwned&new-password-2=pwned
 
 ### Infinite Money via Coupon + Gift Card Loop
 
-When a signup discount can be applied to a gift-card product whose redemption value exceeds the discounted purchase price, a net-positive credit loop is possible. Automate with Burp Macros:
+When a signup discount can be applied to a gift-card product whose redemption value exceeds the discounted purchase price, a net-positive credit loop is possible. Automate the purchase-redeem loop (Caido Automate, or a Burp Macro for the multi-step session):
 
 ```
 Macro sequence:
@@ -273,7 +273,7 @@ The application has two valid discount codes (a promo code and a newsletter sign
 
 ### Lab 5 — Low-level logic flaw
 
-The server stores cart totals in a bounded signed integer. Repeatedly adding `quantity=99` using Burp Intruder (Null payloads, Continue Indefinitely) causes the total to overflow past the maximum and wrap to a negative value. Adjust the final quantity to bring the total into a range that can be covered by store credit.
+The server stores cart totals in a bounded signed integer. Repeatedly adding `quantity=99` using Caido Automate (Null payloads, Continue Indefinitely) causes the total to overflow past the maximum and wrap to a negative value. Adjust the final quantity to bring the total into a range that can be covered by store credit.
 
 ```
 Intruder setup:

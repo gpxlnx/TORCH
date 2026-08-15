@@ -84,7 +84,7 @@ Connection: close, X-Forwarded-For
 X-Forwarded-For: 1.2.3.4
 ```
 
-Other headers to nominate as hop-by-hop: session/auth headers the backend trusts (`Cookie`, custom `X-Auth-*`), and cache-key headers for cache poisoning (mark a header the cache keys on so it is stripped after the response is stored). Detection: send a request with and without `Connection: close, <header>` and diff the responses; a behaviour change means the proxy is stripping it. Automate with a Burp Intruder sweep over candidate header names.
+Other headers to nominate as hop-by-hop: session/auth headers the backend trusts (`Cookie`, custom `X-Auth-*`), and cache-key headers for cache poisoning (mark a header the cache keys on so it is stripped after the response is stored). Detection: send a request with and without `Connection: close, <header>` and diff the responses; a behaviour change means the proxy is stripping it. Automate with a Caido Automate sweep over candidate header names.
 
 ## Real-world
 Nginx alias traversal and `X-*-URL` ACL bypass are recurring CVEs/bug-bounty finds; CDN+origin path-normalization differences enable auth bypass and request smuggling ([[http-request-smuggling]]).

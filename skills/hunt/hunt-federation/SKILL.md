@@ -32,7 +32,7 @@ Entry points:
 2. **Signature validation** - is the assertion signature checked at all, and does it cover exactly what
    the parser reads (stripping, comment injection live here).
 3. **The XSW1-XSW8 matrix** - signature covers a signed element, the SP trusts a wrapper assertion.
-   Automate the eight variants with SAML Raider.
+   Generate the eight variants with a local XML mutation script and keep each proving request in a named Caido Replay session.
 4. **state / CSRF** - a missing or client-only `state` on the OAuth callback enables login-CSRF and
    attacker-to-victim account linking.
 5. **OIDC metadata and client leakage** - `.well-known/openid-configuration`, JS bundles, APK resources:
@@ -54,7 +54,7 @@ Entry points:
   </saml:Assertion>
 </saml:Response>
 ```
-Use SAMLRaider Burp extension for automated XSW1-XSW8 testing.
+Generate XSW1-XSW8 variants with an XML mutation script; send and compare them through named Caido Replay sessions.
 
 ### Attack 2: Signature Stripping
 ```bash
@@ -104,8 +104,8 @@ Try: encoded chars %2F %40 %23
 separate browser profiles so SSO cookies never cross.
 
 1. Map all OAuth/SAML entry points
-2. Capture a valid SAMLResponse via Burp - decode Base64, inspect XML
-3. Test SAML: XSW (SAMLRaider), signature stripping, comment injection, XXE
+2. Capture a valid SAMLResponse via Caido - decode Base64, inspect XML
+3. Test SAML: scripted XSW1-XSW8 variants, signature stripping, comment injection, XXE
 4. Test OAuth: redirect_uri variations, state removal, nonce replay
 5. Check `.well-known/openid-configuration` for OIDC surface
 6. Check `client_secret` in JS bundles or APK resources

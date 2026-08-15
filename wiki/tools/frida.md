@@ -45,7 +45,7 @@ objection -g com.app explore
 > android hooking watch class_method com.app.LoginActivity.checkPin --dump-args
 > memory search / dump
 ```
-- Bypass SSL pinning to intercept the API in Burp; defeat root/jailbreak detection; dump secrets from memory; hook crypto to capture keys/plaintext; trace native (`Interceptor.attach(ptr(addr), ...)`).
+- Bypass SSL pinning to intercept the API in Caido; defeat root/jailbreak detection; dump secrets from memory; hook crypto to capture keys/plaintext; trace native (`Interceptor.attach(ptr(addr), ...)`).
 
 ## Tips and gotchas
 - **Match frida-server version to the client** exactly or attach fails.
@@ -53,6 +53,6 @@ objection -g com.app explore
 - Anti-Frida apps detect the server port/threads; use `frida-server` renamed, gadget injection, or stealth forks. Start with objection (fast), drop to raw Frida scripts for custom hooks.
 
 ## Related techniques
-[[android-application]], [[ios-application]], [[reverse-engineering]]. Pairs with Burp ([[burp-suite]]) for traffic, [[radare2]]/[[ghidra]] for the native layer.
+[[android-application]], [[ios-application]], [[reverse-engineering]]. Pairs with Caido ([[caido]]) for traffic, [[radare2]]/[[ghidra]] for the native layer.
 
 ## Sources

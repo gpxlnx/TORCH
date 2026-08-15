@@ -309,7 +309,7 @@ Cookie: cachebuster=1
 Accept-Encoding: gzip, deflate, cachebuster
 ```
 
-3. **Identify unkeyed inputs** — use Burp Suite's Param Miner extension:
+3. **Identify unkeyed inputs** — use Burp's Param Miner extension (Burp-only):
    - Right-click request → "Guess headers"
    - Right-click request → "Guess GET parameters"
    - "Bulk scan > Rails parameter cloaking scan" for cloaking
@@ -334,8 +334,8 @@ Accept-Encoding: gzip, deflate, cachebuster
 
 ### Tools
 
-- **Burp Suite Param Miner** — automated discovery of unkeyed headers and parameters
-- **Burp Repeater** — manual cache poisoning and confirmation
+- **Burp Param Miner** — automated discovery of unkeyed headers and parameters (Burp-only; no Caido equivalent)
+- **Caido Replay** — manual cache poisoning and confirmation
 - **Burp Comparer** — diff responses to identify cache behavior changes
 
 ## PortSwigger Labs

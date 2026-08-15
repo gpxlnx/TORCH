@@ -190,8 +190,8 @@ def test_grab_command_builders():
     assert shot.x_env("kali", ":0", "/home/kali/.Xauthority") == env
     assert shot.grab_screen_cmd("kali", ":0", "/home/kali/.Xauthority", "/tmp/o.png") == \
         env + ["scrot", "-o", "/tmp/o.png"]
-    assert shot.window_id_cmd("kali", ":0", "/home/kali/.Xauthority", "Burp Suite") == \
-        env + ["xdotool", "search", "--onlyvisible", "--name", "Burp Suite"]
+    assert shot.window_id_cmd("kali", ":0", "/home/kali/.Xauthority", "Caido") == \
+        env + ["xdotool", "search", "--onlyvisible", "--name", "Caido"]
     assert shot.grab_window_cmd("kali", ":0", "/home/kali/.Xauthority", "@43", "/tmp/o.png") == \
         env + ["import", "-window", "@43", "/tmp/o.png"]
     assert shot.wake_cmd("kali", ":0", "/home/kali/.Xauthority") == env + ["xset", "dpms", "force", "on"]

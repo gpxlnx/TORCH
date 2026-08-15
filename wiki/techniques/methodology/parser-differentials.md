@@ -111,7 +111,7 @@ Content-type / polyglot (declared JSON, parsed as HTML by a sniffing sink) and U
 
 ## Tools
 
-- Burp Suite (Repeater, HTTP Request Smuggler extension, Param Miner for unkeyed inputs and cache probing).
+- Caido Replay for manual resends; Burp (HTTP Request Smuggler extension, Param Miner for unkeyed inputs and cache probing) for the smuggling/cache extensions Caido lacks.
 - `curl` / `httpx` with raw request control for framing and encoding tests.
 - Protocol/parser fuzzers and differential harnesses comparing two libraries' parse output on the same input.
 

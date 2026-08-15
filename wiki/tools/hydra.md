@@ -96,7 +96,7 @@ hydra -l root -p toor -M targets.txt ssh
 
 ### HTTP POST form login
 
-First, determine the form parameters using browser dev tools (F12 → Network tab) or Burp Suite. Then:
+First, determine the form parameters using browser dev tools (F12 → Network tab) or Caido. Then:
 
 ```bash
 hydra -L top-usernames-shortlist.txt -P 2023-200_most_used_passwords.txt \
@@ -179,8 +179,8 @@ grep -E '^.{6,}$' jane.txt | grep -E '[A-Z]' | grep -E '[a-z]' | \
 
 - **`-f` is your friend**: Stop at first success to avoid unnecessary noise and potential account lockout triggers.
 - **`-t` threads**: More threads = faster but noisier. For SSH/RDP, keep threads low (4–8) to avoid lockouts. For HTTP, 16–64 is reasonable.
-- **Inspect the login form carefully**: Incorrect `params` strings are the most common cause of Hydra failures. Use browser dev tools (F12 → Network) or Burp Suite to capture the exact POST request, then replicate the field names exactly.
-- **CSRF tokens**: If the login form uses CSRF tokens that change per request, `http-post-form` alone cannot handle them. Use Burp Suite's Intruder or a custom script instead.
+- **Inspect the login form carefully**: Incorrect `params` strings are the most common cause of Hydra failures. Use browser dev tools (F12 → Network) or Caido to capture the exact POST request, then replicate the field names exactly.
+- **CSRF tokens**: If the login form uses CSRF tokens that change per request, `http-post-form` alone cannot handle them. Use Caido's Intruder or a custom script instead.
 - **Success vs failure detection**: Use failure strings (`F=`) when the error message is consistent. Use success strings (`S=`) when the success state (e.g., redirect code, dashboard content) is more reliable.
 - **HTTP Basic Auth vs form login**: `http-get` is for Basic Auth (the browser pop-up). `http-post-form` is for HTML form-based logins.
 - **VNC**: Typically only requires a password, not a username — use `-P` without `-l`/`-L`.

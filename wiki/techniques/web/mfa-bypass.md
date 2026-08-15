@@ -76,7 +76,7 @@ Cookie: account=victim-user
 verification-code=§000000§
 ```
 
-Then brute-force the 4–6 digit code with Burp Intruder. This grants access to the victim's account without knowing their password.
+Then brute-force the 4–6 digit code with Caido Automate. This grants access to the victim's account without knowing their password.
 
 **Intruder setup for numeric brute force:**
 - Attack type: Sniper
@@ -175,8 +175,8 @@ Min fraction digits: 0
 
 ## Tools
 
-- [[burp-suite]] — Intruder for 6-digit code brute force; Turbo Intruder for multi-step automation
-- [[burp-suite]] Macros — automate login step 1 before each 2FA brute-force attempt
+- [[caido]] — Automate for 6-digit code brute force; Burp Turbo Intruder for high-rate multi-step automation (Burp-only)
+- Burp Macros / Caido workflows — automate login step 1 before each 2FA brute-force attempt (Burp session-handling macros; Caido uses workflows/plugins)
 
 ## Sources
 

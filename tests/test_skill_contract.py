@@ -10,7 +10,7 @@ by globbing, and the per-KIND contract is enforced:
   * oob_hunt  (the blind-capable subset ssrf|rce|injection|smuggling|
               deserialization|sqli|cache|xss): additionally an OOB-gate block
               (oob.md row + "Do NOT claim a blind" + "HIT row") and a
-              Collaborator/interactsh reference.
+              interactsh/OAST reference.
 
 Vocab is pinned once in setup/templates/_find.md (canonical-vocab comment) and
 asserted here: the FIND filename placeholder is `SEVERITY` (not the drifted
@@ -109,7 +109,7 @@ def test_hunt_skills_carry_wiki_first_find_and_stage():
     assert not bad, "hunt-skill contract violations:\n" + "\n".join(bad)
 
 
-# --- oob_hunt kind: OOB gate + Collaborator/interactsh ----------------------
+# --- oob_hunt kind: OOB gate + interactsh/OAST ----------------------
 
 def test_oob_capable_hunt_skills_carry_oob_gate():
     bad = []
@@ -125,8 +125,8 @@ def test_oob_capable_hunt_skills_carry_oob_gate():
                      and "HIT row" in text)
         if not has_block:
             bad.append("%s: missing the OOB-gate block (oob.md row + 'Do NOT claim a blind' + 'HIT row')" % d)
-        if not re.search(r"Collaborator|interactsh", text):
-            bad.append("%s: missing a Collaborator/interactsh reference" % d)
+        if not re.search(r"interactsh|OAST", text, re.I):
+            bad.append("%s: missing an interactsh/OAST reference" % d)
     missing = OOB_CLASSES - seen
     assert not missing, "expected an oob_hunt skill per class, none found for: %s" % sorted(missing)
     assert not bad, "OOB-gate contract violations:\n" + "\n".join(bad)
@@ -181,9 +181,9 @@ def test_migrated_hunt_skills_carry_sharpening():
 
 def test_all_hunt_skills_migrated_to_spine():
     """Every VULN-CLASS hunt skill declares 'Assumes hunt-core'. hunt-core (kind 'core') and
-    the hunt-burp Burp driver (a tooling skill, not a vuln class) are exempt. Red until the
+    the hunt-caido Caido driver (a tooling skill, not a vuln class) are exempt. Red until the
     last class skill is migrated."""
-    exempt = {"hunt-burp"}
+    exempt = {"hunt-caido"}
     unmigrated = [os.path.basename(os.path.dirname(p)) for p in _skill_files()
                   if _kind(p) in ("hunt", "oob_hunt")
                   and os.path.basename(os.path.dirname(p)) not in exempt

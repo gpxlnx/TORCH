@@ -62,7 +62,7 @@ The line that keeps quota safety: Haiku is allowed for a **bounded single job**,
 - Do NOT invoke `superpowers:brainstorming`/`writing-plans` mid-run; keep no parallel task list.
 - Model routing (see `## Model routing`): Opus-1M drives; Haiku for bounded short tasks; the mandatory
   Opus **verifier** gates every finding via `verdicts/<F>.json`. No open-ended hunter fan-out.
-- Load-bearing requests through Burp when reachable; degrade to `capture.sh req` otherwise.
+- Load-bearing requests through Caido when reachable; degrade to `capture.sh req` otherwise.
 - Scope, lockout policy and destructive-op limits come from `scope.md`.
 - **RCE-first:** when >1 vector is open, take the one that yields code-exec first - it is the attack
   vector that carries impact; chase lower-impact classes only after code-exec is ruled out or the

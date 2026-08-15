@@ -945,7 +945,7 @@ def test_code_exec_classes_rank_first():
         {"id": "4a:2", "asset": "h", "vuln class": "rce", "status": "[ ]", "tool": "nuclei"},
         {"id": "4a:3", "asset": "h", "vuln class": "ssrf", "status": "[ ]", "tool": "interactsh"},
         {"id": "4a:4", "asset": "h", "vuln class": "sqli", "status": "[ ]", "tool": "sqlmap"},
-        {"id": "4a:5", "asset": "h", "vuln class": "idor", "status": "[ ]", "tool": "burp"},
+        {"id": "4a:5", "asset": "h", "vuln class": "idor", "status": "[ ]", "tool": "caido"},
     ]
     ordered = sorted(rows, key=lambda r: -C._row_value(r))
     assert {ordered[0]["vuln class"], ordered[1]["vuln class"]} == {"rce", "sqli"}

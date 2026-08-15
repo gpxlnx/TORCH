@@ -428,7 +428,7 @@ javascript:alert(document.cookie)
 
 ## Tools
 
-- [[burp-suite]] — proxy, DOM Invader extension for automated source/sink tracing
+- [[caido]] — proxy and Replay; for automated DOM source/sink tracing use Burp DOM Invader (Burp-only; no Caido equivalent)
 - Browser DevTools Inspector + Console — manual DOM manipulation and testing
 - `DOMPurify` — sanitisation library for client-side HTML
 - `Dom-Explorer` — A web-based tool designed for testing HTML parsers and finding mutated XSS

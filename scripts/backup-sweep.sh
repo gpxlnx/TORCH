@@ -9,7 +9,7 @@
 #
 # Usage:
 #   backup-sweep.sh <base-url> [discovered-paths-file]
-#   BURP_PROXY=127.0.0.1:8080 backup-sweep.sh http://T/     # route via Burp so it lands in Proxy history
+#   CAIDO_PROXY=127.0.0.1:8080 backup-sweep.sh http://T/     # route via Caido so it lands in Proxy history
 #   backup-sweep.sh --dry-run <base-url> [paths-file]        # print the URLs it would probe (offline check)
 set -uo pipefail
 DRY=0; [ "${1:-}" = "--dry-run" ] && { DRY=1; shift; }
@@ -25,7 +25,7 @@ EXTRA="${2:-}"
 #     to stall the whole sweep (the tab never finishes, nothing is ever reported).
 UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
 CURL=(curl -s -k --connect-timeout 5 --max-time 15 -A "$UA" -H 'Accept-Language: en-US,en;q=0.9')
-[ -n "${BURP_PROXY:-}" ] && CURL+=(-x "${BURP_PROXY}")
+[ -n "${CAIDO_PROXY:-}" ] && CURL+=(-x "${CAIDO_PROXY}")
 
 # common server-side source files backups cluster around (with their REAL extension):
 BASES="index.php index.html login.php dashboard.php config.php config.inc.php configuration.php
@@ -81,7 +81,7 @@ blocked=$(( ${CODES[403]:-0} + ${CODES[406]:-0} + ${CODES[429]:-0} + ${CODES[503
 if [ "$found" -eq 0 ] && [ "$blocked" -gt $(( NB * NS / 2 )) ]; then
   echo "[!] INCONCLUSIVE: most probes were blocked/unreachable (403/406/429/503/000), not answered."
   echo "    The edge is filtering this sweep -- treat backups as UNTESTED here, not clean."
-  echo "    Retry through Burp (BURP_PROXY=127.0.0.1:8080) or from a browser-identity session."
+  echo "    Retry through Caido (CAIDO_PROXY=127.0.0.1:8080) or from a browser-identity session."
   exit 0
 fi
 echo "[*] done: $found candidate backup(s). READ each in full -- source leak = creds/auth logic/hidden endpoints."

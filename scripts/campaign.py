@@ -351,7 +351,7 @@ def _skill_for_class(cls, triggers):
     return ""
 
 
-# Classes whose real tool is a hand-crafted HTTP request (curl / Burp Repeater) + two accounts, NOT a
+# Classes whose real tool is a hand-crafted HTTP request (curl / Caido Replay) + two accounts, NOT a
 # scanner. Giving these rows tool=curl makes the operator's curl probes ON-BOARD (drift-guard adds
 # open-row tools to its whitelist), fixing the road false-block where an ATO/session vector run with
 # curl was hard-denied because the row's tool was a scanner. Complements CLASS_SKILL (T1.2/T1.3).
@@ -668,10 +668,10 @@ def _skill_fired_since(d, skill, since_iso):
 
 def _req_count(d):
     """Request-issuing tool invocations in .events.jsonl (the budget unit - NOT literal HTTP
-    requests; a single ffuf/nuclei/Intruder run issues thousands). Counts network-touching Bash
-    events AND the non-Bash request paths this framework mandates - Burp (mcp__burp__send*,
-    send_to_intruder), WebFetch, chrome-devtools navigations - which the last audit found were
-    invisible, so a Burp-first campaign blew its budget silently. The driver runs between the
+    requests; a single ffuf/nuclei/Automate run issues thousands). Counts network-touching Bash
+    events AND the non-Bash request paths this framework mandates - Caido (mcp__caido__send*,
+    create-automate-session), WebFetch, chrome-devtools navigations - which the last audit found were
+    invisible, so a Caido-first campaign blew its budget silently. The driver runs between the
     agent's actions and cannot count requests itself; the telemetry hook that logs every call can."""
     ev = _events(d) or []
     n = 0
@@ -681,7 +681,7 @@ def _req_count(d):
         tool = e.get("tool") or ""
         if tool == "Bash" and any(b in NET_BINS for b in (e.get("bins") or [])):
             n += 1
-        elif tool == "WebFetch" or "burp" in tool.lower() or tool.startswith(
+        elif tool == "WebFetch" or "caido" in tool.lower() or tool.startswith(
                 "mcp__plugin_chrome-devtools"):
             n += 1
     return n
@@ -1318,8 +1318,8 @@ def cmd_next(a):
         if tool not in st["emitted_bins"]:
             st["emitted_bins"].append(tool)
         n += 1
-    print("  %d. capture.sh req <request>   (load-bearing exploit reqs -> Skill(hunt-burp) "
-          "if Burp reachable)" % n)
+    print("  %d. capture.sh req <request>   (load-bearing exploit reqs -> Skill(hunt-caido) "
+          "if Caido reachable)" % n)
     if not (row.get("poc") or "").strip():
         print("CANNOT CLOSE: no evidence for %s    [G3]" % rid)
     _save_state(d, st)
@@ -1685,7 +1685,7 @@ def cmd_done(a):
     # --poc / --find both close [x] and both require evidence gates
     if a.poc:
         if not a.kind:
-            _die("--poc requires --kind req|burp|web [G3]")
+            _die("--poc requires --kind req|caido|web [G3]")
         if a.kind == "web" and cls not in set(_load_cfg().get("visual_evidence_classes", [])):
             _die("a 'web' render is not evidence for class '%s' - it is indistinguishable from any "
                  "visitor's screenshot. Use capture.sh req [G3]" % cls)
@@ -1992,7 +1992,7 @@ def main(argv):
     sub.add_parser("next").set_defaults(fn=cmd_next)
     p = sub.add_parser("note"); p.add_argument("row"); p.add_argument("--arsenal", required=True); p.set_defaults(fn=cmd_note)
     p = sub.add_parser("done")
-    p.add_argument("row"); p.add_argument("--poc"); p.add_argument("--kind", choices=["req", "burp", "web"])
+    p.add_argument("row"); p.add_argument("--poc"); p.add_argument("--kind", choices=["req", "caido", "web"])
     p.add_argument("--find"); p.add_argument("--dead"); p.add_argument("--park")
     p.add_argument("--skill", help="the hunt skill that ACTUALLY landed this row - satisfies G2 when the board mapped the wrong class->skill (the override must itself have fired)")
     p.add_argument("--win", help="tmux window the foothold session landed in -> record it (post-ex routes through vm-rsh --win)")

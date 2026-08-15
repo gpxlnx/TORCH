@@ -46,7 +46,7 @@ Update this page every time a new source adds depth, a new payload, or a bypass 
 
 ## tool pages (`wiki/tools/`)
 
-One page per tool (e.g. Nmap, FFuf, SQLMap, Metasploit, Hydra, CrackMapExec, Burp Suite).
+One page per tool (e.g. Nmap, FFuf, SQLMap, Metasploit, Hydra, CrackMapExec, Caido).
 
 Sections:
 - **Purpose**: what the tool does in one sentence.

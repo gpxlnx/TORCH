@@ -61,6 +61,18 @@ def test_help_lists_snippet():
     assert "snippet <eng> <slug> <url-or-file>" in r.stderr
 
 
+def test_caido_is_a_known_mode():
+    result = _run("caido", "eng", "slug")
+    assert result.returncode == 2
+    assert "capture.sh caido <eng> <slug> <request-id>" in result.stderr
+    assert "unknown mode" not in result.stderr
+
+
+def test_help_lists_caido():
+    result = _run("--help")
+    assert "caido <eng> <slug> <request-id>" in result.stderr
+
+
 def test_snippet_extracts_filtered_lines_from_a_local_file(tmp_path):
     # functional: a local source file + a grep pattern -> a fenced .md holding only the matched
     # lines (with source line numbers) and the reveals note. VAULT is overridden to a tmp dir so
@@ -102,11 +114,9 @@ def test_unknown_mode_still_rejected():
     assert "unknown mode" in r.stderr
 
 
-def test_burp_mode_selects_created_tab_by_oracle():
-    # burpshot must SELECT the tab it created (create_repeater_tab appends but does not focus it) and
-    # VERIFY via the active-editor oracle before Send/grab -- never a stale-tab PoC. Source-level check
-    # because the live Burp GUI path cannot run in CI.
+def test_caido_mode_fetches_stored_exchange_by_request_id():
     src = CAP.read_text()
-    assert "get_active_editor_contents" in src   # the oracle that confirms which tab is focused
-    assert "ctrl+equal" in src                    # go_to_next_tab navigation to reach the created tab
-    assert "could not select" in src              # fail-loud when the intended tab cannot be confirmed
+    assert 'bash "$CAIDO_SH" get "$REQUEST_ID"' in src
+    assert "===== REQUEST =====" in src
+    assert "===== RESPONSE =====" in src
+    assert "mode_caido" in src

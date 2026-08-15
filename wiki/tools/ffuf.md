@@ -180,11 +180,11 @@ ffuf -u http://target.com/FUZZ \
      -fr '/\..*'
 ```
 
-### Route Traffic Through Burp Suite
+### Route Traffic Through Caido
 
 ```bash
 ffuf -u http://target.com/ -w wordlist.txt -x http://127.0.0.1:8080
-# Only send matched results to Burp:
+# Only send matched results to Caido:
 ffuf -u http://target.com/ -w wordlist.txt -replay-proxy http://127.0.0.1:8080
 ```
 

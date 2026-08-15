@@ -39,15 +39,15 @@ TORCH/
 │                                   find-lint, lint-wiki, lint-md-tables.py (GFM table integrity), gen_index, build_moc, cve_feed, freshness,
 │                                   check-hooks, check-leaks.sh, trigger-stats, wordlist-* (+wordlists/),
 │                                   shot.py, capture.sh (one entrypoint, modes: ev=live cmd+url card / req=curl
-│                                   request-response / tmux=real tmux-session card / burp=Burp Repeater PoC), vm-scan.sh, burp/ (burp-mcp-cli.py bridge + burp-transport.sh resolver + burp-scope-sync.py),
+│                                   request-response / tmux=real tmux-session card / caido=Replay request-response PoC), vm-scan.sh, caido/ (SDK wrapper + transport resolver + scope sync),
 │                                   build-walkthrough.py (scaffold + auto-populate the walkthrough Evidence gallery),
 │                                   playbook.json
-├── setup/                       <- bootstrap.sh, install-hooks.sh (per-device hook reg), install-skills.sh, new-engagement.sh, new-research.sh, templates/<type>/ + templates/research/, burp/ (disable-lock.sh)
+├── setup/                       <- bootstrap.sh, install-hooks.sh (per-device hook reg), install-skills.sh, new-engagement.sh, new-research.sh, templates/<type>/ + templates/research/, caido/
 ├── tests/                       <- pytest suite for engagement + wiki automation
 ├── skills/                      <- obsidian/ wiki/ research/ disclosure/
 │   │                               claude-md-improver/ (offline fallback) + hooks/ (hook scripts)
-│   ├── burp/                    <- hunt-burp (MCP driver) + screenshot-burp (Repeater PoC capture)
-│   └── hunt/                    <- all hunt-* (except hunt-burp) + triage/evidence/coverage/ingest/next-move/
+│   ├── caido/                   <- hunt-caido (MCP/SDK driver) + screenshot-caido (Replay PoC capture)
+│   └── hunt/                    <- all hunt-* (except hunt-caido) + triage/evidence/coverage/ingest/next-move/
 │                                   wiki-recon/nday/research-ingest/ctf-box/ctf-category/screenshot/learn + triggers.json
 └── raw/
     ├── research/                <- CVE writeups/blogs/advisories + active research projects (<project>/ from new-research.sh; the research skill writes loop state here)

@@ -24,7 +24,7 @@ multi-step state: submit step N while N-1 is mid-processing
 
 ## How to fire (near-simultaneous)
 ```
-Burp Repeater: select requests -> "Send group in parallel (single-packet attack)"   # HTTP/2: ~20-30 reqs, 1 packet
+Caido Replay: select requests -> "Send group in parallel (single-packet attack)"   # HTTP/2: ~20-30 reqs, 1 packet
 Turbo Intruder: race-single-packet-attack.py  (gate -> openGate -> all hit together)
 ```
 ```python

@@ -181,11 +181,11 @@ Defence: disable sensitive buttons by default and enable them only after a genui
 ## Testing
 
 ### Detecting frameability
-- In Burp Suite, check response headers for absence of `X-Frame-Options` and `Content-Security-Policy: frame-ancestors`.
-- A "Frameable response" issue in Burp's active scanner confirms the target is vulnerable.
+- In Caido, check response headers for absence of `X-Frame-Options` and `Content-Security-Policy: frame-ancestors`.
+- A "Frameable response" issue in Caido's active scanner confirms the target is vulnerable.
 
-### Clickbandit (Burp Suite)
-Automated PoC generation:
+### Clickbandit (Burp)
+Automated PoC generation (Burp-only; no Caido equivalent):
 1. Open the target page in Burp's browser.
 2. Go to **Burp > Clickbandit** and click **Copy Clickbandit to clipboard**.
 3. Paste the script into the browser DevTools console.
@@ -244,7 +244,7 @@ Notes: `X-Frame-Options: SAMEORIGIN` / `frame-ancestors 'self'` do NOT stop same
 
 ## Tools
 - `clickjack` (machine1337)
-- [[burp-suite]] — Clickbandit tool to generate PoC (Burp > Clickbandit)
+- Burp Clickbandit — records a clickjacking PoC (Burp > Clickbandit); Burp-only, no Caido equivalent
 
 ---
 

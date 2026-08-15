@@ -203,7 +203,7 @@ echo $cookie;
 
 | Chain | Purpose | Library required? |
 |-------|---------|-------------------|
-| `URLDNS` | DNS lookup to Burp Collaborator — confirms deserialization universally | No |
+| `URLDNS` | DNS lookup to interactsh/OAST — confirms deserialization universally | No |
 | `JRMPClient` | TCP connection to attacker IP — use timing to infer firewalled vs. open | No |
 
 ```bash
@@ -533,7 +533,7 @@ HTB methodology writeups clustered as ingest slug `0xdf-deserialization`. Below 
 
 | Tool | Purpose |
 |------|---------|
-| [[burp-suite]] | Intercept and modify cookies/parameters containing serialized data |
+| [[caido]] | Intercept and modify cookies/parameters containing serialized data |
 | ysoserial | Generate Java deserialization payloads for known gadget chains |
 | PHPGGC | Generate PHP gadget chain payloads for common frameworks |
 | `php -r 'echo serialize(...);'` | Craft PHP serialized strings manually |

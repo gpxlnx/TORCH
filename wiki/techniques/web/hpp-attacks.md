@@ -47,7 +47,7 @@ Used to bypass WAF signature matching and to flip business-logic values (price, 
 Decide a single canonical parameter source and reject duplicates (or explicitly take first and validate); keep the WAF, app, and backend on the **same** parsing rule; validate type + count server-side; for JSON, reject duplicate keys.
 
 ## Tools
-Burp Repeater (manual duplicate/array), OWASP ZAP, `Param Miner`. See [[business-logic]], [[sql-injection]] (WAF-bypass chains).
+Caido Replay (manual duplicate/array), OWASP ZAP, Burp `Param Miner`. See [[business-logic]], [[sql-injection]] (WAF-bypass chains).
 
 ## Sources
 - PayloadsAllTheThings - HTTP Parameter Pollution

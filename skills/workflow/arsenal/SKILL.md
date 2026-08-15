@@ -23,7 +23,7 @@ for the service? Use it; do not hand-roll a curl/socket loop. `ls wiki/tools/` f
 
 | Surface / service | Automated tools (`wiki/tools/<name>.md`) |
 |---|---|
-| Web HTTP(S) | httpx, whatweb, nikto -> ffuf/feroxbuster/gobuster (content) -> katana/gau (crawl) -> arjun (params) -> nuclei (CVE/misconfig) -> dalfox (XSS) -> wpscan (WP); gowitness, burp-suite/burp-mcp |
+| Web HTTP(S) | httpx, whatweb, nikto -> ffuf/feroxbuster/gobuster (content) -> katana/gau (crawl) -> arjun (params) -> nuclei (CVE/misconfig) -> dalfox (XSS) -> wpscan (WP); gowitness, caido |
 | Ports / host | nmap, rustscan, naabu |
 | DNS / subdomains | subfinder, amass, dnsx, gau |
 | SMB / Windows / AD | netexec, responder, impacket, bloodhound/powerview, kerbrute, certipy/rubeus, evil-winrm |

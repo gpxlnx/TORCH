@@ -492,7 +492,7 @@ Helper names vary by V3 build; once V3 CSTI is confirmed, enumerate nearby `_`-p
 
 ## Tools
 
-- [[burp-suite]] — intercept and modify requests, test payloads in Repeater
+- [[caido]] — intercept and modify requests, test payloads in Replay
 - SSTImap — https://github.com/vladko312/SSTImap — automated detection and exploitation
 - TInjA — https://github.com/Hackmanit/TInjA — An efficient SSTI + CSTI scanner utilizing novel polyglots
 - PayloadsAllTheThings — https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Template%20Injection
@@ -655,7 +655,7 @@ tinja url -u "http://example.com/?name=Kirlia" -H "Authentication: Bearer ey..."
 **Engine:** Tornado (Python)
 **Sink:** `blog-post-author-display` POST parameter (preferred name setting), rendered in comment author field
 
-1. Log in, go to account settings, intercept the preferred-name POST request in Burp — notice `blog-post-author-display=user.name`.
+1. Log in, go to account settings, intercept the preferred-name POST request in Caido — notice `blog-post-author-display=user.name`.
 2. The value is embedded inside an already-open template expression (code context).
 3. Supply a malformed value to trigger an error — stack trace reveals Tornado template engine.
 4. Break out of the expression context and inject an import statement:

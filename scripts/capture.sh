@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # capture.sh <mode> <eng> <slug> [args] - unified live PoC-evidence capture on the Kali VM.
-# Merges the former ev/req/tmux/burp shot scripts into one entrypoint. Every mode renders a
+# Merges the former ev/req/tmux/proxy shot scripts into one entrypoint. Every mode renders a
 # PNG on the VM (via shot.py) and pulls it into targets/<eng>/poc/NN-<slug>.png (auto-numbered),
 # then prints the walkthrough `md:` ref. Call it the MOMENT a step LANDS, not at the end.
 #
@@ -30,14 +30,14 @@
 #   log  <eng> <slug> <remote-logfile>                      save a long text log (linpeas/pspy) to poc/NN.md
 #   raw  <eng> <slug> <remote-file>                         pull RAW scan output verbatim -> recon/raw/<slug>
 #   snippet <eng> <slug> <url-or-file> [grep-pattern] [note] fenced source excerpt (app.js/HTML) -> poc/NN-<slug>-snippet.md
-#   burp <eng> <slug> <host> <port> <https> <method> <path> [bodyfile] [tabname]
-#                                                           Burp Repeater request/response grab (via MCP)
+#   caido <eng> <slug> <request-id> [highlight-regex]         Caido Replay request/response card
 #
 # The VM bridge is $VM_SH (default /root/vm.sh); files cross it base64-in-command (no stdin).
 set -euo pipefail
 
 VAULT="${VAULT:-$(cd "$(dirname "$0")/.." && pwd)}"
 VM_SH="${VM_SH:-/root/vm.sh}"
+CAIDO_SH="${CAIDO_SH:-$VAULT/scripts/caido/caido-client.sh}"
 
 usage() {
   cat >&2 <<'U'
@@ -51,7 +51,7 @@ usage: capture.sh <mode> <eng> <slug> [args]
   log  <eng> <slug> <remote-logfile>
   raw  <eng> <slug> <remote-file>
   snippet <eng> <slug> <url-or-file> [grep-pattern] [reveals-note]
-  burp <eng> <slug> <host> <port> <https> <method> <path> [bodyfile] [tabname]
+  caido <eng> <slug> <request-id> [highlight-regex]
 U
   exit 2
 }
@@ -368,101 +368,45 @@ mode_snippet() {
   echo "md: paste the fenced block into walkthrough.md Recon; file ref: [$SLUG](poc/$MD)"
 }
 
-# burp: drive Burp (via the MCP) to replay a request in Repeater, then screenshot the
-# request+response panes. Grabs as the SEAT user (Burp draws on the seat X session).
-mode_burp() {
-  [ $# -ge 7 ] || { echo "usage: capture.sh burp <eng> <slug> <host> <port> <https> <method> <path> [bodyfile] [tabname]" >&2; exit 2; }
-  ENG=$1; local SLUG=$2 HOST=$3 PORT=$4 HTTPS=$5 METHOD=$6 RPATH=$7 BODYFILE=${8:-} TABNAME=${9:-$2}
+# caido: fetch an existing Caido request/response by ID and render a deterministic
+# evidence card. The request must already exist in HTTP History or a named Replay session.
+mode_caido() {
+  [ $# -ge 3 ] || { echo "usage: capture.sh caido <eng> <slug> <request-id> [highlight-regex]" >&2; exit 2; }
+  ENG=$1; local SLUG=$2 REQUEST_ID=$3 HIGHLIGHT=${4:-}
   _poc_target "$ENG" "$SLUG"
-  local RPNG="/tmp/burpshot_${SLUG//[^a-zA-Z0-9]/_}.png"
-
-  # --- VM-side helper 1: build the raw request (CRLF) + create the Repeater tab via the MCP ---
-  local TABPY GRABSH
-  read -r -d '' TABPY <<'PY' || true
-import json, os, subprocess, sys
-cli = os.path.expanduser("~/burp-mcp-cli.py")
-host, port, https, method, path, tab = sys.argv[1:7]
-bf = sys.argv[7] if len(sys.argv) > 7 and sys.argv[7] else ""
-lines = ["%s %s HTTP/1.1" % (method, path), "Host: %s:%s" % (host, port), "Accept: */*", "Connection: close"]
-body = ""
-if bf:
-    body = open(bf).read().strip()
-    lines += ["Content-Type: application/x-www-form-urlencoded;charset=UTF-8", "Content-Length: %d" % len(body)]
-req = "\r\n".join(lines + ["", body])
-args = json.dumps({"content": req, "targetHostname": host, "targetPort": int(port),
-                   "usesHttps": https == "true", "tabName": tab})
-try:
-    p = subprocess.run(["python3", cli, "call", "create_repeater_tab", args],
-                       capture_output=True, text=True, timeout=45)
-    print("TAB_OK" if "Executed" in p.stdout else "TAB_FAIL " + (p.stdout.strip() or p.stderr.strip()[-140:]))
-except Exception as e:
-    print("TAB_FAIL " + str(e))
-PY
-
-  # --- VM-side helper 2: send in the GUI (as the seat user) + grab the window ---
-  read -r -d '' GRABSH <<PY || true
-set -e
-U=\$(who | awk '/\\(:[0-9]/{print \$1; exit}'); U=\${U:-\$(who | awk 'NR==1{print \$1}')}
-D=\$(who | grep -oE '\\(:[0-9]+' | head -1 | tr -d '('); D=\${D:-:0}
-XA=/home/\$U/.Xauthority
-r(){ sudo -u "\$U" env DISPLAY="\$D" XAUTHORITY="\$XA" "\$@"; }
-WID=\$(r xdotool search --name "Burp Suite Professional" | head -1)
-[ -n "\$WID" ] || { echo "GRAB_FAIL no Burp window on \$D"; exit 0; }
-# unlock + wake the seat FIRST: a screen LOCK on seat0 routes synthetic input to the locker (getmouselocation
-# reports window:0) so keys never reach Burp. loginctl unlock-session (root) dismisses the lock; xset wakes the
-# display + disables the blanker. Without this a locked/idle VM silently fails the interactivity precheck below.
-SID=\$(loginctl list-sessions --no-legend 2>/dev/null | awk '/seat0/{print \$1; exit}')
-[ -n "\$SID" ] && loginctl unlock-session "\$SID" 2>/dev/null || true
-r xset dpms force on 2>/dev/null || true; r xset s off 2>/dev/null || true; sleep 0.4
-r xdotool windowactivate --sync "\$WID"; r xdotool windowraise "\$WID"; sleep 0.7
-# window client origin, for coord mapping (screen = window + origin)
-GEO=\$(r xdotool getwindowgeometry "\$WID"); WX=\$(echo "\$GEO" | awk -F'[ ,]+' '/Position/{print \$3}'); WY=\$(echo "\$GEO" | awk -F'[ ,]+' '/Position/{print \$4}'); WX=\${WX:-0}; WY=\${WY:-0}
-# interactivity precheck: a headless/unmapped X still lets 'import' grab the window PIXMAP but routes
-# INPUT to root, so clicks/keys never reach Burp (getmouselocation over Burp reports window:0). Fail loud.
-UW=\$(r xdotool mousemove \$((WX+600)) \$((WY+300)) getmouselocation 2>/dev/null | grep -oE 'window:[0-9]+' | cut -d: -f2)
-if [ "\${UW:-0}" = "0" ]; then echo "GRAB_FAIL Burp window not interactive (input routes to root - headless/unmapped display). Foreground Burp on the VM desktop or restart the X session, then retry."; exit 0; fi
-# Java/Swing IGNORES synthetic --window (XSendEvent) input -> drive via XTEST (no --window flag). Keys reach
-# Burp once the window is activated (synthetic mouse clicks are still swallowed by Swing, so never rely on them).
-r xdotool key ctrl+shift+r; sleep 1.2                                   # -> Repeater tool
-# SELECT the just-created tab. create_repeater_tab appends it RIGHTMOST but does NOT focus it, and Ctrl+=
-# (go_to_next_tab) WRAPS, so step tab-by-tab until get_active_editor_contents shows OUR request line. A
-# built-in VERIFY: Send/grab happens ONLY after the intended tab is confirmed focused (retires stale-tab PoCs).
-MARKER="$METHOD $RPATH"
-SELECTED=0
-for i in \$(seq 1 16); do
-  CUR=\$(timeout 10 python3 ~/burp-mcp-cli.py call get_active_editor_contents "{}" 2>/dev/null | head -1)
-  if printf '%s' "\$CUR" | grep -Fq "\$MARKER"; then SELECTED=1; break; fi
-  r xdotool key ctrl+equal; sleep 0.5                                  # go_to_next_tab (wraps)
-done
-[ "\$SELECTED" = 1 ] || { echo "GRAB_FAIL could not select the tab for '\$MARKER' after 16 steps (MCP up? scripts/burp/burp-transport.sh)"; exit 0; }
-r xdotool key --clearmodifiers ctrl+space; sleep 4                      # Burp Repeater "Send"
-r import -window "\$WID" "$RPNG"; chmod 644 "$RPNG" 2>/dev/null || true
-echo "GRAB_OK \$WID (verified tab: \$MARKER)"
-PY
-
-  local TABPY_B64 GRABSH_B64 CLI_B64
-  TABPY_B64=$(printf '%s' "$TABPY" | base64 -w0)
-  GRABSH_B64=$(printf '%s' "$GRABSH" | base64 -w0)
-  CLI_B64=$(base64 -w0 "$VAULT/scripts/burp/burp-mcp-cli.py")
-
-  # 1) create the Repeater tab
-  local RES
-  RES=$(bash "$VM_SH" "echo '$CLI_B64' | base64 -d > ~/burp-mcp-cli.py
-echo '$TABPY_B64' | base64 -d > /tmp/burpshot_tab.py
-python3 /tmp/burpshot_tab.py '$HOST' '$PORT' '$HTTPS' '$METHOD' '$RPATH' '$TABNAME' '${BODYFILE}'" 2>&1 || true)
-  if ! echo "$RES" | grep -q TAB_OK; then
-    echo "capture(burp): create_repeater_tab failed -> $RES" >&2
-    echo "  The Burp MCP server did not accept create_repeater_tab. Confirm it is up: scripts/burp/burp-transport.sh" >&2
-    echo "  (expect 'bridge' or 'native'; 'down' -> start Burp + the MCP Server BApp on the VM), or route the" >&2
-    echo "  request via the proxy (curl -x 127.0.0.1:8080 ...) and grab Proxy history instead." >&2
+  local CARD JSON CARD_B64 SHOT_B64 RLOG RPNG
+  CARD=$(mktemp)
+  JSON=$(bash "$CAIDO_SH" get "$REQUEST_ID" --max-body 0 --max-body-chars 0) || {
+    rm -f "$CARD"
+    echo "capture(caido): could not read request $REQUEST_ID" >&2
     exit 1
-  fi
+  }
+  printf '%s' "$JSON" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+req = d.get("raw") or ""
+resp = (d.get("response") or {}).get("raw") or "(no response captured)"
+print("$ Caido Replay request %s" % d.get("id", "?"))
+print()
+print("===== REQUEST =====")
+print(req)
+print()
+print("===== RESPONSE =====")
+print(resp)
+' > "$CARD"
+  [ -s "$CARD" ] || { rm -f "$CARD"; echo "capture(caido): empty request/response card" >&2; exit 1; }
 
-  # 2) send + grab (seat user)
-  bash "$VM_SH" "echo '$GRABSH_B64' | base64 -d > /tmp/burpshot_grab.sh; bash /tmp/burpshot_grab.sh" >&2
-
-  # 3) pull the PNG into the vault poc/
-  _pull_and_report "$RPNG" "$SLUG (Burp)"
+  RLOG="/tmp/poc/caido_${SLUG//[^a-zA-Z0-9]/_}.txt"
+  RPNG="/tmp/poc/caido_${SLUG//[^a-zA-Z0-9]/_}.png"
+  CARD_B64=$(base64 -w0 "$CARD"); rm -f "$CARD"
+  SHOT_B64=$(base64 -w0 "$VAULT/scripts/shot.py")
+  local HLQ=""
+  [ -n "$HIGHLIGHT" ] && printf -v HLQ '%q ' --highlight "$HIGHLIGHT"
+  bash "$VM_SH" "mkdir -p /tmp/poc
+echo '$SHOT_B64' | base64 -d > /tmp/shot.py
+echo '$CARD_B64' | base64 -d > '$RLOG'
+python3 /tmp/shot.py --term '$RLOG' --reqresp --cmd 'Caido Replay: $SLUG' ${HLQ}-o '$RPNG'" >&2
+  _pull_and_report "$RPNG" "$SLUG (Caido Replay)"
 }
 
 MODE="${1:-}"; [ -n "$MODE" ] || usage
@@ -478,7 +422,7 @@ case "$MODE" in
   log)  mode_log "$@" ;;
   raw)  mode_raw "$@" ;;
   snippet) mode_snippet "$@" ;;
-  burp) mode_burp "$@" ;;
+  caido) mode_caido "$@" ;;
   -h|--help|help) usage ;;
   *)    echo "capture: unknown mode '$MODE'" >&2; usage ;;
 esac

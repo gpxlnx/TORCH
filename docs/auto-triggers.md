@@ -99,7 +99,7 @@ coldfusion  php-cgi  vcenter  screenconnect  papercut  ofbiz
 ```
 (80 fingerprints. Each emits the hunt skill to load, e.g. `jenkins detected -> load Skill(hunt-rce)`. The tech list above is an illustrative subset; regenerate from `playbook.json`.)
 
-**OOB callback correlation** - flips a waiting `oob.md` row to HIT when its planted token appears in the command + output blob (operator polling OAST/Collaborator), so a confirmed blind-bug callback is surfaced immediately instead of being missed.
+**OOB callback correlation** - flips a waiting `oob.md` row to HIT when its planted token appears in the command + output blob (operator polling OAST/interactsh), so a confirmed blind-bug callback is surfaced immediately instead of being missed.
 
 **GATE-1 wiki-first nudge** - the only enforcement the plan board's GATE lines get. When an exploit-shaped command runs (`sqlmap`/`hydra`/`medusa`/`msfconsole`/`evil-winrm`/`nxc ... -x`/a reverse shell, incl. inside a vm.sh/ssh/wsl wrapper) while the active `Approach.md` `## 2. Weaponize` section has no `[~]`/`[x]` progress, it nudges once per engagement to query the wiki + pick the payload + mark the Weaponize item BEFORE hand-rolling. Fire-once (`.gate1-nudged` marker), framework-meta exempt, advisory + fail-open.
 

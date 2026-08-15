@@ -115,7 +115,7 @@ Also test: reset the password, then replay the old session token. Active session
 
 ## Key Payloads / Examples
 
-Cookie flag inspection in Burp:
+Cookie flag inspection in Caido:
 
 ```http
 HTTP/1.1 200 OK
@@ -220,7 +220,7 @@ Defence: reject `$Version`/legacy cookie syntax at the edge; normalise Unicode a
 
 ## Tools
 
-- [[burp-suite]] — session analysis, cookie flag inspection, Intruder for IDOR enumeration
+- [[caido]] — session analysis, cookie flag inspection, Automate for IDOR enumeration
 - OWASP ZAP — active scan for session management weaknesses
 - Browser DevTools — inspect cookie attributes in the Application tab
 

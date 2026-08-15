@@ -113,7 +113,7 @@ uiopen "myapp://transfer?to=attacker&amount=1000"
 - **App extensions / share sheet / WKWebView**: `WKWebView` with `javaScriptEnabled` + a JS bridge (`WKScriptMessageHandler`) or loading remote content is a client-side injection surface; test the bridge like a web target.
 
 ### 6. Traffic interception
-Set the device HTTP proxy to Burp, install and trust the Burp CA (Settings -> General -> About -> Certificate Trust Settings -> enable full trust), then disable pinning (objection/Frida) and intercept the API. The real attack surface is almost always server-side: test the API as its own target, [[access-control]] / IDOR, [[authentication-attacks]], [[jwt-attacks]], and the web hunt skills. If pinning uses low-level `SecTrustEvaluate`, use the SSL-Kill-Switch2 tweak or a Frida `SecTrustEvaluateWithError` hook.
+Set the device HTTP proxy to Caido, install and trust the Caido CA (Settings -> General -> About -> Certificate Trust Settings -> enable full trust), then disable pinning (objection/Frida) and intercept the API. The real attack surface is almost always server-side: test the API as its own target, [[access-control]] / IDOR, [[authentication-attacks]], [[jwt-attacks]], and the web hunt skills. If pinning uses low-level `SecTrustEvaluate`, use the SSL-Kill-Switch2 tweak or a Frida `SecTrustEvaluateWithError` hook.
 
 ## Common iOS bug classes
 - **Insecure local storage**: tokens/PII in NSUserDefaults, plaintext SQLite/Realm, weak keychain accessibility (the most common finding).
@@ -135,7 +135,7 @@ Set the device HTTP proxy to Burp, install and trust the Burp CA (Settings -> Ge
 Pin with backup pins (and pin the intermediate), encrypted storage (keychain with `WhenUnlockedThisDeviceOnly`, data-protection classes), jailbreak/integrity attestation via **DeviceCheck / App Attest** (server-verified, not a client boolean), no secrets in the binary, ATS enforced with no arbitrary-loads exception, biometric gates that release a keychain item bound to `.biometryCurrentSet`, and no sensitive data in logs, pasteboard, snapshots, or backups.
 
 ## Tools
-`frida` ([[frida]]) / `frida-ios-dump` / bagbak, `objection`, Burp Suite ([[burp-suite]]), `class-dump`, `otool`/`nm`/`plutil`/`codesign`, `radare2` ([[radare2]]) / [[ghidra]] / Hopper, MobSF, SSL-Kill-Switch2, checkra1n/palera1n/Dopamine, Sideloadly/AltStore. API testing pairs with the web hunt skills; shares runtime tooling with [[android-application]].
+`frida` ([[frida]]) / `frida-ios-dump` / bagbak, `objection`, Caido ([[caido]]), `class-dump`, `otool`/`nm`/`plutil`/`codesign`, `radare2` ([[radare2]]) / [[ghidra]] / Hopper, MobSF, SSL-Kill-Switch2, checkra1n/palera1n/Dopamine, Sideloadly/AltStore. API testing pairs with the web hunt skills; shares runtime tooling with [[android-application]].
 
 ## iOS pentesting without a jailbreak (decrypted IPA + get-task-allow re-sign)
 

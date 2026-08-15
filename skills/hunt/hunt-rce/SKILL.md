@@ -127,13 +127,13 @@ Marker discipline (`hunt-core`): use a unique 8+ char canary in reflected/SSTI p
 - for SSTI: `49` PLUS a follow-up payload that reaches an `os`/runtime primitive and returns its output.
 - for blind (no output channel): an out-of-band callback correlated to your planted token - see below.
 
-**Blind RCE is OOB-gated, never inferred.** Plant an interactsh / Burp Collaborator token, then append a row to `targets/<eng>/oob.md`:
+**Blind RCE is OOB-gated, never inferred.** Plant an interactsh/OAST token, then append a row to `targets/<eng>/oob.md`:
 ```
 | <token> | <sink url+param> | rce | <date> | waiting | |
 ```
-(columns: token | sink | class | planted | status | source; token = your unique interactsh/Collaborator label). The recon-capture hook auto-correlates an incoming callback to flip the row to HIT and SessionStart surfaces HITs; a HIT row is the confirmation gate to scaffold the FIND. **Do NOT claim a blind RCE without a HIT row.**
+(columns: token | sink | class | planted | status | source; token = your unique interactsh/OAST label). The recon-capture hook auto-correlates an incoming callback to flip the row to HIT and SessionStart surfaces HITs; a HIT row is the confirmation gate to scaffold the FIND. **Do NOT claim a blind RCE without a HIT row.**
 
-**Drive load-bearing exploit requests through Burp Repeater** (`Skill(hunt-burp)` / Burp MCP) so the operator can replay the injection; fuzz belongs in Intruder, not a hand-rolled loop.
+**Drive load-bearing exploit requests through Caido Replay** (`Skill(hunt-caido)` / Caido MCP) so the operator can replay the injection; fuzz belongs in Automate, not a hand-rolled loop.
 
 ## Chaining
 

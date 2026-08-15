@@ -1,11 +1,10 @@
-"""idor-sweep offline core: request parse, id detect, variant-set build, scope/RoE gating (--dry-run).
-No VM dial; VAULT -> tmp for the fake engagement; _engagement imported from the real repo."""
+"""Caido IDOR sweep: offline request planning, scope gating, and response parsing."""
 import json
 import os
 import pathlib
 import subprocess
 
-SCRIPT = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "burp" / "idor-sweep.py"
+SCRIPT = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "caido" / "idor-sweep.py"
 
 
 def _mk(tmp, eng, in_lines, flags=""):
@@ -23,7 +22,7 @@ def _req(tmp, name, text):
 
 
 def _run(tmp, *args):
-    env = dict(os.environ, VAULT=str(tmp), VM_SH="/bin/false")
+    env = dict(os.environ, VAULT=str(tmp), CAIDO_SH="/bin/false")
     return subprocess.run(["python3", str(SCRIPT), *args], capture_output=True, text=True, env=env)
 
 
@@ -107,7 +106,7 @@ def test_bad_attacker_auth_clean_error(tmp_path):
 
 import importlib.util
 _spec = importlib.util.spec_from_file_location(
-    "idor_sweep", pathlib.Path(__file__).resolve().parents[1] / "scripts" / "burp" / "idor-sweep.py")
+    "idor_sweep", pathlib.Path(__file__).resolve().parents[1] / "scripts" / "caido" / "idor-sweep.py")
 idor = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(idor)
 
@@ -150,24 +149,27 @@ def test_swap_auth_strips_all_owner_auth_headers():
     assert keys.get("accept") == "*/*"             # non-auth headers preserved
 
 
-def test_parse_send_response_extracts_status_and_len():
-    blob = ("HttpRequestResponse{httpRequest=GET / HTTP/1.1, "
-            "httpResponse=HTTP/2 200 OK\nContent-Length: 5\n\nhello, messageAnnotations=NONE}")
-    st, ln, h = idor.parse_send_response(blob)
-    assert st == 200 and ln == 5 and len(h) == 16
+def test_parse_caido_response_extracts_status_len_and_ids():
+    blob = json.dumps({
+        "sessionId": "S1", "requestId": "R1",
+        "response": {"statusCode": 200, "length": 5, "raw": "HTTP/1.1 200 OK\r\n\r\nhello"},
+    })
+    st, ln, digest, request_id, session_id = idor.parse_caido_response(blob)
+    assert st == 200 and ln == 5 and len(digest) == 16
+    assert request_id == "R1" and session_id == "S1"
 
 
-def test_parse_send_response_degrades_on_unknown_shape():
-    assert idor.parse_send_response("garbage no markers") == (0, 0, "")
+def test_parse_caido_response_degrades_on_unknown_shape():
+    assert idor.parse_caido_response("garbage") == (0, 0, "", "", "")
 
 
-def test_tab_specs_are_owner_and_attacker_only():
-    meta = {"method": "GET", "requests": [
+def test_session_specs_are_owner_and_attacker_only():
+    meta = {"method": "GET", "body": "", "requests": [
         {"label": "owner-baseline", "id": 5, "path": "/o/5", "headers": [("Host", "h"), ("Cookie", "A")]},
         {"label": "idor-test", "id": 5, "path": "/o/5", "headers": [("Host", "h"), ("Cookie", "B")]},
         {"label": "enum", "id": 6, "path": "/o/6", "headers": [("Host", "h"), ("Cookie", "B")]},
     ]}
-    specs = idor.tab_specs(meta)
+    specs = idor.session_specs(meta)
     assert [t["name"] for t in specs] == ["idor-owner", "idor-attacker"]   # enum NOT staged (no clutter)
     assert "GET /o/5 HTTP/1.1" in specs[0]["raw"] and "Cookie: A" in specs[0]["raw"]
     assert "Cookie: B" in specs[1]["raw"]

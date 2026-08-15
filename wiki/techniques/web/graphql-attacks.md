@@ -83,7 +83,7 @@ fragment FullType on __Type { kind name description fields(includeDeprecated: tr
 
 **Steps with InQL (Burp extension):**
 
-1. Install InQL in Burp Suite
+1. Install InQL in Caido
 2. Paste the GraphQL endpoint URL into the InQL Scanner tab
 3. Load the schema — InQL lists all queries, mutations, and fields
 4. Right-click a query in the InQL tab inside Repeater to send it directly
@@ -195,7 +195,7 @@ GraphQL endpoints are vulnerable to CSRF when they:
 
 1. Intercept a mutation request (e.g., `changeEmail`)
 2. Confirm the session cookie alone authorizes the action (no CSRF token needed)
-3. Right-click in Burp → Change request method twice to convert to `x-www-form-urlencoded POST`
+3. Right-click in Caido → Change request method twice to convert to `x-www-form-urlencoded POST`
 4. Add the mutation body URL-encoded:
 
 ```
@@ -268,7 +268,7 @@ query {
 IDOR via GraphQL field access. The blog listing omits ID 3 (private post). InQL Scanner reveals a hidden `postPassword` field on the `getBlogPost` type not shown in the default response.
 
 **Steps:**
-1. Proxy traffic through Burp; open a blog post and send the GraphQL request to Repeater
+1. Proxy traffic through Caido; open a blog post and send the GraphQL request to Repeater
 2. Use InQL Scanner on the `/graphql/v1` endpoint to enumerate all fields
 3. Note `getBlogPost` has a `postPassword` field
 4. Change `id` to 3 (the missing/private post) and add `postPassword` to the query:

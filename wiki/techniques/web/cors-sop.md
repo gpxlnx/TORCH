@@ -286,7 +286,7 @@ Cleaner than a `data:` URL; works in modern browsers:
 
 The `sandbox` attribute without `allow-same-origin` causes the iframe to generate a `null` origin. If the server trusts `null`, the credentialed request succeeds.
 
-### Verification via Burp
+### Verification via Caido
 
 Manually add `Origin: https://evil.com` to a request and inspect the response:
 - Vulnerable: `Access-Control-Allow-Origin: https://evil.com` + `Access-Control-Allow-Credentials: true`
@@ -342,7 +342,7 @@ curl -s -I -H "Origin: https://target.com.evil.com" https://target.com/api/data 
 
 ## Tools
 
-- [[burp-suite]] — add Origin header, inspect CORS response headers
+- [[caido]] — add Origin header, inspect CORS response headers
 - Apache2 + PHP — host exfiltrator server
 - Browser DevTools Network tab — observe XHR connections and CORS headers
 - `Corsy` — CORS Misconfiguration Scanner

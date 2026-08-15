@@ -129,7 +129,7 @@ nikto -h 10.10.10.1 -Plugin robots
 - **Does not crawl deeply**: Focuses on the root and common paths, not deep application logic.
 - **Does not understand application logic**: Cannot test authentication-protected areas without session cookies.
 
-Nikto is best used early in a web recon phase for a quick automated surface scan, followed by manual investigation with tools like Burp Suite.
+Nikto is best used early in a web recon phase for a quick automated surface scan, followed by manual investigation with tools like Caido.
 
 ## Tips and Gotchas
 

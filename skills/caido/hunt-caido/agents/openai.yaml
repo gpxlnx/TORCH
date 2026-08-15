@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hunt Caido"
+  short_description: "Drive Caido traffic analysis and replay workflows"
+  default_prompt: "Use $hunt-caido to triage captured traffic and test an in-scope web target through Caido."

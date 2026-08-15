@@ -133,7 +133,7 @@ GET /admin HTTP/1.1
 Host: example.com
 ```
 
-Detection: disable "Update Content-Length" in Burp Repeater, set a high CL value, and POST to static/redirect endpoints — if the server hangs or returns a timeout the endpoint may be CL.0 vulnerable. Confirm by smuggling a request to a non-existent path and observing a 404 on the follow-up request.
+Detection: disable "Update Content-Length" in Caido Replay, set a high CL value, and POST to static/redirect endpoints — if the server hangs or returns a timeout the endpoint may be CL.0 vulnerable. Confirm by smuggling a request to a non-existent path and observing a 404 on the follow-up request.
 
 ## Response Queue Poisoning
 
@@ -234,7 +234,7 @@ GET /flag HTTP/1.1
 Host: target
 
 ```
-(Two trailing newlines required in Burp Repeater; disable "Update Content-Length")
+(Two trailing newlines required in Caido Replay; disable "Update Content-Length")
 
 ### Faking a WebSocket via SSRF (Nginx pattern)
 
@@ -441,7 +441,7 @@ Content-Length: 500
 username=test&query=
 ```
 
-Run via Burp Intruder with Null payloads (~10,000 requests, 1 thread). Check `/submissions` directory for captured victim requests containing credentials.
+Run via Caido Automate with Null payloads (~10,000 requests, 1 thread). Check `/submissions` directory for captured victim requests containing credentials.
 
 ## H2.CL Capture (Elbandito CTF)
 
@@ -544,10 +544,10 @@ Detect: backend `Server:` header differs from the front, a `/page/`-style path-p
 
 ## Tools
 
-- [[burp-suite]] — HTTP Request Smuggler extension, Repeater, Intruder
+- [[caido]] — Replay for manual desync testing; Burp HTTP Request Smuggler extension for automated probing (Burp-only; no Caido equivalent)
 - `h2csmuggler` (BishopFox) — automated h2c tunnel bypass
 - `defparam/smuggler` — An HTTP Request Smuggling / Desync testing tool written in Python 3
-- `dhmosfunk/simple-http-smuggler-generator` — Tool developed for Burp Suite practitioner certificate exam and HTTP Request Smuggling labs
+- `dhmosfunk/simple-http-smuggler-generator` — Tool developed for Caido practitioner certificate exam and HTTP Request Smuggling labs
 
 ## PortSwigger Labs
 
@@ -668,7 +668,7 @@ x=1
 Add a custom HTTP/2 header using Burp Inspector; use Shift+Enter in the header value field to insert real CRLF characters (not literal `\r\n`). Inject `Transfer-Encoding: chunked` after the CRLF. Then smuggle a POST to the search endpoint with `Content-Length: 800` and `search=x` — the back-end waits for 800 bytes and captures the victim's request start into the search history.
 
 #### Lab 11 — HTTP/2 request splitting via CRLF injection (Practitioner)
-Inject a complete smuggled request into an HTTP/2 header value using double CRLF (Shift+Enter twice in Burp Inspector). The `\r\n\r\n` terminates the first request; the appended GET is queued as a separate request. Repeat until a 302 response with admin cookie is captured, then access `/admin/delete?username=carlos`.
+Inject a complete smuggled request into an HTTP/2 header value using double CRLF (Shift+Enter twice in Caido Inspector). The `\r\n\r\n` terminates the first request; the appended GET is queued as a separate request. Repeat until a 302 response with admin cookie is captured, then access `/admin/delete?username=carlos`.
 
 ```
 Header name: foo
@@ -676,10 +676,10 @@ Header value: bar\r\n\r\nGET /x HTTP/1.1\r\nHost: LAB-ID.web-security-academy.ne
 ```
 
 #### Lab 12 — CL.0 request smuggling (Practitioner)
-Front-end honours CL, back-end ignores it for static endpoints. Find a static/redirect path, POST to it with a smuggled body containing `GET /admin`. Use Burp Repeater grouped tabs (send in sequence on same connection) to confirm 404 on follow-up, then smuggle admin access.
+Front-end honours CL, back-end ignores it for static endpoints. Find a static/redirect path, POST to it with a smuggled body containing `GET /admin`. Use Caido Replay grouped tabs (send in sequence on same connection) to confirm 404 on follow-up, then smuggle admin access.
 
 #### Lab 13 — Basic CL.TE (Practitioner)
-Switch Burp Repeater to HTTP/1.1 (Inspector panel → Request attributes). Change GET to POST. CL=6, TE=chunked. Send twice; first returns 200, second returns "GPOST" unknown method error (the `G` prefix left from the smuggled chunk was prepended to the next POST).
+Switch Caido Replay to HTTP/1.1 (Inspector panel → Request attributes). Change GET to POST. CL=6, TE=chunked. Send twice; first returns 200, second returns "GPOST" unknown method error (the `G` prefix left from the smuggled chunk was prepended to the next POST).
 
 ```http
 POST / HTTP/1.1

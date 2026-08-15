@@ -35,8 +35,8 @@ GATE 3 (loop): a vector exhausted -> mark `[!]`, one Deadends line, move to the 
 - [ ] CVE lookup for named tech/version      -> [[cve-arsenal]]
 - [ ] stage PoC into poc/scripts/
 
-## 3. Deliver  ([[burp-mcp]] · [[api-security]])
-- [ ] deliver via burp repeater / curl       -> [[burp-mcp]]
+## 3. Deliver  ([[caido]] · [[api-security]])
+- [ ] deliver via Caido Replay / curl       -> [[caido]]
 - [ ] token / cookie / cred reuse            -> loot.md
 - [ ] fuzz params / request items            -> [[wiki/tools/ffuf]] [[arjun]]
 

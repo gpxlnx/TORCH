@@ -62,7 +62,7 @@ SECTIONS = (
     "## Rabbit holes (skip on redo)",
 )
 
-NO_EVIDENCE = "_No rendered evidence found yet - capture evidence live into poc/ via `capture.sh` (ev/req/tmux/burp)._"
+NO_EVIDENCE = "_No rendered evidence found yet - capture evidence live into poc/ via `capture.sh` (ev/req/tmux/caido)._"
 
 _LEADING_SEQ = re.compile(r"^\d+-")
 _DASH_RUN = re.compile(r"[-_]+")

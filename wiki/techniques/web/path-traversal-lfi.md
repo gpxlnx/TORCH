@@ -194,7 +194,7 @@ Use SecLists for automated fuzzing:
 https://github.com/danielmiessler/SecLists/blob/master/Fuzzing/LFI/LFI-Jhaddix.txt
 ```
 
-Burp Intruder also ships with a "Fuzzing - path traversal" payload list containing encoded sequences.
+Caido Automate also ships with a "Fuzzing - path traversal" payload list containing encoded sequences.
 
 ## PHP Wrappers
 
@@ -444,7 +444,7 @@ if (file.getCanonicalPath().startsWith(BASE_DIRECTORY)) {
 
 ## Tools
 
-- [[burp-suite]] — Intruder with LFI wordlist, Repeater for manual testing
+- [[caido]] — Automate with LFI wordlist, Replay for manual testing
 - SecLists — `Fuzzing/LFI/LFI-Jhaddix.txt`
 - `php_filter_chain_generator` — https://github.com/synacktiv/php_filter_chain_generator
 - `ffuf` / `gobuster` — directory and file fuzzing to find inclusion points

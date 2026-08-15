@@ -178,13 +178,13 @@ def test_hunt_trigger_prose_mention_downgrades_to_soft(vault):
 def test_hunt_trigger_review_prose_does_not_force_mandatory(vault):
     # discussing/reviewing a tool by name, not attacking it -> no intent verb nearby
     # -> hunt-mcp downgrades to soft, no imperative load-first directive.
-    # (NOTE: the brief's original example prompt for this case, "using the Burp MCP
+    # (NOTE: the brief's original example prompt for this case, "using the Caido MCP
     # as a tool, not attacking one", was verified to still fire hard -- "attacking"
     # falls inside the 64-char window around the "mcp" match and the gate does not
     # do negation-detection ("not attacking"). Swapped in this prompt, which has no
     # intent-verb token anywhere in it, to actually exercise the intended behavior.)
     out = run_hook("hunt-trigger.py",
-                   {"prompt": "using the Burp MCP as a tool during code review"}, _env(vault)).stdout
+                   {"prompt": "using the Caido MCP as a tool during code review"}, _env(vault)).stdout
     assert "Your FIRST action MUST be to load Skill(hunt-mcp)" not in out
     assert "MANDATORY" not in out
 
@@ -640,7 +640,7 @@ def test_recon_capture_recognizes_added_natives():
 
 def test_recon_capture_flips_oob_on_callback_via_grep_poll(vault):
     # OOB auto-correlation (a KEPT behavior): a waiting oob.md row flips to HIT when its
-    # token appears in a command's output. Polling a saved OAST/Collaborator log with grep
+    # token appears in a command's output. Polling a saved OAST/interactsh log with grep
     # (a doc-command) must still flip it -- OOB correlation runs BEFORE the doc-command skip.
     eng = vault / "targets" / "acme"
     token = "oastxyz9k"

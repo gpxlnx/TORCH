@@ -149,7 +149,7 @@ installs the core set for you; the rest are referenced by the workflow and insta
 - **superpowers** (recommended) - the planning / execution / debugging workflow the CLAUDE.md loop routes to: `brainstorming` -> `writing-plans` -> `subagent-driven-development`, plus `systematic-debugging`, `dispatching-parallel-agents`, and `verification-before-completion`.
 - **context7** (optional MCP) - up-to-date library / API docs, used for vendor-default and dependency lookups.
 - **gsd** (optional) - the `pause-work` session-end helper.
-- **burp-mcp** (optional MCP) - drives Burp Suite for the `hunt-burp` workflow.
+- **caido** (optional MCP) - drives Caido for the `hunt-caido` workflow; the official SDK client is the fallback.
 
 Install plugins from Claude Code's plugin marketplace (`/plugin`), and MCP servers with `claude mcp add`.
 Everything degrades gracefully: the hooks fail open and the hunt/wiki skills work without the optional
@@ -160,7 +160,7 @@ plugins, but the documented planning loop assumes `superpowers`.
 ```
 CLAUDE.md         top-level instructions loaded by Claude Code
 wiki/             500+ page technique corpus (ships; semantic + keyword indexed)
-skills/           hunt-* skills, workflow/ (campaign drivers, triage / evidence / coverage), research / disclosure / burp, hooks/, meta-skills
+skills/           hunt-* skills, workflow/ (campaign drivers, triage / evidence / coverage), research / disclosure / caido, hooks/, meta-skills
 scripts/          campaign (autonomous workflow driver), next_move, find-lint, check-leaks, index / lint tooling
 setup/            bootstrap, install-hooks, install-skills, new-engagement / research, templates
 docs/             workflows, page-types, setup, sharing (client-data boundary), conventions

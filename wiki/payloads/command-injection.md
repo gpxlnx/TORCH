@@ -43,7 +43,7 @@ of absence. Fingerprint both before running anything, against one endpoint with 
 
 Consequences worth internalising:
 
-- **Burp Collaborator can be unusable** on such a target - `oastify.com` is blocklisted by
+- **interactsh/OAST can be unusable** on such a target - `oastify.com` is blocklisted by
   name, with or without a command around it. Switch to interactsh (`.oast.fun`), whose
   domains commonly pass. Test the bare domain alone to separate the two rules.
 - **Stock nuclei OOB templates are neutered.** `dast/vulnerabilities/cmdi/blind-oast-polyglots.yaml`

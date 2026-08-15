@@ -32,7 +32,7 @@ Money and state-machine endpoints pay; cosmetic ones do not. Work them in this o
 
 ## Methodology
 
-**Setup:** two accounts per `hunt-core` where the flaw is cross-actor; one account suffices for pure value or state tampering. Drive the load-bearing requests through **Burp Repeater** for operator visibility.
+**Setup:** two accounts per `hunt-core` where the flaw is cross-actor; one account suffices for pure value or state tampering. Drive the load-bearing requests through **Caido Replay** for operator visibility.
 
 1. **Map the flow.** Enumerate every step and state of the target feature. Note each parameter and which server check governs it. The flaw is a check the client can reach around.
 
@@ -47,7 +47,7 @@ integer overflow / very large qty
 decimal / rounding (0.001 * 1000)
 ```
 
-4. **Repetition / limits / logic race.** Apply a coupon twice, redeem a gift card twice, exceed a per-account limit. When the limit is a check-then-act with no lock, fire a **small concurrent burst** at the single endpoint (logic [[race-conditions]]) so several requests pass the check before any commits. Keep the burst bounded: a handful of parallel requests is the proof, honor `no_dos`, never a sustained flood. Per `hunt-core` this is a bounded active proof, not object enumeration, so the 5-to-20 identifier ceiling does not apply, but the RoE rate cap does. Send the request to **Turbo Intruder** via `send_to_intruder` / the Burp MCP and fire it with a single-packet or synchronized-gate script so the operator watches the race live; a hand-rolled parallel `curl` loop hides it.
+4. **Repetition / limits / logic race.** Apply a coupon twice, redeem a gift card twice, exceed a per-account limit. When the limit is a check-then-act with no lock, fire a **small concurrent burst** at the single endpoint (logic [[race-conditions]]) so several requests pass the check before any commits. Keep the burst bounded: a handful of parallel requests is the proof, honor `no_dos`, never a sustained flood. Per `hunt-core` this is a bounded active proof, not object enumeration, so the 5-to-20 identifier ceiling does not apply, but the RoE rate cap does. Put the request in **Caido Automate** for the visible bounded burst. If proof requires strict single-packet timing that Automate cannot provide, use the dedicated race harness from [[race-conditions]] and import the proving exchange back into Caido.
 
 5. **Mass assignment / parameter injection.** Add fields the UI never sends (`isAdmin`, `role`, `balance`, `verified`, `discount`, `userId`) to JSON or form bodies; observe a privilege or state change.
 

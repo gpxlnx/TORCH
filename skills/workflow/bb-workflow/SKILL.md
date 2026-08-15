@@ -54,7 +54,7 @@ as the equivalent. `pt-workflow` / `ctf-workflow` default to the VM browser for 
 
 - **G1** no exploit action until the row's arsenal card exists (`Skill(wiki-arsenal)` fills it).
 - **G2** a row cannot close unless its mapped `Skill(hunt-*)` actually fired.
-- **G3** a row cannot close without typed evidence: `req` (default), `burp`, or `web` (visual classes
+- **G3** a row cannot close without typed evidence: `req` (default), `caido`, or `web` (visual classes
   only). A page render is not evidence of a bug.
 - **G8** run the mapped tool before hand-rolling; the driver warns if you skipped it.
 
@@ -83,8 +83,8 @@ The line that keeps quota safety: Haiku is allowed for a **bounded single job**,
   the mandatory Opus **verifier** gates every finding (`done --find` refuses without a passing
   `verdicts/<F>.json`). Still **no open-ended hunter fan-out** (it exhausted the weekly quota last
   time) - Haiku is only for single, fully-specified jobs.
-- Load-bearing exploit requests go through Burp Repeater when it is reachable; degrade to
-  `capture.sh req` when it is not. Never block on Burp.
+- Load-bearing exploit requests go through Caido Replay when it is reachable; degrade to
+  `capture.sh req` when it is not. Never block on Caido.
 - Scope and the enumeration ceiling come from `scope.md`, never from this skill.
 - **RCE-first:** with >1 vector open, take the code-exec one first - it is the attack vector with
   impact; chase lower-impact classes only after code-exec is ruled out or the target needs them.

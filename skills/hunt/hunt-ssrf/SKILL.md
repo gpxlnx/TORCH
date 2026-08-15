@@ -1,6 +1,6 @@
 ---
 name: hunt-ssrf
-description: SSRF hunting - OOB-mandatory methodology. Cloud metadata, blind SSRF via Collaborator/interactsh, redirect-based bypass, headless browser chains. Wiki-first, FIND schema output.
+description: SSRF hunting - OOB-mandatory methodology. Cloud metadata, blind SSRF via interactsh/OAST, redirect-based bypass, headless browser chains. Wiki-first, FIND schema output.
 ---
 
 # Hunt: SSRF
@@ -22,13 +22,13 @@ Bypass variants: [[dns-rebinding]] (hostname re-resolution TOCTOU past an allowl
 **Blind SSRF claims require OOB confirmation. No exceptions.**
 
 NOT confirmation: URL echo in error message, different status code, delayed response alone.
-IS confirmation: DNS lookup or HTTP request to your unique Collaborator/interactsh subdomain.
+IS confirmation: DNS lookup or HTTP request to your unique interactsh/OAST subdomain.
 
-When you plant a blind/OOB SSRF payload, append a row to `targets/<eng>/oob.md`: `| <token> | <sink url+param> | ssrf | <date> | waiting | |` (columns: token | sink | class | planted | status | source, where token = your unique Collaborator/interactsh label). The recon-capture hook auto-correlates incoming callbacks to flip the row to HIT and SessionStart surfaces HITs; a HIT row is the confirmation gate to scaffold the FIND. Do NOT claim a blind SSRF without a HIT row.
+When you plant a blind/OOB SSRF payload, append a row to `targets/<eng>/oob.md`: `| <token> | <sink url+param> | ssrf | <date> | waiting | |` (columns: token | sink | class | planted | status | source, where token = your unique interactsh/OAST label). The recon-capture hook auto-correlates incoming callbacks to flip the row to HIT and SessionStart surfaces HITs; a HIT row is the confirmation gate to scaffold the FIND. Do NOT claim a blind SSRF without a HIT row.
 
 Setup OOB before testing (full channel guide: wiki `oob-callbacks` - DNS-vs-HTTP, self-hosted interactsh, DNS exfil):
 ```bash
-interactsh-client -v   # or use Burp Collaborator
+interactsh-client -v   # or use interactsh
 # Tag each sink: dlsrcurl.<collab>, import.<collab>, webhook.<collab>
 ```
 

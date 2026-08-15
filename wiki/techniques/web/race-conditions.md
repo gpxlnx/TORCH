@@ -58,14 +58,16 @@ Send a request with and without your session cookie to confirm the state is stor
 2. Apply it a second time — confirm it is rejected with "already applied"
 3. This establishes what a successful race looks like vs. a rejected attempt
 
-### 4. Send parallel requests with Burp Repeater
+### 4. Send parallel requests
 
-Burp Suite 2023.9+ supports native single-packet attack mode:
+Burp 2023.9+ has native single-packet attack mode; Caido Replay supports grouped parallel send. Burp workflow:
 
 1. Send the target request to Repeater
 2. Duplicate it multiple times (Ctrl+R many times)
 3. Group all tabs: right-click → "New group" → add all requests
 4. Send group in parallel: "Send group (parallel)" or "Send group (single-packet attack)"
+
+In Caido, add the duplicated requests to a Replay collection and use its parallel/single-packet send.
 
 For HTTP/2 targets, Burp uses the single-packet attack (all requests in one TCP packet, nullifying network jitter). For HTTP/1, it uses last-byte synchronisation.
 
@@ -156,7 +158,7 @@ If both answers are yes, the endpoints are candidates for a multi-endpoint race.
 
 **Connection warming** — before timing multi-endpoint requests, send one or more inconsequential GET requests (e.g., `GET /`) on the same connection to pre-establish it. This separates backend connection-setup latency from endpoint processing time and improves race window alignment.
 
-In Burp Repeater: add a `GET /` tab at the start of the group, then send the group in sequence on a single connection to warm up, then send the attack group in parallel.
+In Caido Replay: add a `GET /` tab at the start of the group, then send the group in sequence on a single connection to warm up, then send the attack group in parallel.
 
 **Lab 3 technique (cart checkout race):**
 
@@ -233,7 +235,7 @@ The gate ensures all 51 requests (1 register + 50 confirm) are released simultan
 
 ## Key payloads / examples
 
-### Burp Repeater — group parallel send
+### Caido Replay — group parallel send
 
 1. `POST /cart/coupon` — duplicate 20 times
 2. Group all
@@ -278,7 +280,7 @@ The following reports are drawn from all 11 paid HackerOne race-condition disclo
 
 ### Shopify partner email confirmation bypass — store takeover ($15,250 critical — Shopify, #300305)
 
-Shopify's partner onboarding flow sent an email confirmation link to verify that a new partner's email was legitimately theirs. The confirmation endpoint did not atomically mark the token as consumed — it checked validity, granted store access, and then marked the token used in three separate, non-locked operations. By sending a burst of simultaneous confirmation requests before the token was invalidated, the researcher confirmed the same token multiple times, each confirmation granting access to a different store. The attacker could use any employee email address to claim access to stores that email was associated with. Executed via parallel HTTP requests (Burp Repeater group send). **Resource:** email-confirmation token (single-use). **Impact:** full store account takeover at scale.
+Shopify's partner onboarding flow sent an email confirmation link to verify that a new partner's email was legitimately theirs. The confirmation endpoint did not atomically mark the token as consumed — it checked validity, granted store access, and then marked the token used in three separate, non-locked operations. By sending a burst of simultaneous confirmation requests before the token was invalidated, the researcher confirmed the same token multiple times, each confirmation granting access to a different store. The attacker could use any employee email address to claim access to stores that email was associated with. Executed via parallel HTTP requests (Caido Replay group send). **Resource:** email-confirmation token (single-use). **Impact:** full store account takeover at scale.
 
 ### Cosmos blockchain faucet race — unlimited token drain ($5,000 critical — Cosmos, #1438052)
 
@@ -290,7 +292,7 @@ The Rust standard library's `remove_dir_all()` function performed a check-then-u
 
 ### World ID verification bypass ($3,000 high — Tools for Humanity, #2110030)
 
-The Worldcoin World ID verification endpoint enforced a "one verification per person" rule, but the uniqueness check and the verification write were non-atomic. By submitting two verification attempts simultaneously (parallel POST requests), the researcher bypassed the check and created multiple valid World ID verifications for the same identity. **Resource:** verification slot (one per person). **Execution:** Burp Repeater parallel group send. **Takeaway:** identity verification systems must use database unique constraints enforced at the write layer, not application-level checks — a `UNIQUE` constraint with an `INSERT ... ON CONFLICT IGNORE` pattern makes the race impossible.
+The Worldcoin World ID verification endpoint enforced a "one verification per person" rule, but the uniqueness check and the verification write were non-atomic. By submitting two verification attempts simultaneously (parallel POST requests), the researcher bypassed the check and created multiple valid World ID verifications for the same identity. **Resource:** verification slot (one per person). **Execution:** Caido Replay parallel group send. **Takeaway:** identity verification systems must use database unique constraints enforced at the write layer, not application-level checks — a `UNIQUE` constraint with an `INSERT ... ON CONFLICT IGNORE` pattern makes the race impossible.
 
 ### curl fopen() race condition — CVE-2023-32001 ($2,480 medium — Internet Bug Bounty, #2078571)
 
@@ -298,7 +300,7 @@ libcurl's cookie-jar write path opened a file, checked whether it was a regular 
 
 ### HackerOne CTF group membership race ($500 low — HackerOne, #1540969)
 
-HackerOne CTF events allowed a limited number of participants per group. The join-group endpoint checked the current member count and added the user in two separate operations. By racing multiple join requests simultaneously, a user could join the same group more than the allowed count, exceeding the capacity limit. **Resource:** group-member slot. **Execution:** Burp Repeater parallel send. **Takeaway:** capacity-constrained group-join operations must use an atomic increment with a cap (e.g., `UPDATE groups SET count = count + 1 WHERE count < max RETURNING count`) rather than a check-then-insert pattern.
+HackerOne CTF events allowed a limited number of participants per group. The join-group endpoint checked the current member count and added the user in two separate operations. By racing multiple join requests simultaneously, a user could join the same group more than the allowed count, exceeding the capacity limit. **Resource:** group-member slot. **Execution:** Caido Replay parallel send. **Takeaway:** capacity-constrained group-join operations must use an atomic increment with a cap (e.g., `UPDATE groups SET count = count + 1 WHERE count < max RETURNING count`) rather than a check-then-insert pattern.
 
 ### Chaturbate subdomain limit bypass ($100 low — Chaturbate, #395351)
 
@@ -314,7 +316,7 @@ Chaturbate enforced a per-account subdomain registration limit in application co
 
 ## Tools
 
-- [[burp-suite]] — Repeater with group parallel send, single-packet attack mode (HTTP/2)
+- [[caido]] — Replay with group parallel send, single-packet attack mode (HTTP/2)
 - Turbo Intruder — BApp Store extension for high-concurrency attacks with Python scripting
 - Raceocat — https://github.com/JavanXD/Raceocat — highly efficient CLI tool for exploiting web race conditions
 - h2spacex — https://github.com/nxenon/h2spacex — HTTP/2 Single Packet Attack low-level library based on Scapy
@@ -326,11 +328,11 @@ Chaturbate enforced a per-account subdomain registration limit in application co
 
 Exploit a non-atomic coupon redemption endpoint to apply a single-use promo code multiple times.
 
-**Method A (Burp Intruder):**
+**Method A (Caido Automate):**
 1. Send `POST /cart/coupon` to Intruder; set null payload, count 30; configure resource pool for 30 concurrent requests
 2. Run attack — multiple requests succeed before the server marks the code used
 
-**Method B (Burp Repeater parallel group):**
+**Method B (Caido Replay parallel group):**
 1. Remove the coupon to reset state
 2. Send `POST /cart/coupon` to Repeater; duplicate tab 50 times (Ctrl+R)
 3. Group all tabs; send group in parallel
@@ -342,7 +344,7 @@ Exploit a non-atomic coupon redemption endpoint to apply a single-use promo code
 
 Brute-force login past a lockout limit by sending all password guesses simultaneously.
 
-**Method A (Burp Intruder):**
+**Method A (Caido Automate):**
 1. Set username to `carlos`, payload position on password field
 2. Resource pool: 30 concurrent requests
 3. A `302` response indicates the correct password was found before lockout

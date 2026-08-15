@@ -453,10 +453,10 @@ Shopify's endpoint to update a store's business/legal name accepted POST request
 
 ## Tools
 
-- [[burp-suite]] — intercept and replay requests; right-click → Engagement tools → Generate CSRF PoC (enables auto-submit script in Options tab)
+- [[caido]] — intercept and replay requests. For automatic CSRF PoC generation use Burp (right-click → Engagement tools → Generate CSRF PoC, auto-submit script in Options); Caido has no built-in PoC generator
 - CyberChef — decode CSRF tokens
 - `XSRFProbe` — The Prime Cross Site Request Forgery Audit and Exploitation Toolkit
-- Burp Collaborator — capture exfiltrated WebSocket messages in CSWSH attacks
+- interactsh/OAST — capture exfiltrated WebSocket messages in CSWSH attacks
 
 ## Sources
 
@@ -484,7 +484,7 @@ Shopify's endpoint to update a store's business/legal name accepted POST request
 
 ### LAB 1 — CSRF vulnerability with no defenses (Apprentice)
 
-No CSRF token, no SameSite restriction. Intercept the email-change POST in Burp, generate CSRF PoC (Engagement tools → Generate CSRF PoC, enable auto-submit), host on exploit server, deliver to victim.
+No CSRF token, no SameSite restriction. Intercept the email-change POST in Caido, build a CSRF PoC (Burp: Engagement tools → Generate CSRF PoC with auto-submit, since Caido has no built-in generator), host on exploit server, deliver to victim.
 
 ```http
 POST /my-account/change-email HTTP/1.1
@@ -674,7 +674,7 @@ Steps:
 </script>
 ```
 
-6. Monitor Burp Collaborator for exfiltrated WebSocket messages containing credentials.
+6. Monitor interactsh/OAST for exfiltrated WebSocket messages containing credentials.
 
 ---
 

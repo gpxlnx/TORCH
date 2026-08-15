@@ -26,7 +26,7 @@ code-exec risk, proving the sink deserializes attacker data before you fire a ga
 merely being accepted. Any of these alone means the parser saw your bytes, not that you control
 execution.
 
-**IS confirmation:** an OOB callback from the gadget to your unique Collaborator / interactsh
+**IS confirmation:** an OOB callback from the gadget to your unique interactsh/OAST
 subdomain, or a demonstrated effect - command execution, a file read, an SSRF fetch - reproduced in
 a clean session per hunt-core. A time-delay gadget that reliably toggles counts as the effect.
 Blind cases need the OOB HIT.

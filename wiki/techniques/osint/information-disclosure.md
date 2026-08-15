@@ -38,7 +38,7 @@ Recon and exploitation — information disclosure often enables other attacks by
 9. Guess common backup file suffixes: `.bak`, `.old`, `.orig`, `.tmp`, `~`, `.swp`
 10. Send `TRACE` HTTP request to reveal internal headers added by proxies or middleware (e.g., `X-Custom-IP-Authorization`)
 11. Check for exposed `.git/` or `.svn/` directory — dump with `git-dumper` and inspect commit history for deleted secrets
-12. Use Burp Suite's Engagement Tools → Find Comments to harvest HTML/JS comments at scale
+12. Use Caido's Engagement Tools → Find Comments to harvest HTML/JS comments at scale
 
 ## Key payloads / examples
 
@@ -140,7 +140,7 @@ Modify a numeric parameter (e.g., `?productId=abc`) to trigger a server-side exc
 
 HTML source comments reference `/cgi-bin/phpinfo.php`. Browsing to that path exposes a full `phpinfo()` page including environment variables like `SECRET_KEY`.
 
-**Key technique:** Use Burp Suite Engagement Tools → Find Comments (Target → Site Map → right-click → Engagement Tools → Find Comments) to discover commented-out path hints at scale.
+**Key technique:** Use Caido Engagement Tools → Find Comments (Target → Site Map → right-click → Engagement Tools → Find Comments) to discover commented-out path hints at scale.
 
 ```
 GET /cgi-bin/phpinfo.php HTTP/2

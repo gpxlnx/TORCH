@@ -22,9 +22,9 @@ are blocked), [[xssi]] (JSONP/script-inclusion info leak), [[browser-extension-a
 
 ## Confirmation gate
 NOT confirmation: payload URL-encoded or HTML-encoded in response, `<script>` appears as `&lt;script&gt;`, ASP.NET validator blocked `<`.
-IS confirmation: HTTP/DNS request to your unique Collaborator subdomain with browser User-Agent (Mozilla/Chrome).
+IS confirmation: HTTP/DNS request to your unique interactsh subdomain with browser User-Agent (Mozilla/Chrome).
 
-When you plant a blind/stored XSS beacon, append a row to `targets/<eng>/oob.md`: `| <token> | <sink url+param> | xss | <date> | waiting | |` (columns: token | sink | class | planted | status | source, where token = your unique Burp Collaborator / interactsh label). The recon-capture hook auto-correlates incoming callbacks to flip the row to HIT and SessionStart surfaces HITs; a HIT row is the confirmation gate to scaffold the FIND. Do NOT claim a blind XSS without a HIT row.
+When you plant a blind/stored XSS beacon, append a row to `targets/<eng>/oob.md`: `| <token> | <sink url+param> | xss | <date> | waiting | |` (columns: token | sink | class | planted | status | source, where token = your unique interactsh/OAST label). The recon-capture hook auto-correlates incoming callbacks to flip the row to HIT and SessionStart surfaces HITs; a HIT row is the confirmation gate to scaffold the FIND. Do NOT claim a blind XSS without a HIT row.
 
 ## Attack Surface Signals
 High-value: admin panels (`*/admin`, `*/settings`), payment flows, stored wikis/labels/tags, SSO/signin pages, SVG upload endpoints.
@@ -104,7 +104,7 @@ aaa"bbb'ccc<ddd>eee`fff
 
 ## Severity
 
-Confirm in a real browser, not just Burp. FIND output and Deadends format per hunt-core:
+Confirm in a real browser, not just Caido. FIND output and Deadends format per hunt-core:
 
 - **high** - stored in an admin/privileged context, or session theft demonstrated.
 - **medium** - reflected requiring a click.

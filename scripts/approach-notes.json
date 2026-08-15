@@ -26,7 +26,7 @@
     "refs": ["idor", "hunt-idor"]
   },
   "ssrf": {
-    "do": "OOB-gate it: stand up interactsh/Collaborator and confirm the callback; then cloud metadata (169.254.169.254) and redirect bypasses.",
+    "do": "OOB-gate it: stand up interactsh/OAST and confirm the callback; then cloud metadata (169.254.169.254) and redirect bypasses.",
     "avoid": "no blind-SSRF claim from inference or a timing guess - silence without a live listener is a false negative, not a result.",
     "refs": ["ssrf", "hunt-ssrf"]
   },

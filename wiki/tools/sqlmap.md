@@ -38,7 +38,7 @@ sqlmap -u "http://www.example.com/" --data "uid=1&name=test"
 sqlmap -u "http://www.example.com/" --data "uid=1*&name=test"   # mark injection point with *
 ```
 
-### Request file (from Burp)
+### Request file (from Caido)
 
 Save the raw HTTP request to a file, then:
 
@@ -173,7 +173,7 @@ sqlmap -u URL --tor                       # route through Tor (SOCKS4 on 9050)
 sqlmap -u URL --check-tor                 # verify Tor is working
 ```
 
-### Routing through Burp for debugging
+### Routing through Caido for debugging
 
 ```bash
 sqlmap -u URL --proxy="http://127.0.0.1:8080"

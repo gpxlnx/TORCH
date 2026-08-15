@@ -57,7 +57,7 @@ smbclient -N //$T/<share> -c 'recurse;ls'       # smbclient only to pull a speci
 # --- web ports found: feroxbuster (primary) + nuclei + whatweb IN PARALLEL, own tmux tab each ---
 feroxbuster -u http://$T -w /tmp/harness-paths.txt -x php,txt,log,sql,bak,zip,env,old,conf -d 2 --no-state -o ferox.txt   # our high-signal list first
 feroxbuster -u http://$T -w /usr/share/seclists/Discovery/Web-Content/raft-large-words.txt -x php,txt,log,bak -d 2 --no-state   # then the big list
-bash scripts/backup-sweep.sh http://$T ferox.txt    # full-filename backup suffixes (.bak/~/.old/...) ferox -x misses; BURP_PROXY=127.0.0.1:8080 to route via Burp
+bash scripts/backup-sweep.sh http://$T ferox.txt    # full-filename backup suffixes (.bak/~/.old/...) ferox -x misses; CAIDO_PROXY=127.0.0.1:8080 to route via Caido
 ffuf -c -u "http://$T/?FUZZ=x" -w scripts/wordlists/harness-params.txt -fs <baseline>   # param mining
 ffuf -c -u http://$T/ -H "Host: FUZZ.$T" -w <vhost-wordlist> -mc all -o vh.json         # vhosts: diff redirect Location, don't filter by code (a decoy vhost 302s the same place; the real one differs)
 ffuf -c -u "http://$T/~FUZZ/" -w /usr/share/seclists/Usernames/top-usernames-shortlist.txt -mc 200,301,403   # Apache userdir (~name) - no dir wordlist carries these, fuzz explicitly
@@ -75,7 +75,7 @@ wpscan -u http://$T                              # if WordPress
 **On any web surface, before moving to exploitation, all of this, in parallel where possible:**
 - **Capture it as-is first**: `capture.sh web <eng> <slug> http://T:PORT/` (browser shot) + `curl -s http://T:PORT/ > poc/<slug>-source.html` (raw source), for EVERY distinct surface (login, dashboards, OSINT/social apps) as you open it.
 - **Read full, not grep.** Fetch a file/response (source, config, HLS manifest, JS bundle) and read it END-TO-END; the vuln hides in the line a narrow `grep` skips. Never pipe an exploit/lead response through `head`/`grep` before reading it whole.
-- **Exploit requests -> Burp.** curl is fine for quick loops; push every load-bearing request (SSRF/LFI/SQLi/BFLA/deser/flag-returning) into Repeater via `Skill(hunt-burp)`, card with `capture.sh burp`.
+- **Exploit requests -> Caido.** curl is fine for quick loops; push every load-bearing request (SSRF/LFI/SQLi/BFLA/deser/flag-returning) into Replay via `Skill(hunt-caido)`, card with `capture.sh caido`.
 - **Source-read primitive first.** The moment you can read files (LFI/.git/backup), read ALL the app source before brute-forcing a login/DB; the vuln is usually in source you can already read.
 - **Read the client JS and snippet what it reveals.** Grep bundles for `fetch(`/`axios`/`/api`/`token`/`secret`/`admin`; a JS/SPA's POST-only JSON API is invisible to feroxbuster/ffuf (they GET, a bare `/api` 404s so recursion never descends). The moment source reveals something load-bearing, capture it: `scripts/capture.sh snippet <eng> <slug> <url-or-file> '<pattern>' '<what it reveals>'` -> paste the fenced block into walkthrough.md Recon.
 - **Launch scanners in parallel the moment a web port appears**, feroxbuster + nuclei + whatweb, one tmux tab each, don't wait serially; card each on finish. Never conclude "no web vuln" until both feroxbuster and nuclei have run AND been read.
@@ -110,13 +110,13 @@ first - an RCE foothold is the attack vector that carries impact. Grind XSS/IDOR
 code-exec is ruled out or the objective specifically needs them (the driver now ranks code-exec
 classes ahead of access/enum rows).
 
-**Web foothold = STAY in Burp (anti-drift).** If the foothold is an HTTP primitive (RCE/LFI/SSRF/authed
-API), the recurring failure is abandoning Burp the instant it lands and scripting the ENTIRE
-post-exploitation over raw `curl`/`vm.sh`/urllib - so the operator, who is watching Burp, loses all
+**Web foothold = STAY in Caido (anti-drift).** If the foothold is an HTTP primitive (RCE/LFI/SSRF/authed
+API), the recurring failure is abandoning Caido the instant it lands and scripting the ENTIRE
+post-exploitation over raw `curl`/`vm.sh`/urllib - so the operator, who is watching Caido, loses all
 visual on the exploitation. Keep the load-bearing follow-ups (the injection that reads user.txt, the
-authed call that leaks config, each privesc-relevant fetch) in **Burp Repeater** (native `mcp__burp__*`
-first, CLI bridge fallback; `Skill(hunt-burp)`). Quick throwaway enumeration loops over the bridge are
-fine; the requests you'd screenshot are not throwaway. See CLAUDE.md "Burp-first does NOT stop at foothold".
+authed call that leaks config, each privesc-relevant fetch) in **Caido Replay** (native `mcp__caido__*`
+first, CLI bridge fallback; `Skill(hunt-caido)`). Quick throwaway enumeration loops over the bridge are
+fine; the requests you'd screenshot are not throwaway. See CLAUDE.md "Caido-first does NOT stop at foothold".
 
 **STOP-and-think the moment ANY shell lands (before reaching for a shortcut).** The recurring
 failure is following the FASTEST path instead of the INTENDED one, then going off the rails. Pause and:
@@ -217,7 +217,7 @@ After each phase, write to `targets/<eng>/`: hosts/access -> `state.md`, creds -
 
 **Video/media -> mp4 into `poc/` early.** `ffmpeg -i <in> -c copy poc/<slug>.mp4`, then hand it to the operator; a visual puzzle (shoulder-surf, on-screen code) is far cheaper read by a human than brute-analyzed frame-by-frame; frame extraction/OCR is the fallback, not the opening move.
 
-**Screenshot every successful step live, not at the end.** Capture EACH privilege milestone (foothold / user / operator / root) the MOMENT it lands - a fast box is not an excuse to defer capture to walkthrough time (a transient exploited state may not be re-shootable, and backfilling evidence is the documented drift). No auto-capture net exists; `scripts/capture.sh` (`ev`/`req`/`tmux`/`burp`) captures straight into `poc/` the moment a step lands. `capture.sh ev <eng> <slug> "<url>" "<cmd-label>"` for a one-call output+request card; `capture.sh req <eng> <slug> -- <curl-args>` for a full request/response card; `capture.sh tmux` for a session card; `capture.sh burp` for a Repeater PoC. `Skill(screenshot)` covers authed/exploited GUI states. Never hand-write a `--term` card (fabricated evidence); `tee` real output into the pane if it was redirected to a file. `python3 scripts/build-walkthrough.py <eng>` auto-populates the `## Evidence` gallery from every `poc/` card.
+**Screenshot every successful step live, not at the end.** Capture EACH privilege milestone (foothold / user / operator / root) the MOMENT it lands - a fast box is not an excuse to defer capture to walkthrough time (a transient exploited state may not be re-shootable, and backfilling evidence is the documented drift). No auto-capture net exists; `scripts/capture.sh` (`ev`/`req`/`tmux`/`caido`) captures straight into `poc/` the moment a step lands. `capture.sh ev <eng> <slug> "<url>" "<cmd-label>"` for a one-call output+request card; `capture.sh req <eng> <slug> -- <curl-args>` for a full request/response card; `capture.sh tmux` for a session card; `capture.sh caido` for a Replay PoC. `Skill(screenshot)` covers authed/exploited GUI states. Never hand-write a `--term` card (fabricated evidence); `tee` real output into the pane if it was redirected to a file. `python3 scripts/build-walkthrough.py <eng>` auto-populates the `## Evidence` gallery from every `poc/` card.
 
 **Grow the harness wordlist.** A non-obvious route/param that cracked the box -> `python3 scripts/wordlist-suggest.py` (leak-safe) then `scripts/wl-add.sh paths <token>` / `wl-add.sh params <name>`, generic methodology names only, never client branding.
 

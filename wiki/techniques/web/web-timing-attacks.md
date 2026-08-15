@@ -78,7 +78,8 @@ When sleep payloads are filtered, timing still reveals processing differences:
 
 - **Param Miner** - response-time attribute; scoped-SSRF detect/exploit; subdomain enumeration (cert transparency, Project Sonar fdns).
 - **Turbo Intruder** - custom timing attacks, response-order analysis (~80% bias threshold, ~30s windows).
-- **Burp Suite** - single-packet attack built into race-condition discovery; timing available in scanner and manual tools.
+- **Caido** - grouped parallel / single-packet send in Replay for race-condition and timing tests.
+- **Burp** - single-packet attack built into race-condition discovery; timing available in the scanner and manual tools.
 
 ## Defense
 

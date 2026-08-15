@@ -9,7 +9,7 @@ date_updated: 2026-06-29
 
 # Payloads: HTTP Request Smuggling
 
-Desync probes + exploit prefixes. Confirm with a differential (Burp HTTP Request Smuggler / "send group in sequence on a single connection"), never timing alone. Routed via the `hunt-smuggling` skill. See [[http-request-smuggling]].
+Desync probes + exploit prefixes. Confirm with a connection-exact differential harness, never timing alone. Store the baseline and proving exchange in Caido Replay. Routed via the `hunt-smuggling` skill. See [[http-request-smuggling]].
 
 ## CL.TE (front-end Content-Length, back-end Transfer-Encoding)
 ```http
@@ -76,7 +76,7 @@ GPOST /admin ...
 
 ## Tooling
 ```bash
-# Burp extension: "HTTP Request Smuggler" (Smuggle probe -> auto CL.TE/TE.CL/TE.TE/H2)
+# dedicated smuggling harness: probe CL.TE/TE.CL/TE.TE/H2 without proxy normalization
 # CLI:
 h2csmuggler -x https://target ...        # HTTP/2 cleartext (h2c) smuggling
 ```

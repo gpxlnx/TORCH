@@ -43,7 +43,7 @@ web.config (IIS)   .jsp/.jspx/.war (Java)   .asp/.aspx (IIS)
 5. **SVG / XML:** SVG with `<script>` -> stored XSS ([[xss]]); SVG/XML with external entity -> [[xxe]] (file read/SSRF).
 6. **Archive:** zip-slip (`../` paths inside zip) on extract; symlink in archive -> read host files.
 7. **Image processing:** ImageMagick/Ghostscript (ImageTragick CVE-2016-3714), pixel-flood DoS, EXIF payload executed by a downstream parser.
-8. **Confirm by execution, through Burp.** Request the uploaded shell in **Burp Repeater** (operator visibility) and run a command (`?cmd=id`); OOB callback if blind. For traversal, fetch the written/read target back from the path you claimed it hit.
+8. **Confirm by execution, through Caido.** Request the uploaded shell in **Caido Replay** (operator visibility) and run a command (`?cmd=id`); OOB callback if blind. For traversal, fetch the written/read target back from the path you claimed it hit.
 9. **Distill (confirmed, generic):** per hunt-core, `python3 scripts/wiki-stage.py --kind technique --slug <slug> --target-page techniques/web/file-upload.md`.
 
 ## Evasion (when a layer rejects)

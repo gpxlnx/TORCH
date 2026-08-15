@@ -45,8 +45,8 @@ GATE 3 (loop): a vector exhausted -> mark `[!]`, one Deadends line, move to the 
 - [ ] pick payload set from wiki/payloads/       -> Skill(arsenal)
 - [ ] stage exploit into poc/scripts/
 
-## 3. Deliver  ([[burp-mcp]] · [[reverse-shells]])
-- [ ] deliver payload (burp repeater / curl / upload) -> [[burp-mcp]] [[file-upload]]
+## 3. Deliver  ([[caido]] · [[reverse-shells]])
+- [ ] deliver payload (Caido Replay / curl / upload) -> [[caido]] [[file-upload]]
 - [ ] get a shell (reverse / bind) + stable PTY       -> [[reverse-shells]]
 - [ ] cred reuse tried before new creds               -> loot.md [[default-credentials]]
 - [ ] fuzz params / request items                     -> [[wiki/tools/ffuf]] [[arjun]]

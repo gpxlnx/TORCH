@@ -50,7 +50,7 @@ Sanitizer/template gadgets in: DOMPurify configs, sanitize-html, Mustache/Handle
 
 ## Tools
 ```
-PortSwigger "Server-Side Prototype Pollution Scanner" + "DOM Invader" (client) Burp extensions
+`ppmap` for server-side checks plus browser DevTools source/sink tracing for client-side gadgets
 ppmap / ppfuzz
 ```
 

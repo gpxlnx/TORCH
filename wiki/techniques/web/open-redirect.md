@@ -91,7 +91,7 @@ Exploitation — often chained with phishing, OAuth token theft, or SSRF.
 
 ## Tools
 
-- [[burp-suite]] — intercept and modify redirect parameters
+- [[caido]] — intercept and modify redirect parameters
 - [[wiki/tools/ffuf]] — fuzz for redirect parameter names
 
 ## Referer-header fallback in a go-back redirect helper

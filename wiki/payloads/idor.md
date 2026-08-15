@@ -49,7 +49,7 @@ GraphQL: query node(id:"victim") / batch many ids in one request
 
 ## Detect at scale
 ```
-Burp: Autorize / AuthMatrix (replay each request as user B, diff)
+Caido Replay: preserve user A's request, replace only user B's auth, then diff
 note 2 accounts' ids -> swap A<->B systematically across every object endpoint
 ```
 

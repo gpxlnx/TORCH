@@ -56,7 +56,7 @@ A long-running bug-bounty class: CRLF in `Location`/redirect params escalates to
 Strip/reject CR and LF (and their encodings) from any value placed in a header; use framework header APIs that disallow control chars (modern servers reject them); allowlist redirect targets; never reflect raw input into `Location`/`Set-Cookie`.
 
 ## Tools
-`crlfuzz`, `nuclei`, Burp Repeater, `Param Miner`. See [[xss]], [[open-redirect]], [[http-request-smuggling]].
+`crlfuzz`, `nuclei`, Caido Replay, Burp `Param Miner`. See [[xss]], [[open-redirect]], [[http-request-smuggling]].
 
 ## Sources
 - PayloadsAllTheThings - CRLF Injection

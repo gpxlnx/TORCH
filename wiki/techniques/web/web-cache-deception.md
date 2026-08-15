@@ -77,7 +77,7 @@ Works when the origin uses a character as a path delimiter but the cache does no
 
 Steps:
 1. Confirm the origin does not abstract paths: `/my-account/test` → 404.
-2. Use Burp Intruder with the PortSwigger delimiter list against `/my-account§§abc` (Sniper, URL-encoding disabled).
+2. Use Caido Automate with a delimiter wordlist against `/my-account{DELIM}abc` (single payload position, URL-encoding disabled).
 3. Identify delimiters that return 200 with user data (e.g., `;`, `?`).
 4. Test whether the cache also uses `?` as a delimiter: `/my-account?abc.js` — if not cached, `?` is shared; try `;` instead.
 5. Craft payload using the delimiter the cache does *not* treat as a delimiter: `/my-account;wcd.js`.
@@ -217,16 +217,16 @@ A significant decrease in response time on repeat requests indicates a cache hit
 1. Send a GET request to a dynamic endpoint with user-specific data.
 2. Append an arbitrary path segment or extension and resend.
 3. Observe `X-Cache` headers and response content.
-4. Use Burp Intruder with delimiter list to identify effective delimiters.
+4. Use Caido Automate with delimiter list to identify effective delimiters.
 5. Combine with encoded traversal sequences to test normalization discrepancies.
 6. Always use a cache buster (random query parameter) to isolate test results from prior cached responses.
 
 ### Tools
 
-- **Burp Suite Repeater**: Manual path manipulation and header inspection.
-- **Burp Suite Intruder**: Automated delimiter fuzzing (`/my-account§§abc` with sniper mode; disable URL encoding for payload).
+- **Caido Replay**: Manual path manipulation and header inspection.
+- **Caido Automate**: Automated delimiter fuzzing (`/my-account{DELIM}abc` payload position; disable URL encoding for payload).
 - **Param Miner**: Dynamic cache buster to prevent false positives.
-- **FoxyProxy**: Route browser traffic through Burp for full HTTP history.
+- **FoxyProxy**: Route browser traffic through Caido for full HTTP history.
 
 ## PortSwigger Labs
 

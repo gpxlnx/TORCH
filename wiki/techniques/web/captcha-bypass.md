@@ -66,9 +66,9 @@ success.
 
 ## Tooling notes
 
-- Route all traffic through Burp (`proxies={"http":"http://127.0.0.1:8080"}`) so attempts land
-  in HTTP history for triage; drive Burp via the MCP (`set_proxy_intercept_state` off) - see
-  [[burp-mcp]] / `hunt-burp`.
+- Route all traffic through Caido (`proxies={"http":"http://127.0.0.1:8080"}`) so attempts land
+  in HTTP history for triage; drive Caido via the MCP with intercept off - see
+  [[caido]] / `hunt-caido`.
 - Keep it single-threaded when the captcha counter is per-IP (concurrent requests corrupt the
   shared "in a row" state).
 - Flask session cookies are signed-but-readable (base64); decode them to confirm auth state
@@ -87,7 +87,7 @@ Combine with an absent rate limit for full impact: no per-request or per-session
 ## Related
 
 - [[authentication-attacks]] (login attacks, brute force)
-- [[burp-mcp]] (driving the attack through Burp)
+- [[caido]] (driving the attack through Caido)
 - [[password-cracking]] (wordlist mutation when a provided list misses)
 
 <!-- promoted-slug: an-anti-automation-captcha-whose-solved-answer-is-never-clea -->

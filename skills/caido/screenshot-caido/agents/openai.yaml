@@ -1,0 +1,4 @@
+interface:
+  display_name: "Screenshot Caido"
+  short_description: "Capture Caido replay evidence for reports"
+  default_prompt: "Use $screenshot-caido to save a Caido request and response as report-ready evidence."

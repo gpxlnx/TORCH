@@ -84,12 +84,12 @@ eyJhbGciOiJub25lIn0.PAYLOAD.
 8. Verify impact: demonstrate full ATO on test account B from attacker session A, then clear the confirmation gate below
 9. **Distill when confirmed** (per hunt-core): a reusable legacy-endpoint bypass or JWT variant, GENERIC (no client host): `python3 scripts/wiki-stage.py --kind technique --slug <slug> --target-page techniques/web/authentication-attacks.md`
 
-## Drive it through Burp
+## Drive it through Caido
 
-Push the load-bearing requests through Burp for operator visibility (`Skill(hunt-burp)`):
-- The password-reset request with the injected `X-Forwarded-Host` / `Host`, and each JWT-tampered request (`alg:none`, key-confusion), go to **Repeater** so the operator can replay and inspect them.
-- The bounded rate-limit / lockout probe (matrix step 4) goes to **Intruder** with the hunt-core bound, never a hand-rolled loop.
-- `scripts/capture.sh burp` grabs the request+response PoC the moment it lands.
+Push the load-bearing requests through Caido for operator visibility (`Skill(hunt-caido)`):
+- The password-reset request with the injected `X-Forwarded-Host` / `Host`, and each JWT-tampered request (`alg:none`, key-confusion), go to **Replay** so the operator can replay and inspect them.
+- The bounded rate-limit / lockout probe (matrix step 4) goes to **Automate** with the hunt-core bound, never a hand-rolled loop.
+- `scripts/capture.sh caido` grabs the request+response PoC the moment it lands.
 
 ## Confirmation gate
 

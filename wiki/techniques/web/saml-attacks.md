@@ -18,7 +18,7 @@ SSO flow: user -> SP -> redirected to IdP -> IdP returns a signed `<Response>`/`
 
 ## Methodology
 
-Decode and inspect first (SAML Raider in Burp, or `base64 -d | xmllint --format -`). Then:
+Decode and inspect first (SAML Raider in Caido, or `base64 -d | xmllint --format -`). Then:
 
 ### Signature stripping
 Some SPs accept an assertion with **no** signature (validation is skipped when the `<ds:Signature>` is absent rather than treated as a failure). Remove the `<ds:Signature>` block entirely and edit `NameID`/attributes to a target user; if accepted, full auth bypass. Test both layers: strip the **Response** signature and the **Assertion** signature independently, some SPs enforce one but not the other. Also try setting the `SignatureValue` to empty or corrupting one byte: a "signature present but never actually verified" SP fails open the same way.

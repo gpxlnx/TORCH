@@ -20,9 +20,9 @@ Anchors: [[nosql-injection]], [[orm-injection]].
 
 **NOT confirmation:** a generic `500`; a WAF block page or a "SQL injection detected" string (that is the app's filter firing, not the database); a reflected error string you have not proved originates from the DB; a single non-repeatable slow response; a boolean or time inference with no differential (no clean baseline-vs-injected delta); the payload echoed back from your own request; any verdict read off a response body without a clean-session re-verify.
 
-**IS confirmation:** a DB error whose text is demonstrably from the engine (`extractvalue`/`updatexml` output, a driver error naming the DBMS); UNION or error-based output that returns real DB content; a boolean oracle that flips TRUE/FALSE consistently across probes; a time delta that reproduces on repeat (baseline vs `SLEEP(5)`/`pg_sleep(5)`/`WAITFOR`, re-run); or an out-of-band DNS/HTTP hit to your unique Collaborator/interactsh subdomain. Re-verify in a CLEAN session every time; on a login-redirect oracle clear the session cookie between probes (a stale authenticated session reads as always-true).
+**IS confirmation:** a DB error whose text is demonstrably from the engine (`extractvalue`/`updatexml` output, a driver error naming the DBMS); UNION or error-based output that returns real DB content; a boolean oracle that flips TRUE/FALSE consistently across probes; a time delta that reproduces on repeat (baseline vs `SLEEP(5)`/`pg_sleep(5)`/`WAITFOR`, re-run); or an out-of-band DNS/HTTP hit to your unique interactsh/OAST subdomain. Re-verify in a CLEAN session every time; on a login-redirect oracle clear the session cookie between probes (a stale authenticated session reads as always-true).
 
-**Out-of-band (blind SQLi via DNS/HTTP).** When you plant a blind/OOB payload, append a row to `targets/<eng>/oob.md`: `| <token> | <sink url+param> | sqli | <date> | waiting | |` (columns: token | sink | class | planted | status | source, token = your unique Collaborator/interactsh label). Exfil sinks: MySQL `LOAD_FILE`/UNC path, MSSQL `xp_dirtree`, Oracle `UTL_HTTP`. The recon-capture hook auto-correlates the callback to flip the row to HIT and SessionStart surfaces HITs; a `HIT row` is the gate to scaffold the FIND. **Do NOT claim a blind** SQLi without a HIT row.
+**Out-of-band (blind SQLi via DNS/HTTP).** When you plant a blind/OOB payload, append a row to `targets/<eng>/oob.md`: `| <token> | <sink url+param> | sqli | <date> | waiting | |` (columns: token | sink | class | planted | status | source, token = your unique interactsh/OAST label). Exfil sinks: MySQL `LOAD_FILE`/UNC path, MSSQL `xp_dirtree`, Oracle `UTL_HTTP`. The recon-capture hook auto-correlates the callback to flip the row to HIT and SessionStart surfaces HITs; a `HIT row` is the gate to scaffold the FIND. **Do NOT claim a blind** SQLi without a HIT row.
 
 ## Attack surface
 
@@ -100,9 +100,9 @@ bounded sample (`--dump` with `--start 1 --stop 5`), never `--dump-all`. Sample 
 with operator approval, 0 under `no_bruteforce`.
 9. Escalate impact (scoped to proof, not mass extraction): UNION extraction, INFORMATION_SCHEMA
    for schema shape, file read/write if perms allow. See Chaining below.
-10. Document: Burp Repeater screenshot + sqlmap output + a non-sensitive data sample. Push the
-    confirming request into **Burp Repeater** (`Skill(hunt-burp)` / `capture.sh burp`) so the
-    operator can replay it; use **Collaborator** for the OOB payloads above.
+10. Document: Caido Replay evidence card + sqlmap output + a non-sensitive data sample. Push the
+    confirming request into **Caido Replay** (`Skill(hunt-caido)` / `capture.sh caido`) so the
+    operator can replay it; use **interactsh** for the OOB payloads above.
 
 Distill when confirmed - reusable NoSQL/ORM bypass, GENERIC, no client host:
 `python3 scripts/wiki-stage.py --kind technique --slug <slug> --target-page techniques/web/sql-injection.md`

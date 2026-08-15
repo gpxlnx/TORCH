@@ -79,18 +79,18 @@ and hand-rolled implementations frequently emit sequential values dressed as UUI
 
 **Setup:** two accounts per `hunt-core`. A owns, B attacks. Separate profiles.
 
-**Drive it through Burp** for operator visibility. With A's request captured in Repeater or proxy
+**Drive it through Caido** for operator visibility. With A's request captured in Replay or proxy
 history:
 
 ```
-scripts/burp/idor-sweep.py <eng> <reqfile> --attacker-auth "Cookie: session=USER_B" --range 5
+scripts/caido/idor-sweep.py <eng> <reqfile> --attacker-auth "Cookie: session=USER_B" --range 5
 ```
 
 Sends owner-baseline / idor-test / bounded id sample through `send_http1_request`, diffs status
-and body, prints a verdict and a ready `capture.sh burp` PoC line. Honors `no_bruteforce` ->
+and body, prints a verdict and a ready `capture.sh caido` PoC line. Honors `no_bruteforce` ->
 range 0. **Do not raise `--range` above the `hunt-core` limits without operator approval.**
 
-For GUI-visible replay: `create_repeater_tab` for an A tab and a B tab, or `send_to_intruder`
+For GUI-visible replay: `create_repeater_tab` for an A tab and a B tab, or `create-automate-session`
 with a bounded number payload.
 
 1. **Log in as A, browse every feature, note every ID** - object, UUID, org, invoice, thread.

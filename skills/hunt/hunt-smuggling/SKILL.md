@@ -60,9 +60,11 @@ Transfer-Encoding: chunked  +  Content-Length: 6 ; body: "0\r\n\r\nX"
 6. **Exploit:** capture other users' requests (steal session cookies/headers), bypass front-end auth/path controls, cache-poison via smuggled response, escalate a reflected issue to stored.
 7. **Distill when confirmed** - reusable obfuscation or H2-desync variant, GENERIC, no client host: `python3 scripts/wiki-stage.py --kind technique --slug <slug> --target-page techniques/web/http-request-smuggling.md`
 
-**Drive it through Burp** for operator visibility. Use Burp Repeater "Send group in sequence
-(single connection)" for the differential and the HTTP Request Smuggler extension for the sweep;
-push each load-bearing smuggled request into Repeater rather than leaving it in a curl loop.
+**Keep it visible in Caido.** Store the baseline and each load-bearing raw candidate in named
+Replay sessions, but use the dedicated connection-exact harness from [[http-request-smuggling]]
+for CL.0, CL.TE, TE.CL, and H2 probes. Generic proxies can normalize the framing this class
+depends on, so a Caido or curl negative is not sufficient. Import the proving exchange back into
+Caido and capture its request ID.
 
 ## Confirmation gate
 
@@ -73,13 +75,13 @@ single timing observation is a signal to investigate, never proof of a desync.
 **IS confirmation:** a reliable differential - a smuggled prefix that changes the *next* request's
 response (your own follow-up, or a captured victim request), reproduced on a clean connection; or
 a consistent timing delta reproduced across several runs and matched to a specific desync variant;
-or a DNS/HTTP hit to your unique Burp Collaborator / interactsh subdomain fired by a
-Collaborator-pointed smuggled request.
+or a DNS/HTTP hit to your unique interactsh/OAST subdomain fired by a
+OAST-pointed smuggled request.
 
-**Blind / OOB desync.** When you plant a Collaborator-pointed smuggled request, append a row to
+**Blind / OOB desync.** When you plant an OAST-pointed smuggled request, append a row to
 `targets/<eng>/oob.md`: `| <token> | <sink url+param> | smuggling | <date> | waiting | |`
-(columns: token | sink | class | planted | status | source; token = your unique Burp
-Collaborator / interactsh label). The recon-capture hook auto-correlates the incoming callback to
+(columns: token | sink | class | planted | status | source; token = your unique Caido
+interactsh/OAST label). The recon-capture hook auto-correlates the incoming callback to
 flip the row to HIT and SessionStart surfaces HITs; a HIT row is the gate to scaffold the FIND.
 **Do NOT claim a blind** smuggling desync without the captured differential or a HIT row.
 

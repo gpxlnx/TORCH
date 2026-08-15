@@ -5,7 +5,7 @@ description: Synthesize raw recon/test output into engagement state. Reads every
 
 # Ingest
 
-Turns a pile of raw tool output into structured engagement state. Model-driven synthesis, so any tool/format works (nmap, nxc, httpx/nuclei JSON, Burp exports, gobuster, manual notes, pasted terminal).
+Turns a pile of raw tool output into structured engagement state. Model-driven synthesis, so any tool/format works (nmap, nxc, httpx/nuclei JSON, Caido exports, gobuster, manual notes, pasted terminal).
 
 ## Steps
 

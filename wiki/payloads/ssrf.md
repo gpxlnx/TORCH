@@ -152,7 +152,7 @@ bugbounty.dod.network -> 127.0.0.2   1ynrnhl.xip.io -> 169.254.169.254
 customer1.app.localhost.my.company.127.0.0.1.nip.io
 ```
 DNS rebinding (single-resolve filters, 2025): pass a public IP at check time, rebind to
-127.0.0.1 / 169.254.169.254 before connect (nccgroup/singularity). Tools: Burp-Encode-IP,
+127.0.0.1 / 169.254.169.254 before connect (nccgroup/singularity). Tools: IPFuscator,
 recollapse, SSRF-PayloadMaker, PortSwigger url-validation-bypass cheat sheet.
 
 ## Wired sub-techniques

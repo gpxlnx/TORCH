@@ -35,9 +35,18 @@ def _is_sep(line):
     return _is_row(line) and "-" in line and _SEP_RE.match(line) is not None
 
 
+def _mask_literal_pipes(s):
+    """Blank out `|` that GFM/Obsidian do NOT treat as a cell separator: inside an
+    inline code span (`...`) or a wikilink alias ([[target|label]])."""
+    s = re.sub(r"`[^`]*`", lambda m: m.group(0).replace("|", "\x00"), s)
+    s = re.sub(r"\[\[[^\]]*\]\]", lambda m: m.group(0).replace("|", "\x00"), s)
+    return s
+
+
 def _cells(line):
-    """Cell count of a GFM row, tolerant of optional edge pipes and escaped \\|."""
-    s = line.strip()
+    """Cell count of a GFM row, tolerant of optional edge pipes, escaped \\|, and
+    literal pipes inside code spans / wikilink aliases."""
+    s = _mask_literal_pipes(line.strip())
     s = s[1:] if s.startswith("|") else s
     s = s[:-1] if s.endswith("|") else s
     return len(re.split(r"(?<!\\)\|", s))
@@ -102,6 +111,11 @@ def demo():
     assert any("detached" in m for _, m in lint_text(split)), "should flag blank-split body"
     clean = "| a | b |\n|---|---|\n| 1 | 2 |\n| 3 | 4 |\n"
     assert not lint_text(clean), "clean table must pass"
+    # literal | inside a code span or wikilink alias is not a cell separator
+    codepipe = "| flag | chars |\n|---|---|\n| s | `{|}` |\n"
+    assert not lint_text(codepipe), "pipe in code span must not count as a column"
+    aliaspipe = "| | [[a|A]] |\n|--|--|\n| x | y |\n"
+    assert not lint_text(aliaspipe), "pipe in wikilink alias must not count as a column"
     print("lint-md-tables self-check ok")
 
 

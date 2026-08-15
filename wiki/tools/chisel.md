@@ -64,7 +64,7 @@ Binary naming convention: `chisel_<version>_<os>_<arch>` — for example `chisel
 # Standard reverse tunnel server — default port 8080
 ./chisel server --reverse
 
-# Custom port (required if Burp or another tool already uses 8080)
+# Custom port (required if Caido or another tool already uses 8080)
 ./chisel server -p 8000 --reverse
 
 # With authentication (prevents unauthorized connections)
@@ -241,7 +241,7 @@ Used when the attacker can connect outbound to the victim (less common in HTB).
 
 ## Tips and Gotchas
 
-- **Port 8080 conflict:** Burp Suite listens on 8080 by default. Always use `-p 8000` or another free port for the chisel server to avoid the conflict.
+- **Port 8080 conflict:** Caido listens on 8080 by default. Always use `-p 8000` or another free port for the chisel server to avoid the conflict.
 
 - **Windows `localhost` routes to IPv6:** On Windows, `localhost` resolves to `::1` (IPv6) by default. If the service you want to forward is not listening on IPv6, the tunnel silently fails. Always use `127.0.0.1` explicitly in the remote spec. Example: `R:1234:127.0.0.1:1234` not `R:1234:localhost:1234`.
 

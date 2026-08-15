@@ -27,7 +27,7 @@ Repos: GitHub/GitLab org + employee personal repos, gists, forks, deleted-but-ca
 
 ## Methodology
 
-Route the load-bearing confirming request (the exposed `.git`/`.env` fetch, or a key validity check) through Burp Repeater for operator visibility; quick loops below can stay in the terminal.
+Route the load-bearing confirming request (the exposed `.git`/`.env` fetch, or a key validity check) through Caido Replay for operator visibility; quick loops below can stay in the terminal.
 
 1. Probe exposed dotfiles/configs with curl (fixed path list, not an ID sweep):
 ```bash

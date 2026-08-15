@@ -112,7 +112,7 @@ def check_dead_scriptrefs():
 
 def _skill_exists(repo, name):
     """True if a skill dir <name> exists anywhere under skills/ (skills/<name>,
-    skills/hunt/<name>, skills/burp/<name>, ...)."""
+    skills/hunt/<name>, skills/caido/<name>, ...)."""
     sk = os.path.join(repo, "skills")
     if os.path.isdir(os.path.join(sk, name)):
         return True
