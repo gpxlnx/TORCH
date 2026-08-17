@@ -14,7 +14,7 @@ qmd_query "exposed secrets git directory .env config hardcoded API keys JS bundl
 ```
 
 Hub: [[web-moc]] (live index). Primary page: [[secret-hunting]].
-Anchors: [[javascript-source-map-exploitation]], [[supply-chain-attacks]], [[git-exposure]], [[hardcoded-secrets-enumeration]], [[source-code-analysis]], [[aws-service-s3-buckets]], [[aws-access-token-secrets]]. Dorks: [[recon-dorks]].
+Anchors: [[javascript-source-map-exploitation]], [[supply-chain-attacks]], [[git-exposure]], [[hardcoded-secrets-enumeration]], [[source-code-analysis]], [[aws-service-s3-buckets]], [[aws-access-token-secrets]]. Regex catalog: [[secrets-regex]]. Dorks: [[recon-dorks]].
 
 ## Attack surface signals
 

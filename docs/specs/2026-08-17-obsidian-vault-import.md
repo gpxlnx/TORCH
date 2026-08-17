@@ -45,33 +45,23 @@ CT/passive **monitoring** (gungnir, cdx/wayback continuous) -> new `recon-monito
 - `wiki/tools/bbot.md` - recursive module-graph subdomain enum (passive/active presets).
 - `wiki/tools/waymore.md` - mode U (URLs) vs mode R (archived-response mining) + path extraction.
 
-### C. Recon depth -> update existing pages
-- `wiki/tools/subfinder.md` (puredns section): wildcard-batch/resolvers-trusted tuning.
-- `wiki/cheatsheets/recon.md`: acquisitions workflow (confirm -> dork -> enumerate), ASN listing.
-
 ### D. Secret detection -> new `wiki/cheatsheets/secrets-regex.md`
-The ~40-entry regex catalog (AWS/GCP/Firebase/Slack/Stripe/GitHub/Twilio/SendGrid/... tokens +
-private-key + cognito-pool patterns). Wire into `hunt-secrets` skill `## Wiki` + `playbook.json`.
+The ~50-entry regex catalog (AWS/GCP/Firebase/Slack/Stripe/GitHub/GitLab/Twilio/SendGrid/Okta/
+Telegram/... tokens + private-key + cognito-pool patterns). Wire into `hunt-secrets` skill `## Wiki`
++ `playbook.json`.
 
-### E. Dorks -> update `wiki/cheatsheets/recon-dorks.md`
-GitHub / Shodan / Google dork sets + acquisitions dorks (generic operators, no client strings).
+## Scope decision (operator, 2026-08-17): only A, B, D
 
-### F. Caido exploitation recipes -> update matching `hunt-*` wiki pages
-Translate the 8 "X Automation in Burp Suite" AutoRepeater recipes (SSRF, XSS, SSTI, CORS, LFI,
-web-cache-deception, sensitive-data, firebase-exposed) into Caido Match/Replace + Automate recipes
-on the corresponding technique/payload pages. Continues the Burp->Caido migration.
-
-### G. Distributed recon -> `wiki/cheatsheets/distributed-recon.md` (conditional)
-AX and Lemma fan-out patterns ONLY, fully de-credentialed (placeholder creds, generic setup).
-ShadowClone excluded. Import AX/Lemma only if they scrub clean (AX = 0 secret hits verified;
-Lemma = 2 minor, scrub then include).
+Areas C, E, F, G are DEFERRED (leave TORCH as-is). This pass imports ONLY:
+- **A** recon breadth -> `recon.md` + new `recon-monitoring.md`
+- **B** two tool pages -> `bbot.md`, `waymore.md`
+- **D** secret-regex catalog -> new `secrets-regex.md` + hunt-secrets/playbook wiring
 
 ## Wiring / index updates
 
 - `scripts/playbook.json`: add `secrets-regex` ref to the secret/exposure fingerprint rows.
 - `skills/hunt/hunt-secrets/SKILL.md`: reference `[[secrets-regex]]` in its Wiki section.
 - `wiki/index.md` + qmd re-index after pages land.
-- `wiki/moc.md` (or relevant MOC) link the new cheatsheets.
 
 ## Execution order (leak-safe)
 

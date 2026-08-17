@@ -144,6 +144,81 @@ curl -s "https://crt.sh/?q=example.com&output=json" \
      | jq -r '.[] | select(.name_value | contains("dev")) | .name_value' | sort -u
 ```
 
+### Passive sources (bug-bounty breadth)
+
+Fan out across many passive sources and dedupe with `anew`. For the recursive graph-based tool see [[wiki/tools/bbot]]; for URL/archive mining see [[wiki/tools/waymore]].
+
+```bash
+# findomain — fast multi-source passive
+findomain -u target.com -q --threads 50 | anew subs.txt
+findomain -f apex.txt -q --threads 100 | anew subs.txt        # batch over a root list
+
+# assetfinder — quick passive, filter throwaway envs
+cat apex.txt | assetfinder -subs-only | grep -vE '\.(test|dev|staging|local)$' | anew subs.txt
+
+# tlsx — SANs/CN from certs (find hidden subs + group by infra)
+echo target.com | tlsx -san -cn -silent | anew subs.txt
+subfinder -d target.com -silent | tlsx -san -silent -resp-only | anew subs.txt
+
+# github/gitlab — subdomains mentioned in public repos (needs API tokens file)
+github-subdomains -d target.com -t tokens.txt -o gh_subs.txt
+
+# shosubgo — subdomains from Shodan (needs SHODAN_API_KEY)
+shosubgo -d target.com -s "$SHODAN_API_KEY" | anew subs.txt
+
+# sublist3r / fierce — legacy but still add unique hits
+sublist3r -d target.com -o sublist3r.txt
+fierce --domain target.com --wide
+```
+
+### Permutation / alteration (brute the near-misses)
+
+```bash
+# gotator — permutation engine (depth + numbers), filter noise
+gotator -sub subs.txt -perm permutations.txt -depth 1 -numbers 10 -mindup -adv -md \
+  | grep -vE '\.(test|dev|staging|local)$' | anew perms.txt
+
+# dnsgen — mutate discovered names, validate with dnsx
+cat subs.txt | dnsgen - | dnsx -silent -resp-only | anew resolved.txt
+
+# altdns — word-list based permutations, optional resolve
+altdns -i subs.txt -o perms.txt -w altdns-words.txt -r -s resolved.txt
+```
+
+### Active resolve / DNS brute (validated hits)
+
+```bash
+# puredns — wildcard-safe mass resolve + brute (the workhorse)
+puredns resolve subs.txt -r resolvers.txt --resolvers-trusted resolvers-trusted.txt \
+  --write resolved.txt
+puredns bruteforce subdomains-wordlist.txt target.com \
+  -r resolvers.txt --resolvers-trusted resolvers-trusted.txt \
+  --wildcard-tests 30 --rate-limit-trusted 400 --write brute.txt
+
+# pugdns — high-throughput UDP DNS brute (mass batch)
+pugdns -interface eth0 --domains subs.txt --nameservers resolvers.txt \
+  --retries 5 --maxbatch 30000 --output out.json
+```
+
+### ASN / reverse-DNS (find the whole netblock)
+
+```bash
+# asnmap — apex -> ASN -> ranges -> reverse-DNS the range
+asnmap -d target.com -silent | dnsx -silent -resp-only -ptr | anew asn_hosts.txt
+
+# reverse-DNS a known ASN / CIDR
+echo AS12345 | dnsx -silent -resp-only -ptr | anew asn_hosts.txt
+prips 192.0.2.0/24 | dnsx -silent -resp-only -ptr | anew asn_hosts.txt
+
+# who owns an IP (Team Cymru whois)
+whois -h whois.cymru.com " -v $(dig +short target.com | head -1)"
+
+# reverse-whois: other domains under the same registrant org
+revwhoix -k "Target Org Name" | anew reverse_domains.txt
+```
+
+For continuous CT-log monitoring, favicon-hash pivoting, and cloud SNI ranges, see [[recon-monitoring]].
+
 ---
 
 ## Virtual Host Discovery
@@ -252,6 +327,21 @@ python3 reflection.py urls.txt | grep "Reflection found" \
 ## JavaScript Analysis (Endpoint + Secret Mining)
 
 Modern SPAs hide most of their real attack surface (internal API routes, debug params, API keys, cloud bucket names) inside JS bundles. Crawling URLs is not enough; mine the JS itself.
+
+```bash
+# hakrawler — fast crawl, follow JS, depth-limited
+echo "https://target.com" | hakrawler -depth 3 -plain -js | sort -u | anew crawl.txt
+
+# xnlinkfinder — extract endpoints from JS/URLs/archived responses (deep link mining)
+xnlinkfinder -i live-urls.txt -sf target.com -o endpoints.txt
+
+# dirsearch — content brute with smart extension set + recursion (complements ffuf)
+dirsearch -u https://target.com \
+  -e conf,config,bak,backup,old,sql,zip,tar.gz,log,json,xml \
+  --recursion --recursion-depth 3 -t 50 --random-agent \
+  -i 200,301,302,401,403 -x 404,429,500,502,503 -o dirsearch.txt
+```
+
 
 ```bash
 # 1. Collect JS file URLs (from crawl + archives)
