@@ -15,6 +15,7 @@ qmd_query "API REST GraphQL gRPC BOLA BFLA mass assignment excessive data exposu
 
 Hub: [[web-moc]] (live web index). Primary page: [[api-security]]. Payload arsenal: `wiki/payloads/api.md`.
 Anchors: [[api-testing]], [[graphql-attacks]].
+OWASP-API classes: [[bola]], [[bfla]], [[bopla-mass-assignment]], [[unrestricted-business-flows]], [[unrestricted-resource-consumption]], [[unsafe-api-consumption]], [[improper-asset-management]]. Logic: [[business-logic-web]], [[testing-financial-webapps]].
 Variants: [[grpc-web-attacks]] (gRPC-Web / protobuf transcoder abuse), [[rsql-injection]] with the [[rsql]] payload (RSQL/FIQL filter-query injection, e.g. Spring Data REST), [[rate-limit-bypass]] (header/race/distributed-source throttle bypass), [[redos]] payload (catastrophic-backtracking regex DoS in an input validator), [[jwt-attacks]] (token flaws).
 
 For object-level authorization (BOLA/IDOR) see `hunt-idor`.
