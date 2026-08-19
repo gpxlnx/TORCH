@@ -614,3 +614,25 @@ treated as untested, not as closed.
 ## Sources
 
 - `raw/git/Claude-OSINT/` — ElementalSoul claude-osint skills v2.1 (offensive-osint §17–19, §23–24; example 04-secret-hunting.md)
+
+## Datadog key type: client token vs org API key (single validate call)
+
+A `VITE_DATADOG_APIKEY`-style value in a client bundle/env file needs classifying before rating
+severity. One read-only call discriminates (no data pull):
+
+```
+curl -s https://api.datadoghq.com/api/v1/validate -H "DD-API-KEY: <LEAKED>"
+```
+
+| Response | Meaning |
+|----------|---------|
+| `{"valid":true}` | org-scoped **API key** -> HIGH (org metrics/logs read; incident-level) |
+| `{"errors":["Forbidden"]}` | consistent with a **RUM client token** (client tokens cannot authenticate to API endpoints; they only ingest telemetry) -> LOW |
+| `{"errors":["Invalid API key"]}` | dead/invalid |
+
+Site matters: a key from another Datadog site (us3/us5/eu/ap1) returns Forbidden on `.com`; retry
+the other sites before concluding client-token. Context clue: RUM client tokens ship alongside
+`VITE_DATADOG_CLIENT_KEY` (`pub...`) + `VITE_DATADOG_APPLICATION_ID` in client-side config, where
+they are public by design; the `APIKEY` naming is a common mislabel.
+
+<!-- promoted-slug: datadog-key-type-validation -->
