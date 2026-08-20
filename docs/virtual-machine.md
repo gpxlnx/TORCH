@@ -25,12 +25,57 @@ your-password
 `vm.sh` reads all three from here and hardcodes nothing. To point at a new VM, edit
 this file only. The script lives at `/root/vm.sh` (device-local, one copy per machine).
 
+The real driver is `setup/vm.sh` in this repo (tracked, secret-free) - it tries a
+Tailscale IP then a LAN IP, accepts both header-form and `label: value` creds files,
+and shells out via `sshpass`. `/root/vm.sh` is just the conventional invocation path
+for it; nothing requires that literal location (see next section).
+
+### No `/root/` access on this device
+
+If your user account cannot write to `/root/` (no sudo, or you'd rather not use root),
+point `VM_SH`/`VM_CREDS` at user-owned paths instead and skip `/root/` entirely - the
+driver only cares about the env vars, not the path:
+
+```bash
+mkdir -p ~/.local/bin ~/.config/torch
+cat > ~/.local/bin/torch-vm.sh <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+export VM_CREDS="${VM_CREDS:-$HOME/.config/torch/creds.txt}"
+exec bash <repo-path>/setup/vm.sh "$@"
+EOF
+chmod +x ~/.local/bin/torch-vm.sh
+```
+
+Fill `~/.config/torch/creds.txt` with `kali ip:` / `username:` / `password:` lines
+(label form - `setup/vm.sh` accepts either that or the header form above), `chmod 600`
+it, then add to your shell profile (`~/.profile` / `~/.bashrc`) so every session and
+every script that reads `$VM_SH`/`$VM_CREDS` resolves without extra setup:
+
+```bash
+export VM_SH="$HOME/.local/bin/torch-vm.sh"
+export VM_CREDS="$HOME/.config/torch/creds.txt"
+```
+
+Install `sshpass` if the VM uses password auth (`apt install sshpass`); key/agent auth
+needs no extra tooling. Verify with `bash "$VM_SH" 'whoami && hostname'`.
+
+Before setting this up on a "new" machine, check whether it is already done -
+`echo $VM_SH $VM_CREDS`, `cat ~/.profile`, and `find ~/.local/bin ~/.config/torch` (not
+`ls -la`, which has been observed to falsely report an empty listing for populated
+dirs/files in at least one WSL-on-Debian environment - trust `find`/`stat` over `ls`
+when a listing looks suspiciously empty).
+
 ## Use it
 
 ```bash
 bash /root/vm.sh '<remote bash command>'   # runs as root on the VM, output streamed back
 bash /root/vm.sh 'nmap -sV -Pn TARGET'
 ```
+
+(Or `bash "$VM_SH" '<cmd>'` if you're on the user-owned-path setup above - every other
+script in this doc and in `scripts/` already reads `$VM_SH`/`$VM_CREDS` with the
+`/root/...` values as fallback default, so nothing else changes.)
 
 ## Gotchas
 

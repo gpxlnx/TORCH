@@ -55,6 +55,15 @@ bash setup/install-hooks.sh    # symlinks ~/.claude/vault-hooks + registers the 
 
 **`settings.json` and the symlink never sync** (machine-local by design). Always run `install-hooks.sh` once per device after the first git pull.
 
+## Kali attack VM (`vm.sh`)
+
+Offensive tooling (nmap/ffuf/nuclei/nxc) and the VPN route to targets live on a
+separate Kali VM, reached over SSH via `vm.sh`. Full setup incl. the no-`/root/`-access
+variant (user-owned paths + env vars, already the working setup on at least one
+device): `docs/virtual-machine.md`. Check `echo $VM_SH $VM_CREDS` before assuming a
+device needs setup from scratch - use `find`, not `ls -la`, to verify (see that doc's
+note on a `ls -la` false-empty bug observed on WSL/Debian).
+
 ## Caido on Kali
 
 Run Caido as the Kali graphical seat user so proxy and Replay traffic use the VM's

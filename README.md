@@ -36,6 +36,7 @@ If TORCH saves you time on an engagement, a [star](https://github.com/Encod3d-Se
 - [What ships vs what stays private](#what-ships-vs-what-stays-private)
 - [Requirements](#requirements)
 - [Quickstart](#quickstart)
+- [Guia Hilton HackerOne em portugues](docs/guia-uso-ptbr.md)
 - [Plugins and MCP servers](#plugins-and-mcp-servers)
 - [Layout](#layout)
 - [The model underneath](#the-model-underneath)
@@ -129,6 +130,9 @@ bash scripts/check-leaks.sh
 ```
 
 `bootstrap.sh` self-locates the vault; if it cannot, set `OBSIDIAN_VAULT` (and `QMD_VAULT` for the search index) to the repo root. Per-machine paths go in the git-ignored `CLAUDE.local.md`, copy [`CLAUDE.local.example.md`](CLAUDE.local.example.md) to create it. See [`docs/setup.md`](docs/setup.md) for the full walkthrough.
+
+For a Portuguese TORCH runbook aligned with the Hilton HackerOne programme, see
+[`docs/guia-uso-ptbr.md`](docs/guia-uso-ptbr.md).
 
 ---
 
