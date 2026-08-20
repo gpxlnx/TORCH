@@ -13,3 +13,14 @@ Bold names are hostnames. Run `hostname` to identify the active machine.
 If you only use one machine, you can skip this entirely and just set
 `OBSIDIAN_VAULT` (or `QMD_VAULT`) in your shell profile - the path resolvers and
 hooks self-locate or read those env vars.
+
+## Kali VM bridge (optional, per hostname)
+
+`vm.sh` + `creds.txt` are device-local (see `docs/virtual-machine.md`), so note
+where they live per machine if it is not the default `~/.torch/`:
+
+`- **<HOSTNAME-A>:** ~/.torch/vm.sh + ~/.torch/creds.txt (default).`
+`- **<HOSTNAME-B>:** <VM_SH override path> + <VM_CREDS override path>.`
+
+Never put the VM IP, username, or password here (or anywhere tracked) - they
+live only inside `creds.txt` itself.
