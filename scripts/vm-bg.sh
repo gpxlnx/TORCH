@@ -7,7 +7,7 @@
 #   vm-bg.sh --wait  <eng> <win> [secs=120]  sleep then cat the log
 #   vm-bg.sh --dry-run <eng> <win> '<cmd>'   print the plan, run nothing
 set -uo pipefail
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 DRY=0; MODE=launch
 case "${1:-}" in
   --dry-run) DRY=1; shift;;

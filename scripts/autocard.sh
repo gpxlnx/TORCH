@@ -11,13 +11,13 @@
 # Env: AUTOCARD_MAX=N   cards at most N tabs per invocation (default 2, keeps a run short so it
 #                       finishes well under the hook timeout; the rest are picked up next turn).
 #      CAPTURE_SH=path  override the capture.sh used (test injection); default scripts/capture.sh.
-#      VM_SH=path       the SSH bridge to the tooling VM (default /root/vm.sh).
+#      VM_SH=path       the SSH bridge to the tooling VM (default ~/.torch/vm.sh).
 # Idempotent: each tab is carded once (tracked in targets/<eng>/.carded-tabs). Fail-open: any
 # problem (no VM, no tmux session, no tabs) exits 0 silently. A tab still running is skipped this
 # round and picked up on a later turn once its pane shows the shell prompt again.
 ENG="${1:-}"; [ -n "$ENG" ] || exit 0
 VAULT="$(cd "$(dirname "$0")/.." 2>/dev/null && pwd)" || exit 0
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 CAP="${CAPTURE_SH:-$VAULT/scripts/capture.sh}"
 MAX="${AUTOCARD_MAX:-2}"
 # AUTOCARD_ALL=1 (close-out sweep, fired by build-walkthrough.py): drop the per-run cap AND card

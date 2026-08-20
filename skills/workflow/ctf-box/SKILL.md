@@ -26,13 +26,13 @@ Only after the wiki has nothing do you write a custom PoC. Do not reinvent what 
 
 **Version-pinned tooling -> a THROWAWAY docker container, never mutate the VM's runtime.** A tool that needs a specific/older interpreter or an abandoned dependency (e.g. `h2csmuggler` pins the deprecated `hyper` lib and only runs on Python <=3.11; a legacy exploit needs `node:16`) should run inside a disposable container matched to that version, NOT via a host downgrade or a fragile venv that leaves the Kali VM in a broken state for the next box. `docker run -it --rm -v $(pwd):/app python:3.11 bash` (swap the tag: `python:3.9`, `node:16`, ...); `--rm` deletes it the moment you exit, so nothing persists and nothing on the VM breaks. Keep the VM's system python/tooling pristine.
 
-**Anti-pattern:** a raw one-shot `bash /root/vm.sh '<exploit>'` (or an inline `node -e`/`python3 -c` payload through it) for a listener, shell, or chained exploit is the smell this mandate exists to catch -- it skips wiki-first and leaves no session to capture. Run persistent/interactive steps in their own named tmux tab instead: `scripts/vm-scan.sh <eng> <target> '<cmd>'`.
+**Anti-pattern:** a raw one-shot `bash ~/.torch/vm.sh '<exploit>'` (or an inline `node -e`/`python3 -c` payload through it) for a listener, shell, or chained exploit is the smell this mandate exists to catch -- it skips wiki-first and leaves no session to capture. Run persistent/interactive steps in their own named tmux tab instead: `scripts/vm-scan.sh <eng> <target> '<cmd>'`.
 
 ## Phase 1 Recon: basic tools only (in this order)
 
 Use the standard toolkit. Do NOT hand-roll recon scripts.
 
-**Preflight (every engagement, before scanning): prune the tooling VM's `/etc/hosts` and `/etc/krb5.conf` of PRIOR-box entries.** The VM persists across boxes, so a stale `<ip> <domain>/<realm>` line (or a stale `default_realm`) silently mis-resolves this box while nxc/certipy (explicit IP) look fine; impacket Kerberos hangs on a dead KDC instead. `bash /root/vm.sh 'grep -vE "^#|^127\.|^::1|^$" /etc/hosts'`, delete any line not for this box, add only this target; `bash /root/vm.sh 'grep -i default_realm /etc/krb5.conf'`, blank/reset it.
+**Preflight (every engagement, before scanning): prune the tooling VM's `/etc/hosts` and `/etc/krb5.conf` of PRIOR-box entries.** The VM persists across boxes, so a stale `<ip> <domain>/<realm>` line (or a stale `default_realm`) silently mis-resolves this box while nxc/certipy (explicit IP) look fine; impacket Kerberos hangs on a dead KDC instead. `bash ~/.torch/vm.sh 'grep -vE "^#|^127\.|^::1|^$" /etc/hosts'`, delete any line not for this box, add only this target; `bash ~/.torch/vm.sh 'grep -i default_realm /etc/krb5.conf'`, blank/reset it.
 
 Tooling-first: rustscan/nmap/feroxbuster/ffuf/nuclei/nxc, never a hand-rolled `/dev/tcp` or curl fuzz loop (skips the fingerprint router). **feroxbuster is the DEFAULT web content-discovery tool** (recursive, faster than ffuf/big.txt); launch it the moment nmap shows a web port; ffuf is for param-mining + vhosts.
 

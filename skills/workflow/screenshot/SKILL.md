@@ -40,7 +40,7 @@ print the md ref) into ONE call, so live capture has no friction. `cmd` and `url
 anonymous card.
 ```bash
 # 1) tee the step's output on the VM as you run it (safe for stateful exploits - no re-run needed):
-bash /root/vm.sh 'python3 /tmp/exploit.py 2>&1 | tee /tmp/poc/flag3.log'
+bash ~/.torch/vm.sh 'python3 /tmp/exploit.py 2>&1 | tee /tmp/poc/flag3.log'
 # 2) card it the MOMENT it lands:
 scripts/capture.sh ev <eng> flag3-contract "POST http://T:8545 eth_sendTransaction" "reset()+transferDeposit()"
 #   args: <eng> <slug> <request-url> <cmd-label> [logfile=/tmp/poc/<slug>.log]
@@ -100,15 +100,15 @@ Push the script once, then shoot. `T` = target host, `PORT` = web port, `<eng>` 
 ```bash
 # 0) push shot.py to Kali (once per session). vm.sh does NOT forward local stdin, so base64 the
 #    file INTO the command (a `... | vm.sh 'cat > file'` pipe silently writes an EMPTY file):
-B64=$(base64 -w0 scripts/shot.py); bash /root/vm.sh "mkdir -p /tmp/poc; echo $B64 | base64 -d > /tmp/shot.py"
+B64=$(base64 -w0 scripts/shot.py); bash ~/.torch/vm.sh "mkdir -p /tmp/poc; echo $B64 | base64 -d > /tmp/shot.py"
 
 # 1) LIVE page (unauth / GET-able): the URL address bar is added AUTOMATICALLY
-bash /root/vm.sh 'python3 /tmp/shot.py http://T:PORT/internal --step 1 --slug login --dir /tmp/poc --caption "NOC login"'
+bash ~/.torch/vm.sh 'python3 /tmp/shot.py http://T:PORT/internal --step 1 --slug login --dir /tmp/poc --caption "NOC login"'
 
 # 2) AUTHED / exploited state: curl WITH the session, save HTML, render it. Pass --url-bar so the
 #    image shows WHICH URL produced it (the authed path, or the exact exploit request); --base loads
 #    /static from the target; the cookie stays in curl, never in the browser.
-bash /root/vm.sh 'curl -s -b "session=VAL" http://T:PORT/internal/dashboard > /tmp/d.html;
+bash ~/.torch/vm.sh 'curl -s -b "session=VAL" http://T:PORT/internal/dashboard > /tmp/d.html;
   python3 /tmp/shot.py --html /tmp/d.html --base http://T:PORT --url-bar "http://T:PORT/internal/dashboard" --step 3 --slug dashboard --dir /tmp/poc --caption "Dashboard via SQLi"'
 ```
 shot.py prints `saved <path>` + a ready `md: ![caption](poc/NN-slug.png)` line - keep that line.
@@ -119,10 +119,10 @@ never shown raw). The fancy 2-line shell prompt is **auto-stripped** so a tmux g
 `rootnmap -p-` mess (`--raw` keeps prompts if you need them). For a fetched web resource, add
 `--url-bar` so the card shows its URL - a leaked source file is evidence only if you can see where it lives.
 ```bash
-bash /root/vm.sh 'nmap -sV T | tee /tmp/o.txt;
+bash ~/.torch/vm.sh 'nmap -sV T | tee /tmp/o.txt;
   python3 /tmp/shot.py --term /tmp/o.txt --cmd "nmap -sV T" --step 1 --slug nmap --dir /tmp/poc'
 # a leaked source / log / config, WITH its URL in the address bar:
-bash /root/vm.sh 'curl -s http://T/logs/app.log > /tmp/l.txt;
+bash ~/.torch/vm.sh 'curl -s http://T/logs/app.log > /tmp/l.txt;
   python3 /tmp/shot.py --term /tmp/l.txt --url-bar http://T/logs/app.log --cmd "GET /logs/app.log" -o /tmp/poc/app-log.png'
 ```
 `--maxlines` (default 120) caps long output (linpeas); the card auto-sizes to wrapped rows so a long
@@ -143,7 +143,7 @@ bash scripts/vm-scan.sh <eng> T-web-192.0.2.10 'ffuf -u http://192.0.2.10/FUZZ -
 Tab name correlates to the target; dots/colons/spaces become `-` (tmux target syntax).
 Screenshot a live/finished tab as a clean colored card (no display needed):
 ```bash
-bash /root/vm.sh 'python3 /tmp/shot.py --tmux <eng>:T --step 2 --slug nmap --dir /tmp/poc'
+bash ~/.torch/vm.sh 'python3 /tmp/shot.py --tmux <eng>:T --step 2 --slug nmap --dir /tmp/poc'
 ```
 Target the tab by the `@NN` window id or the sanitized name (dots/colons became `-`) that `vm-scan.sh` printed, not the raw dotted target.
 then pull the PNG into `poc/` as usual.
@@ -152,8 +152,8 @@ then pull the PNG into `poc/` as usual.
 For real GUI apps with no text stream (Burp, Wireshark, a browser rendering an exploit)
 or the whole desktop:
 ```bash
-bash /root/vm.sh 'python3 /tmp/shot.py --window "Burp Suite" --step 3 --slug burp --dir /tmp/poc'
-bash /root/vm.sh 'python3 /tmp/shot.py --screen --step 4 --slug desktop --dir /tmp/poc'
+bash ~/.torch/vm.sh 'python3 /tmp/shot.py --window "Burp Suite" --step 3 --slug burp --dir /tmp/poc'
+bash ~/.torch/vm.sh 'python3 /tmp/shot.py --screen --step 4 --slug desktop --dir /tmp/poc'
 ```
 shot.py wakes + unlocks the seat session and grabs as the desktop user (root-over-SSH has
 no X authority, so a bare `scrot` fails with "Can't open X display :0"). `--window` grabs
@@ -165,7 +165,7 @@ for GUI windows.
 The PNG is born on Kali; the vault is on WSL. Transfer each:
 ```bash
 mkdir -p targets/<eng>/poc
-bash /root/vm.sh 'base64 -w0 /tmp/poc/03-dashboard-after-sqli.png' | base64 -d > targets/<eng>/poc/03-dashboard-after-sqli.png
+bash ~/.torch/vm.sh 'base64 -w0 /tmp/poc/03-dashboard-after-sqli.png' | base64 -d > targets/<eng>/poc/03-dashboard-after-sqli.png
 ```
 
 ## Embed in the walkthrough

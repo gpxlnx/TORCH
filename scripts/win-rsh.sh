@@ -22,7 +22,7 @@
 # Assumes a live PS reverse shell in tmux window <session>:<win> (default 'shell'). VM_SH overridable
 # for tests. Prints a diagnostic to stderr + exits 1 if no prompt returns within the timeout.
 set -uo pipefail
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 WIN="shell"; TO=60; FILE=""
 while [ $# -gt 0 ]; do
   case "${1:-}" in

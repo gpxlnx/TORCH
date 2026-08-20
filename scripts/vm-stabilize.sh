@@ -14,7 +14,7 @@
 # Ctrl-Z, run `stty raw -echo; fg` in the kali pane, Enter twice, then `export TERM=xterm` on target.
 # See wiki [[reverse-shells]] (## TTY Upgrade). VM_SH overridable for tests.
 set -uo pipefail
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 WIN="shell"; COLS=220; ROWS=50; DRY=0; USE_PY=0
 while [ $# -gt 0 ]; do
   case "${1:-}" in

@@ -49,9 +49,9 @@ NOT_UNCRACKED_OUTPUTS = [
 
 # commands that ARE an exploit-shaped loop (so a starved output is meaningful, not a bare scan)
 EXPLOIT_LOOP_CMDS = [
-    "bash /root/vm.sh 'for i in 1 2 3; do curl -s http://t/wp-admin/admin-ajax.php --data time=...; done'",
+    "bash ~/.torch/vm.sh 'for i in 1 2 3; do curl -s http://t/wp-admin/admin-ajax.php --data time=...; done'",
     "sqlmap -u 'http://t/?id=1' --dump",
-    "bash /root/vm.sh 'bash /tmp/ext.sh'",
+    "bash ~/.torch/vm.sh 'bash /tmp/ext.sh'",
     "john /tmp/kdbx.hash --wordlist=/tmp/mount.txt",
     "hashcat -m 0 hash.txt rockyou.txt",
 ]

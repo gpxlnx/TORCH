@@ -27,28 +27,28 @@ def test_second_scanner_advised_on_ctf(vault):
 def test_second_scanner_allowed_after_window(vault):
     eng = vault / "targets" / "acme"; _ctf(eng)
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    _run("bash /root/vm.sh 'ffuf -u http://10.0.0.5/FUZZ'", env)
+    _run("bash ~/.torch/vm.sh 'ffuf -u http://10.0.0.5/FUZZ'", env)
     # backdate the recorded launch to >3 min ago
     p = eng / ".scan-launches.jsonl"
     lines = [json.loads(l) for l in p.read_text().splitlines() if l.strip()]
     lines[-1]["ts"] = time.time() - 200
     p.write_text("\n".join(json.dumps(x) for x in lines) + "\n")
-    assert _run("bash /root/vm.sh 'feroxbuster -u http://10.0.0.5/'", env).get("permissionDecision") != "deny"
+    assert _run("bash ~/.torch/vm.sh 'feroxbuster -u http://10.0.0.5/'", env).get("permissionDecision") != "deny"
 
 def test_scanner_cap_not_on_non_ctf(vault):
     eng = vault / "targets" / "acme"
     json.dump({"type": "pentest", "pass": 5, "emitted_bins": ["ffuf"]}, open(eng / ".campaign.json", "w"))
     (eng / "Approach.md").write_text("### 4a\n| id | asset | vuln class | tool | status |\n|--|--|--|--|--|\n| r1 | 10.0.0.5 | content-discovery | ffuf | [ ] |\n")
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    _run("bash /root/vm.sh 'ffuf -u http://10.0.0.5/FUZZ'", env)
-    assert _run("bash /root/vm.sh 'feroxbuster -u http://10.0.0.5/'", env).get("permissionDecision") != "deny"
+    _run("bash ~/.torch/vm.sh 'ffuf -u http://10.0.0.5/FUZZ'", env)
+    assert _run("bash ~/.torch/vm.sh 'feroxbuster -u http://10.0.0.5/'", env).get("permissionDecision") != "deny"
 
 def test_dirb_second_advised_on_ctf(vault):
     """dirb is a HEAVY_SCANNERS member NOT in NET_BINS - must still be reachable/capped even as a
     bare command that is not otherwise exploit-shaped."""
     eng = vault / "targets" / "acme"; _ctf(eng)
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    assert _run("bash /root/vm.sh 'dirb http://10.0.0.5/'", env).get("permissionDecision") != "deny"
+    assert _run("bash ~/.torch/vm.sh 'dirb http://10.0.0.5/'", env).get("permissionDecision") != "deny"
     o2 = _run("dirb http://10.0.0.5/", env)
     assert o2.get("permissionDecision") != "deny"
     assert "already running" in o2.get("additionalContext", "")
@@ -61,8 +61,8 @@ def test_scanner_cap_always_advisory_regardless_of_enforce_off(vault):
     marker = os.path.join(REPO, "skills", "hooks", ".enforce-off")
     open(marker, "w").close()
     try:
-        _run("bash /root/vm.sh 'ffuf -w x -u http://10.0.0.5/FUZZ'", env)
-        o2 = _run("bash /root/vm.sh 'feroxbuster -u http://10.0.0.5/'", env)
+        _run("bash ~/.torch/vm.sh 'ffuf -w x -u http://10.0.0.5/FUZZ'", env)
+        o2 = _run("bash ~/.torch/vm.sh 'feroxbuster -u http://10.0.0.5/'", env)
         assert o2.get("permissionDecision") != "deny"
         assert "SCANNER-CAP" in o2.get("additionalContext", "")
     finally:

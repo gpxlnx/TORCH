@@ -13,9 +13,9 @@
 # below may need re-measuring. Synthetic mouse only registers on an UNLOCKED seat (see setup/burp/disable-lock.sh).
 #
 #   bash scripts/burp/burp-approve.sh          # approve a pending popup (no-op if none is up)
-# Env: VM_SH (SSH bridge, default /root/vm.sh).
+# Env: VM_SH (SSH bridge, default ~/.torch/vm.sh).
 set -uo pipefail
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 
 read -r -d '' VMSCRIPT <<'PYEOF' || true
 U=$(who | awk '/\(:[0-9]/{print $1; exit}'); U=${U:-kali}

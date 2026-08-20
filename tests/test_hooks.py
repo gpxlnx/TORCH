@@ -517,7 +517,7 @@ def _import_recon_capture():
 
 def test_inner_cmds_extracts_vm_sh_wrapper():
     rc = _import_recon_capture()
-    assert rc.inner_cmds("bash /root/vm.sh 'nmap -sV 10.0.0.5'") == ["nmap -sV 10.0.0.5"]
+    assert rc.inner_cmds("bash ~/.torch/vm.sh 'nmap -sV 10.0.0.5'") == ["nmap -sV 10.0.0.5"]
 
 
 def test_inner_cmds_extracts_ssh_wrapper():
@@ -546,7 +546,7 @@ def test_inner_cmds_ignores_quoted_mention_not_at_command_position():
 def test_inner_cmds_extracts_vm_sh_wrapper_through_sudo():
     # command-position still works after peeling a leading sudo wrapper.
     rc = _import_recon_capture()
-    assert rc.inner_cmds("sudo bash /root/vm.sh 'nmap -sV x'") == ["nmap -sV x"]
+    assert rc.inner_cmds("sudo bash ~/.torch/vm.sh 'nmap -sV x'") == ["nmap -sV x"]
 
 
 def test_inner_cmds_extracts_wsl_wrapper_multiline():
@@ -564,13 +564,13 @@ def test_inner_cmds_strips_loop_do_prefix():
     # made the vm.sh re.match, anchored at segment start, fail) -- a curl inside a
     # for...do...done loop must still get unwrapped.
     rc = _import_recon_capture()
-    cmd = "for i in 1 2; do bash /root/vm.sh 'curl -s http://10.10.10.10/flag'; done"
+    cmd = "for i in 1 2; do bash ~/.torch/vm.sh 'curl -s http://10.10.10.10/flag'; done"
     assert "curl -s http://10.10.10.10/flag" in rc.inner_cmds(cmd)
 
 
 def test_inner_cmds_strips_then_prefix():
     rc = _import_recon_capture()
-    cmd = "if true; then bash /root/vm.sh 'nmap -sV 10.0.0.5'; fi"
+    cmd = "if true; then bash ~/.torch/vm.sh 'nmap -sV 10.0.0.5'; fi"
     assert "nmap -sV 10.0.0.5" in rc.inner_cmds(cmd)
 
 
@@ -586,7 +586,7 @@ def test_inner_cmds_recurses_into_sh_c_nested_wrapper():
     # a wrapper NESTED inside a -c payload (vm.sh called from inside a sh -c body) must
     # also unwrap -- inner_cmds recurses into the extracted -c payload.
     rc = _import_recon_capture()
-    inners = rc.inner_cmds("sh -c \"bash /root/vm.sh 'nuclei -u https://x'\"")
+    inners = rc.inner_cmds("sh -c \"bash ~/.torch/vm.sh 'nuclei -u https://x'\"")
     assert "nuclei -u https://x" in inners
 
 
@@ -606,7 +606,7 @@ def test_inner_cmds_still_empty_for_plain_command():
 def test_invokes_detects_probe_tool_through_wrappers():
     rc = _import_recon_capture()
     for cmd in (
-        "bash /root/vm.sh 'nmap -sV 10.0.0.5'",
+        "bash ~/.torch/vm.sh 'nmap -sV 10.0.0.5'",
         "sshpass -p x ssh kali@host 'nuclei -u https://x'",
         "wsl -d kali -u kali -- gobuster dir -u http://x",
     ):

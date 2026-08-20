@@ -8,15 +8,15 @@
 #
 # Examples:
 #   # POST RCE, highlight the proof strings:
-#   bash /root/vm.sh "printf 'command=id' > /tmp/b.txt"
+#   bash ~/.torch/vm.sh "printf 'command=id' > /tmp/b.txt"
 #   bash scripts/burp/burp-hunt.sh <eng> rce <TARGET-IP> 80 false POST /home.php /tmp/b.txt 'www-data|uid=0|root:'
 #   # GET, highlight a token:
 #   bash scripts/burp/burp-hunt.sh <eng> leak <TARGET-IP> 80 false GET /api/me '' 'secret|token'
 #
-# Env: VM_SH (SSH bridge, default /root/vm.sh). bodyfile must already be on the VM (like capture.sh burp).
+# Env: VM_SH (SSH bridge, default ~/.torch/vm.sh). bodyfile must already be on the VM (like capture.sh burp).
 set -uo pipefail
 VAULT="$(cd "$(dirname "$0")/../.." && pwd)"
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 [ $# -ge 7 ] || { echo "usage: burp-hunt.sh <eng> <slug> <host> <port> <https> <method> <path> [bodyfile-on-vm] [highlight-regex]" >&2; exit 2; }
 ENG=$1; SLUG=$2; HOST=$3; PORT=$4; HTTPS=$5; METHOD=$6; RPATH=$7; BODYFILE=${8:-}; HL=${9:-}
 

@@ -2,6 +2,7 @@
 embedding model, no wiki required -- runs everywhere (CI-safe). The subprocess-backed
 run_query / live eval are exercised only by the local-only gate (tests/test_wiki_eval.py)."""
 import importlib.util
+import json
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -10,8 +11,17 @@ spec = importlib.util.spec_from_file_location("wiki_eval", SCRIPT)
 we = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(we)
 
-SEMANTIC = "\n[0.842] techniques/web/ssrf.md\nsome chunk text about ssrf\n\n[0.700] payloads/ssrf.md\nmore text\n\n[0.510] techniques/web/xxe.md\nnope\n"
-KEYWORD = "\ntools/netexec.md\nnxc smb enumeration\n\ntools/nmap.md\nservice scan\n"
+# `qmd ... --format json` shape: a list of hits, each carrying a "file" field of
+# "qmd://<collection>/<relpath>" plus score/title/snippet fields parse_results ignores.
+SEMANTIC = json.dumps([
+    {"file": "qmd://wiki/techniques/web/ssrf.md", "score": 0.842},
+    {"file": "qmd://wiki/payloads/ssrf.md", "score": 0.7},
+    {"file": "qmd://wiki/techniques/web/xxe.md", "score": 0.51},
+])
+KEYWORD = json.dumps([
+    {"file": "qmd://wiki/tools/netexec.md"},
+    {"file": "qmd://wiki/tools/nmap.md"},
+])
 
 
 def test_parse_semantic_strips_score_and_keeps_paths():
@@ -23,8 +33,12 @@ def test_parse_keyword_bare_paths():
 
 
 def test_parse_ignores_prose_blocks():
-    # a prose paragraph (has spaces, not a .md path) must not be counted as a result
-    assert we.parse_results("\n[0.9] techniques/web/xss.md\nthis is prose with a stray word.md inside\n") == ["techniques/web/xss.md"]
+    # a hit from another collection (no "qmd://wiki/" prefix) must not be counted as a result
+    other_collection = json.dumps([
+        {"file": "qmd://wiki/techniques/web/xss.md"},
+        {"file": "qmd://notes/some-file.md"},
+    ])
+    assert we.parse_results(other_collection) == ["techniques/web/xss.md"]
 
 
 def test_hit_at_topk():

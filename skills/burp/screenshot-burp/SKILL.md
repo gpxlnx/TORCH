@@ -8,7 +8,7 @@ description: Capture a Burp Suite Repeater request/response as a PoC image (targ
 Turn a Burp Repeater exchange into a report-ready **request + response image**. This is the Burp-native
 counterpart to `Skill(screenshot)` (curl/terminal cards): when you drive a target through Burp, capture
 the proof FROM Burp. Prereqs are the same as `Skill(hunt-burp)` (Burp running + the MCP Server BApp, SSE
-on `127.0.0.1:9876`; verify with `bash /root/vm.sh 'python3 ~/burp-mcp-cli.py list'`).
+on `127.0.0.1:9876`; verify with `bash ~/.torch/vm.sh 'python3 ~/burp-mcp-cli.py list'`).
 
 ## One command (use this)
 ```bash
@@ -77,15 +77,15 @@ WxH+X+Y +repage` or `maim`/`scrot -a` (pure X11), never flameshot here.
 ## Manual fallback (what the script automates)
 ```bash
 # 1) stage the request as a Repeater tab (root, via MCP)
-bash /root/vm.sh 'python3 ~/burp-mcp-cli.py call create_repeater_tab "{\"content\":\"GET /x HTTP/1.1\r\nHost: T:80\r\nConnection: close\r\n\r\n\",\"targetHostname\":\"T\",\"targetPort\":80,\"usesHttps\":false}"'
+bash ~/.torch/vm.sh 'python3 ~/burp-mcp-cli.py call create_repeater_tab "{\"content\":\"GET /x HTTP/1.1\r\nHost: T:80\r\nConnection: close\r\n\r\n\",\"targetHostname\":\"T\",\"targetPort\":80,\"usesHttps\":false}"'
 # 2) send + grab as the seat user (detect the desktop user + display from `who`)
-bash /root/vm.sh 'U=$(who | awk "/\(:[0-9]/{print \$1;exit}"); D=$(who|grep -oE "\(:[0-9]+"|head -1|tr -d "(")
+bash ~/.torch/vm.sh 'U=$(who | awk "/\(:[0-9]/{print \$1;exit}"); D=$(who|grep -oE "\(:[0-9]+"|head -1|tr -d "(")
   sudo -u "$U" env DISPLAY="$D" XAUTHORITY=/home/$U/.Xauthority bash -c "
   WID=\$(xdotool search --name \"Burp Suite Professional\" | head -1)
   xdotool windowactivate --sync \$WID; xdotool mousemove 500 400 click 1; sleep .4
   xdotool key ctrl+space; sleep 4; import -window \$WID /tmp/burp.png"'
 # 3) pull it
-bash /root/vm.sh 'base64 -w0 /tmp/burp.png' | base64 -d > targets/<eng>/poc/NN-slug.png
+bash ~/.torch/vm.sh 'base64 -w0 /tmp/burp.png' | base64 -d > targets/<eng>/poc/NN-slug.png
 ```
 
 ## Redaction / boundary

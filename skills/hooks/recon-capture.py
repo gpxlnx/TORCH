@@ -217,7 +217,7 @@ def _invokes_any(cmd, tools):
         (m for ic in inner_cmds(cmd) if (m := invokes(ic, tools))), None)
 
 
-# Bridge wrappers: this harness runs remote tooling via `bash /root/vm.sh '<cmd>'`,
+# Bridge wrappers: this harness runs remote tooling via `bash ~/.torch/vm.sh '<cmd>'`,
 # `sshpass ... ssh user@host '<cmd>'`, or `wsl ... -- <cmd>`. The real tool sits inside
 # the wrapper's quoted arg, so invokes() (command-position) misses it. Extract the inner
 # command(s) so the caller can run invokes()/fingerprinting against them too.

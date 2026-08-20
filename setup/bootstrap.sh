@@ -109,12 +109,22 @@ else
   echo "  claude mcp add caveman-shrink -s user -e QMD_VAULT=$VAULT -- npx -y caveman-shrink qmd mcp"
 fi
 
-# Kali VM capture deps (screenshot + tmux scan-runner). Best-effort; needs the VM configured.
-if [ -f /root/vm.sh ] && [ -f /root/creds.txt ]; then
+# Kali VM bridge: device-local, no root needed. Place vm.sh (no secrets) unconditionally;
+# creds.txt holds the actual VM IP/user/password so it is never auto-generated.
+mkdir -p "$HOME/.torch"
+if [ ! -f "$HOME/.torch/vm.sh" ]; then
+  cp "$SCRIPT_DIR/vm.sh" "$HOME/.torch/vm.sh"
+  chmod +x "$HOME/.torch/vm.sh"
+  echo "[ok] installed $HOME/.torch/vm.sh"
+fi
+
+# Kali VM capture deps (screenshot + tmux scan-runner). Best-effort; needs creds.txt configured.
+if [ -f "$HOME/.torch/creds.txt" ]; then
   echo "[..] provisioning Kali VM capture deps"
   bash "$VAULT/scripts/vm-provision.sh" || echo "[warn] vm-provision failed; run scripts/vm-provision.sh later"
 else
-  echo "[note] Kali VM not configured; after setup run: bash scripts/vm-provision.sh (see docs/virtual-machine.md)"
+  echo "[note] Kali VM not configured yet; create $HOME/.torch/creds.txt (see docs/virtual-machine.md),"
+  echo "       then run: bash scripts/vm-provision.sh"
 fi
 
 echo ""

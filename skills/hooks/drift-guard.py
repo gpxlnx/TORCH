@@ -4,7 +4,7 @@
 The proven failure: the deterministic driver (scripts/campaign.py) is advisory BY
 INVOCATION - it only enforces its gates on turns the agent chooses to run it, so under
 momentum the agent walked away from `campaign.py next` in 90 seconds and free-handed a whole
-box via 85 raw `bash /root/vm.sh` exploit calls. This hook pulls the agent back: on an
+box via 85 raw `bash ~/.torch/vm.sh` exploit calls. This hook pulls the agent back: on an
 exploit-shaped Bash command during an active campaign, if the agent is OFF-BOARD (running an
 exploit/scan binary the driver never emitted, and the board is NOT empty), it ESCALATES a
 counter and ADVISES the agent back to the driver. It never denies a command - the standing
@@ -25,7 +25,7 @@ ON-BOARD (allowed, never counted) when EITHER:
 
 EXPLOIT-SHAPED = handroll.classify() fires (a substitutable hand-rolled request loop) OR the
 command mentions a network/scan/exploit binary (NET_BINS). NET_BINS is word-searched over the
-WHOLE command string, not just the leading token, so `bash /root/vm.sh 'nmap ...'` - the exact
+WHOLE command string, not just the leading token, so `bash ~/.torch/vm.sh 'nmap ...'` - the exact
 wrapper the reference failure used - is caught by the inner binary.
 
 SAFETY (this hook only advises, but stays fail-open anyway - never let a hook bug break a turn):
@@ -67,7 +67,7 @@ _BIN_RE = re.compile(r"\b(" + "|".join(sorted(map(re.escape, NET_BINS), key=len,
 _DRIVER_RE = re.compile(r"campaign\.py\s+(?:next|board|done|pass-done|init)\b")
 # A HAND-WRITTEN exploit run as a script/interpreter, or an interactive reverse-shell driver:
 # exploit-shaped even though it touches no NET_BIN (the exact gap the post-mortem free-handed
-# through - `bash /root/vm.sh 'python3 exp.py'`). Deliberately does NOT match the `bash /root/vm.sh`
+# through - `bash ~/.torch/vm.sh 'python3 exp.py'`). Deliberately does NOT match the `bash ~/.torch/vm.sh`
 # transport wrapper itself (that is how EVERY VM command runs); it matches the INNER interpreter.
 _INTERP_RE = re.compile(
     r"\bpython3?\s+(?:-c\b|\S+\.py\b)|\bphp\s+(?:-r\b|\S+\.php\b)|\bruby\s+-e\b|\bperl\s+-e\b"

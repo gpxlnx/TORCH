@@ -33,7 +33,7 @@ def test_off_board_escalates_but_never_denies(vault):
     eng = vault / "targets" / "acme"
     _campaign(eng, emitted=["ffuf"])           # board wants ffuf; agent free-hands nmap
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    o1 = _run("bash /root/vm.sh 'nmap -sV 10.0.0.5'", env)
+    o1 = _run("bash ~/.torch/vm.sh 'nmap -sV 10.0.0.5'", env)
     assert "additionalContext" in o1 and "off-board, streak 1" in o1["additionalContext"]
     assert "permissionDecision" not in o1
     o2 = _run("nmap -p- 10.0.0.5", env)
@@ -48,7 +48,7 @@ def test_off_board_escalates_but_never_denies(vault):
 
 def test_selfkill_advisory_on_pkill_shell(vault):
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    for cmd in ("bash /root/vm.sh 'pkill -f bash'", "killall nc", "pkill python3", "pkill -f socat"):
+    for cmd in ("bash ~/.torch/vm.sh 'pkill -f bash'", "killall nc", "pkill python3", "pkill -f socat"):
         o = _run(cmd, env)
         assert "SELF-KILL" in (o.get("additionalContext") or ""), cmd
 
@@ -89,7 +89,7 @@ def test_post_foothold_never_denies(vault):
         "| r1 | 10.0.0.5 | privesc | linpeas | [ ] |\n")
     (eng / "state.md").write_text("| asset | access |\n|--|--|\n| 10.0.0.5 | foothold |\n")
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    o1 = _run("bash /root/vm.sh 'python3 /tmp/x.py'", env)
+    o1 = _run("bash ~/.torch/vm.sh 'python3 /tmp/x.py'", env)
     o2 = _run("nmap 10.0.0.5", env)
     o3 = _run("curl http://10.0.0.5/", env)         # 3rd - advisory only, never deny
     assert o3.get("permissionDecision") != "deny"
@@ -115,7 +115,7 @@ def test_scripted_exploit_over_vmsh_fires(vault):
     eng = vault / "targets" / "acme"
     _campaign(eng, emitted=["sqlmap"])
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    o = _run("bash /root/vm.sh 'python3 /tmp/typo3_rce.py --target 10.0.0.5'", env)
+    o = _run("bash ~/.torch/vm.sh 'python3 /tmp/typo3_rce.py --target 10.0.0.5'", env)
     assert "additionalContext" in o and "off-board, streak 1" in o["additionalContext"]
     # a reverse-shell driver is the interactive free-hand zone -> also fires
     o2 = _run("bash scripts/vm-rsh.sh 'id'", env)
@@ -123,13 +123,13 @@ def test_scripted_exploit_over_vmsh_fires(vault):
 
 
 def test_vmsh_transport_not_falsely_matched(vault):
-    """The `bash /root/vm.sh '...'` transport is how EVERY VM command runs; a benign inner command
+    """The `bash ~/.torch/vm.sh '...'` transport is how EVERY VM command runs; a benign inner command
     must NOT be read as an interpreter exploit (no `bash \\S+\\.sh` collision with vm.sh)."""
     eng = vault / "targets" / "acme"
     _campaign(eng, emitted=[])
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    assert _run("bash /root/vm.sh 'ls -la /var/www'", env) == {}
-    assert _run("bash /root/vm.sh 'cat /etc/passwd'", env) == {}
+    assert _run("bash ~/.torch/vm.sh 'ls -la /var/www'", env) == {}
+    assert _run("bash ~/.torch/vm.sh 'cat /etc/passwd'", env) == {}
 
 
 def test_open_row_tool_is_on_board(vault):
@@ -138,7 +138,7 @@ def test_open_row_tool_is_on_board(vault):
     eng = vault / "targets" / "acme"
     _campaign(eng, emitted=[])                      # board's open row wants sqlmap; emitted empty
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    assert _run("bash /root/vm.sh 'sqlmap -u http://10.0.0.5/?id=1 --batch'", env) == {}
+    assert _run("bash ~/.torch/vm.sh 'sqlmap -u http://10.0.0.5/?id=1 --batch'", env) == {}
 
 
 def test_end_of_board_allows(vault):
@@ -185,7 +185,7 @@ def test_confirmed_chain_never_denies(vault):
     (eng / "state.md").write_text(
         "| asset | access |\n|--|--|\n| 10.0.0.5 | port-open |\n\n## CONFIRMED CHAIN\n1. LFI via redirect\n")
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
-    _run("bash /root/vm.sh 'python3 /tmp/lfi.py'", env)
-    _run("bash /root/vm.sh 'python3 /tmp/lfi.py'", env)
+    _run("bash ~/.torch/vm.sh 'python3 /tmp/lfi.py'", env)
+    _run("bash ~/.torch/vm.sh 'python3 /tmp/lfi.py'", env)
     o3 = _run("nmap 10.0.0.5", env)              # 3rd off-board -> advisory only, never deny
     assert o3.get("permissionDecision") != "deny"

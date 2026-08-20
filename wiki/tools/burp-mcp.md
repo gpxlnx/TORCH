@@ -83,11 +83,11 @@ JSON-RPC handshake and calls a single tool:
 ```bash
 # push the CLI to Kali once (stdin is not forwarded through vm.sh; base64 it in):
 base64 -w0 scripts/burp/burp-mcp-cli.py | \
-  xargs -I{} bash /root/vm.sh 'echo {} | base64 -d > ~/burp-mcp-cli.py'
+  xargs -I{} bash ~/.torch/vm.sh 'echo {} | base64 -d > ~/burp-mcp-cli.py'
 
-bash /root/vm.sh 'python3 ~/burp-mcp-cli.py list'                              # list every tool + description
-bash /root/vm.sh 'python3 ~/burp-mcp-cli.py schema send_http1_request'         # a tool input schema
-bash /root/vm.sh 'python3 ~/burp-mcp-cli.py call get_proxy_http_history "{\"count\":50}"'
+bash ~/.torch/vm.sh 'python3 ~/burp-mcp-cli.py list'                              # list every tool + description
+bash ~/.torch/vm.sh 'python3 ~/burp-mcp-cli.py schema send_http1_request'         # a tool input schema
+bash ~/.torch/vm.sh 'python3 ~/burp-mcp-cli.py call get_proxy_http_history "{\"count\":50}"'
 ```
 
 Alternative: SSH local-forward the port to the host (`ssh -L 9876:127.0.0.1:9876 kali`)

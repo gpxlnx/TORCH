@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(REPO, "scripts"))
 
 # Force a nonexistent VM_SH for the whole test session: recon-capture.py's live lead
 # render (and loop-driver.py's drains) shell out to $VM_SH, and a real device may have
-# a real /root/vm.sh configured (a real SSH bridge). Tests must never dial that out --
+# a real ~/.torch/vm.sh configured (a real SSH bridge). Tests must never dial that out --
 # this makes every hook subprocess fail open (os.path.exists(vm) is False) instantly
 # instead of attempting a real network connection. A test that wants a FAKE vm.sh stub
 # still works: it sets "VM_SH" explicitly in its own env dict, which always wins over

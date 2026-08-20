@@ -23,7 +23,7 @@ def _load():
 WEB_PROBES = [
     "feroxbuster -u http://olympus.thm -w list.txt",
     "ffuf -u http://10.1.1.1/ -H 'Host: FUZZ.t' -w list -mc all",
-    "bash /root/vm.sh 'curl -s http://chat.t/login.php'",
+    "bash ~/.torch/vm.sh 'curl -s http://chat.t/login.php'",
     "gobuster dir -u http://t -w w.txt",
     "nuclei -u http://t",
 ]

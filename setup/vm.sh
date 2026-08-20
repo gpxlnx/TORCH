@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # vm.sh - one-line SSH bridge to the Kali attack VM. Device-local. No secrets in this file.
 #
-# Reads IP(s)/user/password from /root/creds.txt (git-ignored, per-device) and runs a
+# Reads IP(s)/user/password from ~/.torch/creds.txt (git-ignored, per-device) and runs a
 # command as the configured user on the VM, streaming output back. Cross-machine: it tries
 # each candidate host in priority order (Tailscale/100.x IP first = location-independent,
 # then the LAN/VM IP) and uses the first that answers on :22. So the SAME script works from
 # any machine that can reach the VM by any of those addresses.
 #
-#   bash /root/vm.sh '<remote bash command>'
-#   bash /root/vm.sh 'id; hostname; ip -4 addr'
+#   bash ~/.torch/vm.sh '<remote bash command>'
+#   bash ~/.torch/vm.sh 'id; hostname; ip -4 addr'
 #
 # creds.txt is parsed flexibly - both label form and header form are accepted:
 #   kali ip: 192.168.23.128        |   # IP
@@ -22,7 +22,7 @@
 # no persistent state (chain with ; / &&); fails fast on unreachable (ConnectTimeout).
 set -euo pipefail
 
-CREDS="${VM_CREDS:-/root/creds.txt}"
+CREDS="${VM_CREDS:-$HOME/.torch/creds.txt}"
 [ -r "$CREDS" ] || { echo "vm.sh: cannot read $CREDS" >&2; exit 2; }
 
 # _field "label1|label2" "HeaderName" -> first matching value, label form then header form.
@@ -47,7 +47,7 @@ LANIP=$(_field "kali[[:space:]]*ip|vm[[:space:]]*ip|ip" "IP")
 [ -n "$VMPASS" ] || { echo "vm.sh: no password in $CREDS" >&2; exit 2; }
 
 CMD="${1:-}"
-[ -n "$CMD" ] || { echo "usage: bash /root/vm.sh '<remote bash command>'" >&2; exit 2; }
+[ -n "$CMD" ] || { echo "usage: bash ~/.torch/vm.sh '<remote bash command>'" >&2; exit 2; }
 
 # Candidate hosts, priority order, de-duplicated, empties skipped.
 CANDS=()

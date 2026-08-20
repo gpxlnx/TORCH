@@ -6,7 +6,7 @@
 #   bash scripts/vm-sync.sh pspy64        # (once pspy64 is a file in scripts/)
 #   bash scripts/vm-sync.sh shot.py
 set -euo pipefail
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 ARSENAL="/opt/arsenal"
 
 name="${1:-}"

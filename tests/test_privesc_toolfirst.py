@@ -28,7 +28,7 @@ _STATE_FOOTHOLD = (
     "| 10.0.0.5 | http | 80 | web-rce | foothold | - | apache shell |\n")
 _STATE_NONE = _STATE_FOOTHOLD.replace("| foothold |", "| none |")
 
-MANUAL = "bash /root/vm.sh 'find / -perm -4000 -type f 2>/dev/null'"
+MANUAL = "bash ~/.torch/vm.sh 'find / -perm -4000 -type f 2>/dev/null'"
 
 
 def _write(d, state):
@@ -55,7 +55,7 @@ def test_suppressed_after_linpeas_launched(tmp_path):
     d = str(tmp_path)
     _write(d, _STATE_FOOTHOLD)
     # a linpeas launch records the marker and returns None
-    assert rc._privesc_toolfirst_nudge(d, "bash /root/vm.sh 'linpeas.sh'", _eng()) is None
+    assert rc._privesc_toolfirst_nudge(d, "bash ~/.torch/vm.sh 'linpeas.sh'", _eng()) is None
     # subsequent manual enum is now suppressed
     assert rc._privesc_toolfirst_nudge(d, MANUAL, _eng()) is None
 
@@ -65,11 +65,11 @@ def test_fires_once_per_engagement(tmp_path):
     d = str(tmp_path)
     _write(d, _STATE_FOOTHOLD)
     assert rc._privesc_toolfirst_nudge(d, MANUAL, _eng()) is not None
-    assert rc._privesc_toolfirst_nudge(d, "bash /root/vm.sh 'cat /etc/crontab'", _eng()) is None
+    assert rc._privesc_toolfirst_nudge(d, "bash ~/.torch/vm.sh 'cat /etc/crontab'", _eng()) is None
 
 
 def test_ignores_unrelated_command(tmp_path):
     rc = _load()
     d = str(tmp_path)
     _write(d, _STATE_FOOTHOLD)
-    assert rc._privesc_toolfirst_nudge(d, "bash /root/vm.sh 'whoami'", _eng()) is None
+    assert rc._privesc_toolfirst_nudge(d, "bash ~/.torch/vm.sh 'whoami'", _eng()) is None

@@ -9,7 +9,7 @@ RSH = os.path.join(REPO, "scripts", "vm-rsh.sh")
 
 
 def _fake_vm(tmp_path, pane_lines):
-    """A fake /root/vm.sh: no-op on send-keys; prints a canned pane on capture-pane."""
+    """A fake ~/.torch/vm.sh: no-op on send-keys; prints a canned pane on capture-pane."""
     body = "\n".join(pane_lines)
     fake = tmp_path / "vm.sh"
     fake.write_text(

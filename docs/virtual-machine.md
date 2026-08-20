@@ -8,10 +8,10 @@ linpeas, chromium), and is reached over SSH by a one-line driver, `vm.sh`.
 Claude (WSL) --ssh (vm.sh)--> Kali VM --VPN--> targets
 ```
 
-## Configure it: one file, `/root/creds.txt`
+## Configure it: one file, `~/.torch/creds.txt`
 
-IP, username, and password all live in `/root/creds.txt` (git-ignored, device-local).
-Edit the value on the line under each header:
+IP, username, and password all live in `~/.torch/creds.txt` (git-ignored, device-local,
+user-owned - no root needed). Edit the value on the line under each header:
 
 ```
 # IP
@@ -23,21 +23,22 @@ your-password
 ```
 
 `vm.sh` reads all three from here and hardcodes nothing. To point at a new VM, edit
-this file only. The script lives at `/root/vm.sh` (device-local, one copy per machine).
+this file only. The script lives at `~/.torch/vm.sh` (device-local, one copy per
+machine; `setup/bootstrap.sh` installs it automatically, no sudo required).
 
 ## Use it
 
 ```bash
-bash /root/vm.sh '<remote bash command>'   # runs as root on the VM, output streamed back
-bash /root/vm.sh 'nmap -sV -Pn TARGET'
+bash ~/.torch/vm.sh '<remote bash command>'   # runs as the configured user on the VM, output streamed back
+bash ~/.torch/vm.sh 'nmap -sV -Pn TARGET'
 ```
 
 ## Gotchas
 
 - **No stdin is forwarded.** `local-cmd | vm.sh 'cat > f'` writes an EMPTY file. Push a
   file by base64-ing it INTO the command:
-  `B64=$(base64 -w0 f); bash /root/vm.sh "echo $B64 | base64 -d > /tmp/f"`.
-  Pull one back: `bash /root/vm.sh 'base64 -w0 /tmp/f' | base64 -d > local`.
+  `B64=$(base64 -w0 f); bash ~/.torch/vm.sh "echo $B64 | base64 -d > /tmp/f"`.
+  Pull one back: `bash ~/.torch/vm.sh 'base64 -w0 /tmp/f' | base64 -d > local`.
 - **No persistent state.** Each call is a fresh SSH session; `cd` and vars do not carry.
   Chain steps with `;` / `&&` in one call.
 - **Long FOREGROUND commands get dropped (exit 255, no output).** A single `vm.sh '<cmd>'`
@@ -45,8 +46,8 @@ bash /root/vm.sh 'nmap -sV -Pn TARGET'
   poll a file instead: a tmux tab (`scripts/vm-scan.sh <eng> <target> '<cmd>'`), or
   `nohup <cmd> >/tmp/out 2>&1 &` then poll `for i in $(seq 1 60); do grep -q DONE /tmp/out && break; sleep 3; done`.
   When pushing a script then running it, do BOTH in one call (write races the run otherwise).
-- **Runs as root**, `ConnectTimeout=10` (fails fast). A `Permission denied` means
-  `/root/creds.txt` is stale.
+- **Runs as the configured `~/.torch/creds.txt` user**, `ConnectTimeout=10` (fails fast). A
+  `Permission denied` means `~/.torch/creds.txt` is stale.
 
 ## Running scans in tmux + capturing the desktop
 
@@ -132,6 +133,6 @@ unreachable.
 
 ## Secrets boundary
 
-The VM IP and password live only in `/root/creds.txt` (device-local). Never write them
-into `docs/`, `wiki/`, `session/`, scripts, or commits. Target specifics stay under
-`targets/<eng>/`.
+The VM IP and password live only in `~/.torch/creds.txt` (device-local, `chmod 600`
+recommended). Never write them into `docs/`, `wiki/`, `session/`, scripts, or commits.
+Target specifics stay under `targets/<eng>/`.

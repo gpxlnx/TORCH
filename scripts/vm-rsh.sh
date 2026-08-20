@@ -15,7 +15,7 @@
 # the window scripts/vm-scan.sh --win shell created for the nc listener). VM_SH overridable
 # for tests. Fail-soft: prints nothing + exits 1 if the end marker never appears.
 set -uo pipefail
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 WIN="shell"; TO=40
 while [ $# -gt 0 ]; do
   case "${1:-}" in

@@ -13,6 +13,9 @@
 #   bash vm-provision.sh --list   # print the toolset (no VM needed)
 set -uo pipefail
 
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
+CREDS="${VM_CREDS:-$HOME/.torch/creds.txt}"
+
 # Screenshot / tmux-runner capture deps (this script's original purpose).
 CAPTURE="tmux scrot xdotool imagemagick x11-utils xauth"
 # Recon + test toolchain, Kali package names. httpx-toolkit = ProjectDiscovery httpx.
@@ -26,8 +29,8 @@ if [ "${1:-}" = "--list" ]; then
   exit 0
 fi
 
-if [ ! -f /root/vm.sh ] || [ ! -f /root/creds.txt ]; then
-  echo "[note] Kali VM not configured (need /root/vm.sh + /root/creds.txt)."
+if [ ! -f "$VM_SH" ] || [ ! -f "$CREDS" ]; then
+  echo "[note] Kali VM not configured (need $VM_SH + $CREDS)."
   echo "       See docs/virtual-machine.md, then re-run: bash scripts/vm-provision.sh"
   exit 0
 fi
@@ -77,7 +80,7 @@ REMOTE_EOF
 
 echo "[..] provisioning toolchain on the VM (apt-first, per-package tolerant)"
 B64=$(printf '%s' "$REMOTE" | base64 -w0)
-bash /root/vm.sh "echo $B64 | base64 -d | bash"
+bash "$VM_SH" "echo $B64 | base64 -d | bash"
 
 # Seed /opt/arsenal with OUR vault-side helpers (base64 over the bridge, unconditional so a
 # re-provision refreshes them): shot.py + capture.sh + any harness wordlists.
@@ -85,14 +88,14 @@ echo "[..] seeding /opt/arsenal with our helpers (shot.py, capture.sh, harness w
 HERE="$(cd "$(dirname "$0")" && pwd)"
 for f in shot.py capture.sh; do
   [ -f "$HERE/$f" ] || continue
-  bash /root/vm.sh "mkdir -p /opt/arsenal; printf %s '$(base64 -w0 "$HERE/$f")' | base64 -d > /opt/arsenal/$f && chmod +x /opt/arsenal/$f && echo '  arsenal $f'"
+  bash "$VM_SH" "mkdir -p /opt/arsenal; printf %s '$(base64 -w0 "$HERE/$f")' | base64 -d > /opt/arsenal/$f && chmod +x /opt/arsenal/$f && echo '  arsenal $f'"
 done
 for wl in "$HERE"/wordlists/harness-*.txt; do
   [ -f "$wl" ] || continue
   bn="$(basename "$wl")"
-  bash /root/vm.sh "printf %s '$(base64 -w0 "$wl")' | base64 -d > /opt/arsenal/$bn && echo '  arsenal $bn'"
+  bash "$VM_SH" "printf %s '$(base64 -w0 "$wl")' | base64 -d > /opt/arsenal/$bn && echo '  arsenal $bn'"
 done
 
 echo "[ok] provisioning attempted. Verify installed binaries with:"
-echo "     bash /root/vm.sh 'for t in httpx subfinder ffuf naabu dnsx katana gau dalfox arjun sqlmap swaks jwt_tool trufflehog gitleaks; do command -v \$t >/dev/null 2>&1 && echo \"ok \$t\" || echo \"MISSING \$t\"; done'"
+echo "     bash $VM_SH 'for t in httpx subfinder ffuf naabu dnsx katana gau dalfox arjun sqlmap swaks jwt_tool trufflehog gitleaks; do command -v \$t >/dev/null 2>&1 && echo \"ok \$t\" || echo \"MISSING \$t\"; done'"
 echo "     (note: httpx-toolkit installs the binary as 'httpx'; if a name is MISSING, tune the package name for your Kali release.)"

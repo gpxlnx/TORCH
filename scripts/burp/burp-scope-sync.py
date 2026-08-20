@@ -15,7 +15,7 @@ those sends just need a one-time manual MCP-tab approval; we never widen scope t
 Usage:
   burp-scope-sync.py [<eng>]            # sync the active (or named) engagement's scope into Burp
   burp-scope-sync.py --dry-run [<eng>]  # print the Burp scope JSON, do NOT push (offline)
-Env: VAULT (targets/ root, self-locates to repo), VM_SH (SSH bridge, default /root/vm.sh).
+Env: VAULT (targets/ root, self-locates to repo), VM_SH (SSH bridge, default ~/.torch/vm.sh).
 """
 import base64
 import ipaddress
@@ -28,7 +28,7 @@ import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(SCRIPT_DIR))  # scripts/burp/ -> repo root
 VAULT = os.environ.get("VAULT") or REPO
-VM_SH = os.environ.get("VM_SH", "/root/vm.sh")
+VM_SH = os.environ.get("VM_SH", os.path.expanduser("~/.torch/vm.sh"))
 sys.path.insert(0, os.path.join(REPO, "skills", "hooks"))
 import _engagement  # canonical scope.md parser (same source of truth as scope-guard.py)
 

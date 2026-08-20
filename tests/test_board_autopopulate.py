@@ -66,7 +66,7 @@ def test_seed_then_real_ports():
 def test_extract_assets_nmap_and_rustscan():
     rc = _load("rc", "skills/hooks/recon-capture.py")
     nmap = "Nmap scan report for 10.10.10.10\n22/tcp open  ssh     OpenSSH 8.2p1\n80/tcp open  http    Apache httpd 2.4.41\n"
-    got = rc._extract_assets("bash /root/vm.sh 'nmap -sCV 10.10.10.10'", nmap)
+    got = rc._extract_assets("bash ~/.torch/vm.sh 'nmap -sCV 10.10.10.10'", nmap)
     assert ("10.10.10.10", "22", "ssh") in got and ("10.10.10.10", "80", "http") in got
     rust = "10.10.10.10 -> [22,80,8080]"
     gr = rc._extract_assets("rustscan -a 10.10.10.10 -g", rust)

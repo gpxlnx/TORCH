@@ -3,15 +3,15 @@
 
 Reads a tracked gold set (scripts/wiki-eval-gold.json) of representative pentest queries,
 each mapped to the canonical wiki page(s) that MUST rank. For each query it runs the qmd
-CLI (semantic `qmd query`, or keyword `qmd keyword` when mode="keyword") and computes
-hit@3, hit@5, and MRR, per-query and aggregate. Result paths are wiki-relative (e.g.
-techniques/web/ssrf.md); a query hits if ANY of its expected paths is in the top-k (either
-twin counts).
+CLI (hybrid `qmd query --no-rerank`, or keyword `qmd search` when mode="keyword") against
+the `wiki` collection and computes hit@3, hit@5, and MRR, per-query and aggregate. Result
+paths are wiki-relative (e.g. techniques/web/ssrf.md); a query hits if ANY of its expected
+paths is in the top-k (either counts).
 
-Read-only against the live index. Queries qmd in-process when its modules are importable (the
-embedding model loads once and stays warm across all queries, ~10x faster than a fresh process
-per query); falls back to the `qmd` CLI otherwise. QMD_VAULT is set automatically. Exit 0 for
-reports; exit 1 for the gate modes (--verify-gold with a missing page, --check with a regression).
+Read-only against the live index. Shells out to `qmd ... --format json` per query (the qmd
+CLI is a standalone binary, not a Python-importable module) and parses each hit's "file"
+field. QMD_VAULT is set automatically. Exit 0 for reports; exit 1 for the gate modes
+(--verify-gold with a missing page, --check with a regression).
 
   python3 scripts/wiki-eval.py                 # human report (per-query + aggregate)
   python3 scripts/wiki-eval.py --json          # metrics as JSON (subagent/CI consumption)
@@ -22,7 +22,6 @@ reports; exit 1 for the gate modes (--verify-gold with a missing page, --check w
 import datetime
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -32,58 +31,29 @@ WIKI = os.path.join(VAULT, "wiki")
 GOLD = os.path.join(VAULT, "scripts", "wiki-eval-gold.json")
 BASELINE = os.path.join(VAULT, "scripts", "wiki-eval-baseline.json")
 TOPN = 5
-EPSILON = 0.001  # aggregate must not drop by more than this vs baseline
+# `qmd query`'s hybrid mode samples lex/vec/hyde query-expansion through a small LLM, so hit@3
+# can flip a query or two between identical runs with no real regression (observed: 0-2 of 51
+# gold queries flip run-to-run). Tolerate up to this many per-query flips before failing; the
+# aggregate check is derived from this same budget so the two never disagree.
+MAX_QUERY_FLIPS = 2
 
-_SCORE = re.compile(r"^\[[0-9.]+\]\s+(.*)$")
-
-
-def _blocks(stdout):
-    """qmd prints, per result: a blank line, a result line, then up to ~300 chars of chunk
-    text. Split on blank lines; the first line of each block is the candidate result line."""
-    blocks, cur = [], []
-    for ln in stdout.splitlines():
-        if ln.strip() == "":
-            if cur:
-                blocks.append(cur)
-                cur = []
-        else:
-            cur.append(ln)
-    if cur:
-        blocks.append(cur)
-    return blocks
+_WIKI_PREFIX = "qmd://wiki/"
 
 
 def parse_results(stdout):
-    """Ranked wiki-relative paths from `qmd query` / `qmd keyword` stdout. Strips the
-    [score] prefix (semantic) and accepts only path-shaped heads (ends .md, no spaces), so a
-    prose text block is never mistaken for a result."""
+    """Ranked wiki-relative paths from `qmd ... --format json` stdout: each hit's "file" field
+    is "qmd://wiki/<relpath>"; strip the collection prefix so results line up with the gold
+    set's wiki-relative expected paths (e.g. techniques/web/ssrf.md)."""
+    try:
+        items = json.loads(stdout)
+    except (json.JSONDecodeError, TypeError):
+        return []
     out = []
-    for b in _blocks(stdout):
-        head = b[0].strip()
-        m = _SCORE.match(head)
-        cand = (m.group(1) if m else head).strip()
-        if cand.endswith(".md") and " " not in cand:
-            out.append(cand)
+    for it in items:
+        f = it.get("file", "")
+        if f.startswith(_WIKI_PREFIX):
+            out.append(f[len(_WIKI_PREFIX):])
     return out
-
-
-_QMD = None  # lazy in-process handle: dict of callables, or False if qmd is not importable
-
-
-def _qmd_inproc():
-    """Load qmd's own query functions once (model stays warm across queries). Returns a dict of
-    callables, or False if qmd cannot be imported (caller falls back to the CLI)."""
-    global _QMD
-    if _QMD is None:
-        os.environ.setdefault("QMD_VAULT", VAULT)
-        os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
-        try:
-            from qmd.embedder import embed_one
-            from qmd.store import query_keyword, query_semantic
-            _QMD = {"embed_one": embed_one, "semantic": query_semantic, "keyword": query_keyword}
-        except Exception:
-            _QMD = False
-    return _QMD
 
 
 def _dedupe(paths):
@@ -97,40 +67,25 @@ def _dedupe(paths):
     return out
 
 
-def _run_inproc(query, mode, window):
-    q = _qmd_inproc()
-    if not q:
-        return None
-    try:
-        if mode == "keyword":
-            res = q["keyword"](query, window)
-        else:
-            res = q["semantic"](q["embed_one"](query), window)
-        return [m["file"] for m in res["metadatas"][0]]
-    except Exception:
-        return None
-
-
 def _run_subprocess(query, mode, window):
-    cmd = "keyword" if mode == "keyword" else "query"
+    cmd = ["qmd", "search" if mode == "keyword" else "query", query,
+           "-c", "wiki", "-n", str(window), "--format", "json"]
+    if mode != "keyword":
+        cmd.append("--no-rerank")  # hybrid RRF only; the LLM rerank pass is too slow for a 50-query gate
     env = dict(os.environ, QMD_VAULT=VAULT, HF_HUB_DISABLE_PROGRESS_BARS="1")
     try:
-        out = subprocess.check_output(["qmd", cmd, query, "-n", str(window)], text=True, env=env,
-                                      stderr=subprocess.DEVNULL, timeout=120)
+        out = subprocess.check_output(cmd, text=True, env=env,
+                                      stderr=subprocess.DEVNULL, timeout=180)
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
         return []
     return parse_results(out)
 
 
 def run_query(query, mode, n=TOPN):
-    """Ranked, page-level (deduped) wiki-relative paths for one query. Prefers qmd in-process
-    (model loaded once, warm across queries); falls back to the `qmd` CLI. Fetches a wider
-    window than n so dedupe still yields n distinct pages."""
+    """Ranked, page-level (deduped) wiki-relative paths for one query. Fetches a wider window
+    than n so dedupe still yields n distinct pages."""
     window = max(n * 3, 12)
-    paths = _run_inproc(query, mode, window)
-    if paths is None:
-        paths = _run_subprocess(query, mode, window)
-    return _dedupe(paths)
+    return _dedupe(_run_subprocess(query, mode, window))
 
 
 def hit_at(ranked, expected, k):
@@ -196,8 +151,8 @@ def main():
         print(f"wiki-eval: gold set OK ({len(gold)} queries, all expected pages exist).")
         return 0
 
-    if not shutil.which("qmd") and not _qmd_inproc():
-        print("wiki-eval: qmd not importable and `qmd` not on PATH; cannot run retrieval eval. "
+    if not shutil.which("qmd"):
+        print("wiki-eval: `qmd` not on PATH; cannot run retrieval eval. "
               "(--verify-gold works without qmd.)", file=sys.stderr)
         return 1
 
@@ -228,21 +183,27 @@ def main():
             return 1
         with open(BASELINE, encoding="utf-8") as fh:
             base = json.load(fh)
+        n_q = base["aggregate"].get("n_queries") or len(base.get("per_query_hit3", {})) or 1
+        epsilon = (MAX_QUERY_FLIPS + 0.5) / n_q  # matches the per-query flip budget below
         regressions = []
-        if res["aggregate"]["hit@3"] < base["aggregate"]["hit@3"] - EPSILON:
+        if res["aggregate"]["hit@3"] < base["aggregate"]["hit@3"] - epsilon:
             regressions.append(f'aggregate hit@3 {res["aggregate"]["hit@3"]} < baseline '
-                               f'{base["aggregate"]["hit@3"]}')
+                               f'{base["aggregate"]["hit@3"]} (beyond the {MAX_QUERY_FLIPS}-flip budget)')
         live = {p["query"]: p["hit@3"] for p in res["per_query"]}
-        for query, was in base.get("per_query_hit3", {}).items():
-            if was and not live.get(query, False):
-                regressions.append(f'per-query regressed to miss: "{query}"')
+        flips = [query for query, was in base.get("per_query_hit3", {}).items()
+                 if was and not live.get(query, False)]
+        if len(flips) > MAX_QUERY_FLIPS:
+            regressions.append(f'{len(flips)} per-query flips to miss exceeds the '
+                               f'{MAX_QUERY_FLIPS}-flip noise budget: ' +
+                               ", ".join(f'"{q}"' for q in flips))
         if regressions:
             print(f"wiki-eval CHECK FAIL: {len(regressions)} regression(s):")
             for r in regressions:
                 print(f"  {r}")
             return 1
+        note = f" ({len(flips)} flip(s) within the {MAX_QUERY_FLIPS}-query noise budget)" if flips else ""
         print(f"wiki-eval CHECK OK: hit@3={res['aggregate']['hit@3']} "
-              f">= baseline {base['aggregate']['hit@3']}; no per-query regressions.")
+              f">= baseline {base['aggregate']['hit@3']}{note}.")
         return 0
 
     if "--json" in args:

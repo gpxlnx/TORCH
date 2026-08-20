@@ -8,7 +8,7 @@ send_http1_request over the bridge, and prints a verdict. Scope/RoE fail-closed 
 Usage:
   idor-sweep.py [--dry-run] <eng> <reqfile> [--attacker-auth "Cookie: session=B"]
                 [--id-regex '/orders/(\\d+)'] [--range N] [--port P] [--https|--no-https]
-Env: VAULT (targets/ root), VM_SH (bridge, default /root/vm.sh).
+Env: VAULT (targets/ root), VM_SH (bridge, default ~/.torch/vm.sh).
 """
 import argparse
 import base64
@@ -22,7 +22,7 @@ import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(SCRIPT_DIR))  # scripts/burp/ -> repo root
 VAULT = os.environ.get("VAULT") or REPO
-VM_SH = os.environ.get("VM_SH", "/root/vm.sh")
+VM_SH = os.environ.get("VM_SH", os.path.expanduser("~/.torch/vm.sh"))
 sys.path.insert(0, os.path.join(REPO, "skills", "hooks"))
 import _engagement  # canonical scope.md parser
 

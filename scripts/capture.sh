@@ -33,11 +33,11 @@
 #   burp <eng> <slug> <host> <port> <https> <method> <path> [bodyfile] [tabname]
 #                                                           Burp Repeater request/response grab (via MCP)
 #
-# The VM bridge is $VM_SH (default /root/vm.sh); files cross it base64-in-command (no stdin).
+# The VM bridge is $VM_SH (default ~/.torch/vm.sh); files cross it base64-in-command (no stdin).
 set -euo pipefail
 
 VAULT="${VAULT:-$(cd "$(dirname "$0")/.." && pwd)}"
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 
 usage() {
   cat >&2 <<'U'

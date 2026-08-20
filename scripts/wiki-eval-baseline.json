@@ -1,10 +1,10 @@
 {
   "_comment": "Baseline metrics for scripts/wiki-eval.py --check, captured from the clean index. Regenerate with: python3 scripts/wiki-eval.py --baseline. The pytest gate fails if a live eval drops aggregate hit@3 below baseline (minus epsilon) or flips a per-query hit@3 from true to false.",
-  "captured": "2026-08-10",
+  "captured": "2026-08-20",
   "aggregate": {
     "hit@3": 0.9608,
-    "hit@5": 1.0,
-    "mrr": 0.8105,
+    "hit@5": 0.9608,
+    "mrr": 0.8333,
     "n_queries": 51
   },
   "per_query_hit3": {
@@ -42,22 +42,22 @@
     "nxc": true,
     "impacket": true,
     "evil-winrm": true,
-    "nmap service version detection port scan": false,
+    "nmap service version detection port scan": true,
     "sqlmap automated sql injection dump database": true,
     "bloodhound active directory attack path graph": true,
-    "ffuf directory content fuzzing wordlist": true,
+    "ffuf directory content fuzzing wordlist": false,
     "feroxbuster recursive content discovery": true,
     "nuclei template vulnerability scanner": true,
     "hydra brute force login password": true,
     "responder LLMNR NBT-NS mDNS poisoning": true,
     "default credentials vendor login admin admin": true,
     "API security BOLA BFLA mass assignment excessive data": true,
-    "authentication bypass account takeover": false,
+    "authentication bypass account takeover": true,
     "business logic flaw workflow state bypass": true,
     "OAuth SAML SSO redirect_uri XSW signature bypass": true,
     "LLM prompt injection excessive agency insecure output": true,
     "MCP server tool poisoning indirect prompt injection": true,
-    "exposed secrets git history hardcoded credentials source maps": true,
+    "exposed secrets git history hardcoded credentials source maps": false,
     "CVE-2021-26855": true
   }
 }

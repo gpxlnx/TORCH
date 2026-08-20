@@ -68,7 +68,7 @@ authed flows. Load-bearing requests still go to Burp Repeater when reachable (`S
 
 ```bash
 bash scripts/browser.sh stop                                   # drop the CDP tunnel
-bash /root/vm.sh 'tmux kill-session -t cdpbrowser'             # close the VM browser
+bash ~/.torch/vm.sh 'tmux kill-session -t cdpbrowser'             # close the VM browser
 ```
 
 Setup / recipe rationale + the dead-ends that shaped this: `scripts/browser.sh`, `scripts/shot.py`

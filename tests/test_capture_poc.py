@@ -25,7 +25,7 @@ def test_plain_command_unchanged():
 
 
 def test_unwraps_vm_sh_transport():
-    assert clean("bash /root/vm.sh 'nmap -sV 10.1.1.5'") == "nmap -sV 10.1.1.5"
+    assert clean("bash ~/.torch/vm.sh 'nmap -sV 10.1.1.5'") == "nmap -sV 10.1.1.5"
 
 
 def test_strips_cd_and_echo_banner_noise():
@@ -43,12 +43,12 @@ def test_strips_local_md_read_only():
 
 def test_keeps_remote_cat_as_loot():
     # a remote read (via vm.sh) of a target file is loot, not local-state noise -> survives
-    assert clean("bash /root/vm.sh 'cat /etc/shadow'") == "cat /etc/shadow"
+    assert clean("bash ~/.torch/vm.sh 'cat /etc/shadow'") == "cat /etc/shadow"
 
 
 def test_echo_feeding_a_pipe_is_kept_by_its_sink():
     # `echo <x> | base64 -d | nc ...` is an nc command, not an echo banner (var b64 undecodable)
-    out = clean('bash /root/vm.sh "echo $P | base64 -d | nc 10.1.1.5 1337"')
+    out = clean('bash ~/.torch/vm.sh "echo $P | base64 -d | nc 10.1.1.5 1337"')
     assert out == "echo $P | base64 -d | nc 10.1.1.5 1337"
 
 
@@ -65,11 +65,11 @@ def test_splits_chain_keeps_meaningful_only():
 
 def test_compound_for_loop_kept_intact():
     # a spray/brute loop is ONE command; its internal `;` must not be split across lines
-    out = clean('bash /root/vm.sh "for u in a b; do sshpass -p x ssh $u@10.1.1.5 id; done"')
+    out = clean('bash ~/.torch/vm.sh "for u in a b; do sshpass -p x ssh $u@10.1.1.5 id; done"')
     assert out == "for u in a b; do sshpass -p x ssh $u@10.1.1.5 id; done"
 
 
 def test_semicolon_inside_quotes_not_split():
     # a `;` inside a quoted SQLi payload must not split the command
-    out = clean("bash /root/vm.sh \"sqlmap -u 'http://h/?q=1;DROP' --batch\"")
+    out = clean("bash ~/.torch/vm.sh \"sqlmap -u 'http://h/?q=1;DROP' --batch\"")
     assert out == "sqlmap -u 'http://h/?q=1;DROP' --batch"

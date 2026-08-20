@@ -9,7 +9,7 @@
 # Runs ON the Kali box as root (uses `sudo -u <seatuser>` for the X/session bits). Idempotent.
 #   On the box:      sudo bash setup/burp/disable-lock.sh
 #   From the vault:  base64 -w0 setup/burp/disable-lock.sh | \
-#                      xargs -I{} bash /root/vm.sh 'echo {} | base64 -d > /tmp/disable-lock.sh; bash /tmp/disable-lock.sh'
+#                      xargs -I{} bash ~/.torch/vm.sh 'echo {} | base64 -d > /tmp/disable-lock.sh; bash /tmp/disable-lock.sh'
 set -u
 U=$(who | awk '/\(:[0-9]/{print $1; exit}'); U=${U:-kali}
 D=$(who | grep -oE '\(:[0-9]+' | head -1 | tr -d '('); D=${D:-:0}

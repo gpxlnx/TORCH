@@ -21,10 +21,10 @@ def test_no_time_based_autortl_even_after_long_drift(vault):
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
     dp = eng / ".last-direction"; dp.write_text("")
     old = time.time() - 360; os.utime(dp, (old, old))      # 6 min since direction
-    o1 = _run("bash /root/vm.sh 'curl http://10.0.0.5/'", env)
+    o1 = _run("bash ~/.torch/vm.sh 'curl http://10.0.0.5/'", env)
     assert "spinning" not in o1.get("additionalContext", "").lower()
     assert "redteamlead" not in o1.get("additionalContext", "").lower()
-    o2 = _run("bash /root/vm.sh 'curl http://10.0.0.5/'", env)
+    o2 = _run("bash ~/.torch/vm.sh 'curl http://10.0.0.5/'", env)
     assert "spinning" not in o2.get("additionalContext", "").lower()
     assert "redteamlead" not in o2.get("additionalContext", "").lower()
 
@@ -32,5 +32,5 @@ def test_autortl_silent_when_recent_direction(vault):
     eng = vault / "targets" / "acme"; _ctf(eng)
     env = dict(os.environ, CLAUDEBRAIN_VAULT=str(vault))
     (eng / ".last-direction").write_text("")               # just now
-    o = _run("bash /root/vm.sh 'curl http://10.0.0.5/'", env)
+    o = _run("bash ~/.torch/vm.sh 'curl http://10.0.0.5/'", env)
     assert "redteamlead" not in o.get("additionalContext", "").lower()

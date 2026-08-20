@@ -14,7 +14,7 @@
 set -uo pipefail
 
 VAULT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 PORT=9222
 PROFILE="cdp-visible"
 SESSION="cdpbrowser"

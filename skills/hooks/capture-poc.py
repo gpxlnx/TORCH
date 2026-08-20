@@ -3,7 +3,7 @@
 targets/<eng>/poc/cmdlog/<tool>.md, grouped by the primary binary, so the operator has a readable,
 per-tool record of exactly what ran and what came back - without any manual capture step.
 
-Example: `bash /root/vm.sh 'nmap -sCV 10.1.1.5'` appends to poc/cmdlog/nmap.md:
+Example: `bash ~/.torch/vm.sh 'nmap -sCV 10.1.1.5'` appends to poc/cmdlog/nmap.md:
 
     ## 2026-08-10 09:06:12
 
@@ -67,7 +67,7 @@ def _response_text(data):
 
 
 def _unwrap(cmd):
-    """The INNER command of a `bash /root/vm.sh '<inner>'` (or vm-rsh/win-rsh) transport, so the
+    """The INNER command of a `bash ~/.torch/vm.sh '<inner>'` (or vm-rsh/win-rsh) transport, so the
     entry is grouped by the real tool (nmap) not the wrapper (bash)."""
     m = re.search(r"(?:vm\.sh|vm-rsh\.sh|win-rsh\.sh)\b[^'\"]*['\"](.+)['\"]\s*$", cmd or "", re.S)
     return m.group(1) if m else (cmd or "")

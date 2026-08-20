@@ -16,7 +16,7 @@
 #   burp-transport.sh --dry-run  # offline: never dial the bridge (native-or-down only)
 set -uo pipefail
 VAULT="${VAULT:-$(cd "$(dirname "$0")/../.." && pwd)}"
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 DRY=0; [ "${1:-}" = "--dry-run" ] && DRY=1
 
 if [ "${BURP_NATIVE:-}" = "1" ]; then

@@ -39,7 +39,7 @@ Tech stack signals:
 
 ## Methodology
 0. **Prefer a vetted module over a hand-rolled exploit.** For a known CVE/product, check Metasploit
-   FIRST: `bash /root/vm.sh "msfconsole -q -x 'search <cve-or-product>; exit'"`. If a module exists,
+   FIRST: `bash ~/.torch/vm.sh "msfconsole -q -x 'search <cve-or-product>; exit'"`. If a module exists,
    run it non-interactively (`use <mod>; set RHOSTS <ip>; set LHOST <vpn-ip>; run -z; sessions -l;
    exit`) rather than writing bespoke exploit code - faster, more reliable, and the exploit logic
    lives in the vetted module. Hand-roll only when no module fits.

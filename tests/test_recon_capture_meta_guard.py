@@ -29,7 +29,7 @@ META_COMMANDS = [
 ]
 
 REAL_RECON_COMMANDS = [
-    "bash /root/vm.sh 'nxc smb 10.10.10.5 -u a -p b'",
+    "bash ~/.torch/vm.sh 'nxc smb 10.10.10.5 -u a -p b'",
     "nuclei -u http://target -o out.txt",
     "curl -s http://target/login.php",
     "ffuf -u http://t/FUZZ -w list.txt",

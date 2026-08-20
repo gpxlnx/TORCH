@@ -43,7 +43,7 @@ if [ "$DRY" = "1" ]; then
   exit 0
 fi
 
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 OUT="$(bash "$VM_SH" "$REMOTE")"
 printf '%s\n' "$OUT"
 if printf '%s' "$OUT" | grep -q 'reused=1'; then
