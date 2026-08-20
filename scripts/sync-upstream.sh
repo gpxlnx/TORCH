@@ -51,3 +51,9 @@ echo "== pushing customize =="
 git push origin customize --force-with-lease || exit 1
 
 echo "done: main mirrors upstream, customize rebased and pushed."
+
+if [ -f "$VAULT/scripts/campaign-doctor.py" ]; then
+  echo ""
+  echo "== campaign-health check (scripts/hooks/skills wiring) =="
+  python3 "$VAULT/scripts/campaign-doctor.py" || echo "^ fix above, then re-run or apply manually (setup/install-skills.sh, setup/install-hooks.sh)."
+fi
