@@ -14,11 +14,12 @@ fi
 echo "Vault: $VAULT"
 echo "Machine: $(hostname)"
 
-# 1. Create ~/.claude/CLAUDE.md include
+# 1. ~/.claude/CLAUDE.md: NOT touched. TORCH/CLAUDE.md is picked up automatically
+# by Claude Code as the project CLAUDE.md whenever you run `claude` from inside
+# the vault -- no global include needed, and a global write would clobber any
+# personal ~/.claude/CLAUDE.md used for unrelated projects.
 CLAUDE_DIR="$HOME/.claude"
 mkdir -p "$CLAUDE_DIR"
-echo "@$VAULT/CLAUDE.md" > "$CLAUDE_DIR/CLAUDE.md"
-echo "[ok] Created $CLAUDE_DIR/CLAUDE.md -> $VAULT/CLAUDE.md"
 
 # 2. Symlink vault hooks into ~/.claude/vault-hooks
 # Owned by install-hooks.sh (step 3b): it clears a stale REAL directory at the

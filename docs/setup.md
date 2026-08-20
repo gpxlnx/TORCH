@@ -1,6 +1,8 @@
 # Vault Setup
 
-**New machine:** run `bash setup/bootstrap.sh` from the vault root. This creates the `~/.claude/CLAUDE.md` include, copies obsidian skills, installs bun + qmd, installs the four official Claude plugins (code-review, frontend-design, skill-creator, claude-md-management), installs caveman and ponytail, and registers the `wiki-search` and `caveman-shrink` MCP servers. After setup, restart Claude Code and run `qmd update` to build the local search index.
+**New machine:** run `bash setup/bootstrap.sh` from the vault root. This copies obsidian skills, installs bun + qmd, installs the four official Claude plugins (code-review, frontend-design, skill-creator, claude-md-management), installs caveman and ponytail, and registers the `wiki-search` and `caveman-shrink` MCP servers. After setup, restart Claude Code and run `qmd update` to build the local search index.
+
+Bootstrap does **not** touch `~/.claude/CLAUDE.md` -- it never did a merge, only a blind overwrite, so a personal global CLAUDE.md used for other projects would get destroyed. TORCH's `CLAUDE.md` at the vault root is picked up automatically as the project CLAUDE.md whenever `claude` runs from inside the vault; no global include is required. If you want TORCH's schema active from other working directories too, add `@<vault-path>/CLAUDE.md` to your own `~/.claude/CLAUDE.md` by hand (append, don't overwrite).
 
 **Caveman (both machines):** Output compression skill -- cuts ~65% of Claude output tokens with no accuracy loss. Requires Node >=18. Bootstrap handles install automatically; to install manually: `curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash`. Trigger per session with `/caveman`, or say "talk like caveman". Source: https://github.com/JuliusBrussee/caveman
 
