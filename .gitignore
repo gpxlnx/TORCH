@@ -50,6 +50,9 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 
+# --- Plugin/tooling caches (not TORCH content) -------------------------------
+.agents/
+
 # --- OS cruft ---------------------------------------------------------------
 .DS_Store
 Thumbs.db
