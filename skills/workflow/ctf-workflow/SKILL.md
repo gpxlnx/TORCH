@@ -50,7 +50,7 @@ ctf-box method for that vuln class) - read it before acting.
    trap) and it has no session management, while
    meterpreter also carries `post/multi/recon`/`local_exploit_suggester` escalation modules and
    built-in file transfer. (b) **Before picking the LPORT, test target egress on common ports
-   (80/443/53)** - high ports like 4444 are frequently filtered, so pick an egress-allowed LPORT.
+   (80/443/53)** - high ports like 4444 are frequently filtered, so pick an egress-allowed LPORT. (`scripts/vm-handler.sh <eng> <lhost>` picks a free egress port and launches the handler for you, printing the LPORT.)
    (c) If you did fall back to raw nc, **stabilize it immediately** with `bash
    scripts/vm-stabilize.sh --win shell <eng>` (pty + job control + window size). (d) Then record the
    foothold (step 6) and drive with `vm-rsh`. An unstabilized nc shell (no job control, mid-line

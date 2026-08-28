@@ -34,7 +34,7 @@ exploitability test beats a blind fire. Cheatsheet: Search and Selection + Optio
 `shell_reverse_tcp` when meterpreter is blocked or unstable, routine on hardened Windows/EDR.
 Delivery via `msfvenom` (ELF/EXE/ASPX/PHP, cheatsheet's MSFVenom section has every format).
 Egress-test the LPORT (80/443/53 before 4444). Background the handler correctly:
-`set ExitOnSession false; run -j` so it keeps catching new sessions.
+`set ExitOnSession false; run -j` so it keeps catching new sessions. On the VM, `scripts/vm-handler.sh <eng> <lhost> [payload]` automates the LPORT choice: it reads the VM's listeners and picks the first FREE egress-friendly port (80/443/53/8000/8080), so the handler never fails to bind on a taken port nor silently picks a filtered high port; it launches in the engagement's `msf` tmux window and prints the LPORT to build the payload with.
 
 ## Sessions / post-ex
 `sessions -i` to interact, `run post/multi/recon/local_exploit_suggester` is the privesc reflex
