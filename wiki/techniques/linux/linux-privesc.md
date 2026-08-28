@@ -1937,3 +1937,24 @@ id      # uid=0
 - Find candidate sessions: `ls -la /run/screen/S-root` (or `/var/run/screen/`), `ps -eo user,cmd | grep -i screen`.
 
 <!-- promoted-slug: screen-root-session-attach -->
+
+## Root cron `cp` by-name: symlink source = read, dest = write
+
+A root cron that copies specific files **by name** (not a wildcard) from a user-writable directory with a plain `cp` (e.g. `cp ~user/reports/report1 ~user/backups/report1`) is a dual arbitrary-file primitive, because plain `cp` dereferences symlinks at both ends. If both dirs are writable by the user (replace the named file even when the file itself is not writable but its directory is):
+
+- **Arbitrary root READ:** make the SOURCE `reportN` a symlink to a root-only file. `cp` reads it as root and writes the copy world-readable in the destination.
+  ```sh
+  ln -sf /root/root.txt ~/reports/report1   # or /etc/shadow
+  # after next cron tick:
+  cat ~/backups/report1
+  ```
+- **Arbitrary root WRITE -> shell:** make the DESTINATION `reportN` a symlink to a root-owned target and control the source file's content. `cp` follows the dest symlink and writes your content as root.
+  ```sh
+  echo "$(cat mykey.pub)" > ~/reports/report1
+  ln -sf /root/.ssh/authorized_keys ~/backups/report1
+  # after next cron tick: ssh -i mykey root@host
+  ```
+
+Gotcha: a by-name copy ignores extra symlinks with new names - you must replace one of the exact filenames the cron references. Confirm the interval by diffing the destination file mtimes against the box clock.
+
+<!-- promoted-slug: cron-cp-byname-symlink-deref -->
