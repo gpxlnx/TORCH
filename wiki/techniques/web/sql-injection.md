@@ -1115,3 +1115,31 @@ When `sleep()`, `or 1=1`, and named SQL functions are all WAF-blocked, send pure
 Confirm the WAF gap explicitly: send both the arithmetic payload and a `sleep()`/`or 1=1` payload side by side and diff which one gets edge-blocked versus reaches the database.
 
 <!-- promoted-slug: a-pure-arithmetic-payload-with-no-function-name-or-boolean-k -->
+
+## SQLi hidden inside an opaque application token (decode it first)
+
+When an id/reference arrives as an opaque token (a random-looking cookie/param, a Hashids/Sqids
+string, base58/base62), do NOT trust that strict format validation makes it safe. Decode it first,
+the injectable field is often a plaintext value INSIDE it.
+
+Tell that a token is a reversible encoding, not a random handle: a fixed prefix shared across all
+issued tokens (that prefix is the encoding of a constant structural part). E.g. every token began
+with the same 16 chars because it was `base58("booking_id:")` + the encoded id.
+
+- Decode across charsets: base64/base62/**base58** (bitcoin alphabet: no `0OIl`), hex, Sqids/Hashids.
+  A structured plaintext like `booking_id:1048291` or `type:value` confirms it.
+- The raw-token endpoint can look bulletproof - strict 400 "bad request" on any tampered char, 404
+  on a valid-but-unknown id - because the app decodes, checks the structure, THEN uses the inner
+  value in SQL unsanitised. Re-encode a payload in the inner field and the validator passes it:
+
+```
+# app: SELECT room_num,days FROM bookings WHERE id='<decoded value>'
+token = base58("booking_id:" + "0' UNION SELECT username,password FROM email_access-- -")
+GET /api/booking-info?booking_key=<token>     # -> creds land in the JSON fields
+```
+
+Same idea for any wrapper that decodes then queries: JWT claim used in SQL, a signed-but-not-encrypted
+cookie field, an encoded GraphQL node id. sqlmap won't find it (it fuzzes the raw token, which 400s);
+you must wrap each payload in the encoding first (custom `--eval` / a tamper script, or by hand).
+
+<!-- promoted-slug: sqli-via-encoded-token -->
