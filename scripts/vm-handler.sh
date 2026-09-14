@@ -9,7 +9,7 @@
 #
 # Usage: bash vm-handler.sh <eng> <lhost> [payload]      (payload default: cmd/unix/reverse_bash)
 #        bash vm-handler.sh --selftest
-# Env:   EGRESS_PORTS (default "80 443 53 8000 8080"), VM_SH (default /root/vm.sh)
+# Env:   EGRESS_PORTS (default "80 443 53 8000 8080"), VM_SH (default ~/.torch/vm.sh)
 set -uo pipefail
 
 EGRESS_PORTS="${EGRESS_PORTS:-80 443 53 8000 8080}"
@@ -33,7 +33,7 @@ if [ "${1:-}" = "--selftest" ]; then
 fi
 
 ENG="${1:?need <eng>}"; LHOST="${2:?need <lhost>}"; PAYLOAD="${3:-cmd/unix/reverse_bash}"
-VM_SH="${VM_SH:-/root/vm.sh}"
+VM_SH="${VM_SH:-$HOME/.torch/vm.sh}"
 VAULT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # ports already listening on the VM (any interface) -> the bound set
