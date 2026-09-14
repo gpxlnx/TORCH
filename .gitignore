@@ -53,3 +53,6 @@ __pycache__/
 # --- OS cruft ---------------------------------------------------------------
 .DS_Store
 Thumbs.db
+
+# --- local hook toggles (per-machine kill-switch, never ship) ---
+skills/hooks/.enforce-off

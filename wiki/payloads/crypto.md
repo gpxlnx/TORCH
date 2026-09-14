@@ -54,3 +54,21 @@ alg:none   weak HS256 secret (hashcat -m 16500)   RS256->HS256 confusion (sign w
 
 ## Real-world
 Padding-oracle on a "remember me"/state cookie -> decrypt+forge it; ECB cut-and-paste and CBC bit-flip on home-rolled token crypto; hash length extension on `H(secret||data)` MACs - all recurring real findings on custom auth.
+
+## XOR encryption oracle (known-plaintext keystream recovery)
+
+When you can feed chosen input to an "encryptor" that XORs with a fixed repeating keystream then encodes it (base64/hex) - a sudo/SUID tool, a web endpoint, a leaked script - recover the key with one known-plaintext call:
+
+1. Submit a known plaintext at least as long as the target ciphertext (e.g. 16x `A` = `0x41`).
+2. Decode the returned blob; `keystream[i] = out[i] XOR 0x41`.
+3. Decode the target ciphertext and `plain[i] = target[i] XOR keystream[i]`.
+
+```python
+import base64
+ks = bytes(b ^ 0x41 for b in base64.b64decode(oracle_out_for_16A))
+secret = bytes(base64.b64decode(target_ct)[i] ^ ks[i] for i in range(len(target_ct)))
+```
+
+Distinct from keystream **reuse** (two ciphertexts under the same key, crib-drag): here one oracle call under your control yields the key directly.
+
+<!-- promoted-slug: xor-encryption-oracle-known-plaintext -->
