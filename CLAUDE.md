@@ -188,7 +188,7 @@ TORCH/
 ├── targets/    <- engagements (PRIVATE, git-ignored; ALL client data lives here)
 ├── wiki/       <- knowledge base: techniques/ payloads/ tools/ cheatsheets/ (+ index, moc)
 ├── session/    <- hot.md (startup cache) · log.md (audit) · memory.md (editorial)
-├── docs/       <- workflows, page-types, auto-triggers, virtual-machine, setup, sharing, conventions, layout
+├── docs/       <- workflows, page-types, auto-triggers, virtual-machine, new-machine-checklist, setup, sharing, conventions, layout
 ├── scripts/    <- automation (next_move, status, capture.sh, shot.py, lint-*, wiki-*, vm-*, burp/, ...)
 ├── setup/      <- bootstrap.sh, install-hooks.sh, install-skills.sh, new-engagement.sh, templates/, burp/
 ├── skills/     <- hunt/ (hunt-* + hunt-core) · workflow/ (triage/evidence/coverage/ingest/ctf-box/learn/walkthrough/...) · burp/ · wiki/ research/ disclosure/ code-review/ + hooks/
