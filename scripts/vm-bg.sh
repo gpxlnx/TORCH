@@ -25,7 +25,7 @@ fi
 # launch: run CMD inside the tmux window, line-buffered, to the /dev/shm log
 REMOTE="tmux has-session -t '$SESSION' 2>/dev/null || tmux new-session -d -s '$SESSION'; \
 tmux list-windows -t '$SESSION' -F '#{window_name}' | grep -qx '$WIN' || tmux new-window -t '$SESSION' -n '$WIN'; \
-tmux send-keys -t '$SESSION:$WIN' \"stdbuf -oL -eL $CMD > $LOG 2>&1\" Enter; echo 'launched -> $LOG (read: vm-bg.sh --read $ENG $WIN)'"
+tmux send-keys -t '$SESSION:$WIN' \"( stdbuf -oL -eL $CMD ) > $LOG 2>&1\" Enter; echo 'launched -> $LOG (read: vm-bg.sh --read $ENG $WIN)'"
 if [ "$DRY" = 1 ]; then
   printf 'DRY-RUN plan:\n  log: %s\n  stage: run in tmux %s:%s via stdbuf, redirect to /dev/shm\n  remote: %s\n' "$LOG" "$SESSION" "$WIN" "$REMOTE"
   exit 0
