@@ -111,6 +111,17 @@ fi
 
 # Kali VM bridge: device-local, no root needed. Place vm.sh (no secrets) unconditionally;
 # creds.txt holds the actual VM IP/user/password so it is never auto-generated.
+if ! command -v sshpass >/dev/null 2>&1; then
+  echo "Installing sshpass (required by vm.sh / browser.sh to reach the Kali VM)..."
+  if command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get install -y sshpass && echo "[ok] sshpass installed" \
+      || echo "[warn] sshpass install failed -- install manually: sudo apt-get install -y sshpass"
+  else
+    echo "[warn] no apt-get -- install sshpass manually for your package manager"
+  fi
+else
+  echo "[ok] sshpass already installed"
+fi
 mkdir -p "$HOME/.torch"
 if [ ! -f "$HOME/.torch/vm.sh" ]; then
   cp "$SCRIPT_DIR/vm.sh" "$HOME/.torch/vm.sh"

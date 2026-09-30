@@ -22,6 +22,8 @@
 # no persistent state (chain with ; / &&); fails fast on unreachable (ConnectTimeout).
 set -euo pipefail
 
+command -v sshpass >/dev/null || { echo "vm.sh: sshpass missing - install: sudo apt-get install -y sshpass" >&2; exit 3; }
+
 CREDS="${VM_CREDS:-$HOME/.torch/creds.txt}"
 [ -r "$CREDS" ] || { echo "vm.sh: cannot read $CREDS" >&2; exit 2; }
 

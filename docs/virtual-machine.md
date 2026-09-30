@@ -8,6 +8,12 @@ linpeas, chromium), and is reached over SSH by a one-line driver, `vm.sh`.
 Claude (WSL) --ssh (vm.sh)--> Kali VM --VPN--> targets
 ```
 
+## Prerequisites (new machine / new VM)
+
+- **This host** needs `sshpass` (`bash setup/bootstrap.sh` installs it via apt; manually: `sudo apt-get install -y sshpass`). Without it, `vm.sh` fails fast with a clear error.
+- **The Kali VM** needs `PasswordAuthentication yes` in `sshd_config` (default on the official Kali VM/VMware/VirtualBox images) since `vm.sh` authenticates with `sshpass -p`, not a key. A hardened/custom Kali install may need this re-enabled.
+- `vm-provision.sh` installs tooling via `sudo apt-get` on the VM; the default `kali` user on official images has passwordless sudo. A different/locked-down user needs `NOPASSWD` sudo for provisioning to actually install anything (it fails open per-package, so a sudo prompt it can't answer just shows up as `MISS` for everything, not a hang or a hard error).
+
 ## Configure it: one file, `~/.torch/creds.txt`
 
 IP, username, and password all live in `~/.torch/creds.txt` (git-ignored, device-local,
