@@ -15,9 +15,9 @@ you where to go and what to STOP. On-demand and token-light: it costs nothing un
 - The board/Killchain is empty and you need direction from the raw tech stack / code / JS.
 - The campaign driver printed "consider Skill(redteamlead)".
 
-## How it runs (one fresh subagent, sonnet-4-6)
+## How it runs (one fresh subagent, opus)
 `ENG=$(cat targets/active.md)` -> the engagement dir is `targets/$ENG/`.
-Dispatch ONE subagent via the Agent tool with `model: sonnet-4-6` (a fresh, independent context; it is NOT
+Dispatch ONE subagent via the Agent tool with `model: opus` (a fresh, independent context; it is NOT
 invested in the approach you have been hammering, which is the point). Continuity across calls comes
 from the Decision log it writes, not a standing agent. Give it this prompt (fill <ENG>, <OBSTACLE>):
 
