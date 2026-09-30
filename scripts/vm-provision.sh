@@ -61,10 +61,26 @@ if ! command -v pwncat-cs >/dev/null 2>&1; then
     || { pipx install pwncat-cs >/dev/null 2>&1 && echo "  pwncat-cs (pipx)" \
     || { pip install --user --break-system-packages -q pwncat-cs >/dev/null 2>&1 && echo "  pwncat-cs (pip --user)" \
     || echo "  MISS pwncat-cs (raw nc + vm-stabilize.sh is the fallback)"; }; }
+  # pipx/pip --user land in ~/.local/bin, invisible to vm.sh's non-interactive, non-login PATH -- symlink it in.
+  [ -x "\$HOME/.local/bin/pwncat-cs" ] && [ ! -e /usr/local/bin/pwncat-cs ] && \$SUDO ln -sf "\$HOME/.local/bin/pwncat-cs" /usr/local/bin/pwncat-cs
 fi
 if ! command -v jwt_tool >/dev/null 2>&1 && [ ! -x /usr/local/bin/jwt_tool ]; then
   [ -d /opt/jwt_tool ] || \$SUDO git clone -q https://github.com/ticarpi/jwt_tool /opt/jwt_tool 2>/dev/null
   [ -f /opt/jwt_tool/jwt_tool.py ] && \$SUDO ln -sf /opt/jwt_tool/jwt_tool.py /usr/local/bin/jwt_tool && echo "  jwt_tool (git)" || echo "  MISS jwt_tool"
+fi
+# gau (getallurls): not apt-packaged on Kali -- build from source. -buildvcs=false because
+# /opt/gau is cloned as root then built as the invoking user (git refuses VCS ops across
+# that ownership mismatch otherwise).
+if ! command -v gau >/dev/null 2>&1; then
+  command -v go >/dev/null 2>&1 || \$SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq golang-go >/dev/null 2>&1
+  if command -v go >/dev/null 2>&1; then
+    [ -d /opt/gau ] || \$SUDO git clone -q https://github.com/lc/gau /opt/gau >/dev/null 2>&1
+    ( cd /opt/gau/cmd/gau 2>/dev/null && go build -buildvcs=false -o /tmp/gau-bin . ) \
+      && \$SUDO mv /tmp/gau-bin /usr/local/bin/gau && \$SUDO chmod +x /usr/local/bin/gau \
+      && echo "  gau (git+go build)" || echo "  MISS gau (git+go build failed)"
+  else
+    echo "  MISS gau (no go toolchain)"
+  fi
 fi
 # /opt/arsenal: canonical on-VM home for OUR helpers + fetched offensive tools. World-writable
 # so the base64 push (below, from the vault side) and the model can drop scripts here.
